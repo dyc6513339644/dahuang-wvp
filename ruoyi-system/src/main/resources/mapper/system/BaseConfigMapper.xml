@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.BaseConfigMapper">
+    
+    <resultMap type="BaseConfig" id="BaseConfigResult">
+        <result property="id"    column="id"    />
+        <result property="menuName"    column="menu_name"    />
+        <result property="configType"    column="config_type"    />
+        <result property="inputType"    column="input_type"    />
+        <result property="configTabId"    column="config_tab_id"    />
+        <result property="parameter"    column="parameter"    />
+        <result property="uploadType"    column="upload_type"    />
+        <result property="required"    column="required"    />
+        <result property="width"    column="width"    />
+        <result property="high"    column="high"    />
+        <result property="defaultValue"    column="default_value"    />
+        <result property="configInfo"    column="config_info"    />
+        <result property="configDesc"    column="config_desc"    />
+        <result property="sort"    column="sort"    />
+        <result property="configStatus"    column="config_status"    />
+    </resultMap>
+
+    <sql id="selectBaseConfigVo">
+        select id, menu_name, config_type, input_type, config_tab_id, parameter, upload_type, required, width, high, default_value, config_info, config_desc, sort, config_status from sys_base_config
+    </sql>
+
+    <select id="selectBaseConfigList" parameterType="BaseConfig" resultMap="BaseConfigResult">
+        <include refid="selectBaseConfigVo"/>
+        <where>  
+            <if test="menuName != null  and menuName != ''"> and menu_name like concat('%', #{menuName}, '%')</if>
+            <if test="configType != null  and configType != ''"> and config_type = #{configType}</if>
+            <if test="inputType != null  and inputType != ''"> and input_type = #{inputType}</if>
+            <if test="configTabId != null "> and config_tab_id = #{configTabId}</if>
+            <if test="parameter != null  and parameter != ''"> and parameter = #{parameter}</if>
+            <if test="uploadType != null "> and upload_type = #{uploadType}</if>
+            <if test="required != null  and required != ''"> and required = #{required}</if>
+            <if test="width != null "> and width = #{width}</if>
+            <if test="high != null "> and high = #{high}</if>
+            <if test="defaultValue != null  and defaultValue != ''"> and default_value = #{defaultValue}</if>
+            <if test="configInfo != null  and configInfo != ''"> and config_info = #{configInfo}</if>
+            <if test="configDesc != null  and configDesc != ''"> and config_desc = #{configDesc}</if>
+            <if test="sort != null "> and sort = #{sort}</if>
+            <if test="configStatus != null "> and config_status = #{configStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectBaseConfigById" parameterType="Integer" resultMap="BaseConfigResult">
+        <include refid="selectBaseConfigVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertBaseConfig" parameterType="BaseConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_base_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">menu_name,</if>
+            <if test="configType != null and configType != ''">config_type,</if>
+            <if test="inputType != null and inputType != ''">input_type,</if>
+            <if test="configTabId != null">config_tab_id,</if>
+            <if test="parameter != null and parameter != ''">parameter,</if>
+            <if test="uploadType != null">upload_type,</if>
+            <if test="required != null and required != ''">required,</if>
+            <if test="width != null">width,</if>
+            <if test="high != null">high,</if>
+            <if test="defaultValue != null and defaultValue != ''">default_value,</if>
+            <if test="configInfo != null and configInfo != ''">config_info,</if>
+            <if test="configDesc != null and configDesc != ''">config_desc,</if>
+            <if test="sort != null">sort,</if>
+            <if test="configStatus != null">config_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">#{menuName},</if>
+            <if test="configType != null and configType != ''">#{configType},</if>
+            <if test="inputType != null and inputType != ''">#{inputType},</if>
+            <if test="configTabId != null">#{configTabId},</if>
+            <if test="parameter != null and parameter != ''">#{parameter},</if>
+            <if test="uploadType != null">#{uploadType},</if>
+            <if test="required != null and required != ''">#{required},</if>
+            <if test="width != null">#{width},</if>
+            <if test="high != null">#{high},</if>
+            <if test="defaultValue != null and defaultValue != ''">#{defaultValue},</if>
+            <if test="configInfo != null and configInfo != ''">#{configInfo},</if>
+            <if test="configDesc != null and configDesc != ''">#{configDesc},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="configStatus != null">#{configStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBaseConfig" parameterType="BaseConfig">
+        update sys_base_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">menu_name = #{menuName},</if>
+            <if test="configType != null and configType != ''">config_type = #{configType},</if>
+            <if test="inputType != null and inputType != ''">input_type = #{inputType},</if>
+            <if test="configTabId != null">config_tab_id = #{configTabId},</if>
+            <if test="parameter != null and parameter != ''">parameter = #{parameter},</if>
+            <if test="uploadType != null">upload_type = #{uploadType},</if>
+            <if test="required != null and required != ''">required = #{required},</if>
+            <if test="width != null">width = #{width},</if>
+            <if test="high != null">high = #{high},</if>
+            <if test="defaultValue != null and defaultValue != ''">default_value = #{defaultValue},</if>
+            <if test="configInfo != null and configInfo != ''">config_info = #{configInfo},</if>
+            <if test="configDesc != null and configDesc != ''">config_desc = #{configDesc},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="configStatus != null">config_status = #{configStatus},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBaseConfigById" parameterType="Integer">
+        delete from sys_base_config where id = #{id}
+    </delete>
+
+    <delete id="deleteBaseConfigByIds" parameterType="String">
+        delete from sys_base_config where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

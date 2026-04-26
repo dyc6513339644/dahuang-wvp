@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.BaseConfigTabMapper">
+    
+    <resultMap type="BaseConfigTab" id="BaseConfigTabResult">
+        <result property="id"    column="id"    />
+        <result property="pid"    column="pid"    />
+        <result property="title"    column="title"    />
+        <result property="status"    column="status"    />
+        <result property="info"    column="info"    />
+        <result property="sort"    column="sort"    />
+    </resultMap>
+
+    <sql id="selectBaseConfigTabVo">
+        select id, pid, title, status, info, sort from sys_base_config_tab
+    </sql>
+
+    <select id="selectBaseConfigTabList" parameterType="BaseConfigTab" resultMap="BaseConfigTabResult">
+        <include refid="selectBaseConfigTabVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="pid != null "> and pid = #{pid}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="info != null "> and info = #{info}</if>
+            <if test="sort != null "> and sort = #{sort}</if>
+        </where>
+    </select>
+    
+    <select id="selectBaseConfigTabById" parameterType="Long" resultMap="BaseConfigTabResult">
+        <include refid="selectBaseConfigTabVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertBaseConfigTab" parameterType="BaseConfigTab" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_base_config_tab
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pid != null">pid,</if>
+            <if test="title != null">title,</if>
+            <if test="status != null">status,</if>
+            <if test="info != null">info,</if>
+            <if test="sort != null">sort,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pid != null">#{pid},</if>
+            <if test="title != null">#{title},</if>
+            <if test="status != null">#{status},</if>
+            <if test="info != null">#{info},</if>
+            <if test="sort != null">#{sort},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBaseConfigTab" parameterType="BaseConfigTab">
+        update sys_base_config_tab
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pid != null">pid = #{pid},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="info != null">info = #{info},</if>
+            <if test="sort != null">sort = #{sort},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBaseConfigTabById" parameterType="Long">
+        delete from sys_base_config_tab where id = #{id}
+    </delete>
+
+    <delete id="deleteBaseConfigTabByIds" parameterType="String">
+        delete from sys_base_config_tab where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
