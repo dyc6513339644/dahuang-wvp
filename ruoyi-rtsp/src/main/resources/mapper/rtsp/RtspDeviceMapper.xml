@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.rtsp.mapper.RtspDeviceMapper">
+
+    <resultMap type="RtspDevice" id="RtspDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="ip"    column="ip"    />
+        <result property="name"    column="name"    />
+        <result property="userName"    column="user_name"    />
+        <result property="password"    column="password"    />
+        <result property="channel"    column="channel"    />
+        <result property="playType"    column="play_type"    />
+        <result property="url"    column="url"    />
+        <result property="streamId"    column="stream_id"    />
+        <result property="easyNTSUrl"    column="easy_NTS_url"    />
+        <result property="firm"    column="firm"    />
+        <result property="lat"    column="lat"    />
+        <result property="lng"    column="lng"    />
+        <result property="addressMap"    column="address_map"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectRtspDeviceVo">
+        select r.id,
+               r.dept_id,
+               r.ip,
+               r.name,
+               r.user_name,
+               r.password,
+               r.channel,
+               r.play_type,
+               r.url,
+               r.stream_id,
+               r.easy_NTS_url,
+               r.firm,
+               r.lat,
+               r.lng,
+               r.address_map,
+               r.create_by,
+               r.create_time,
+               r.update_by,
+               r.update_time,
+               r.remark,
+               d.dept_name
+        from rtsp_device r
+                 left join sys_dept d on r.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectRtspDeviceList" parameterType="RtspDevice" resultMap="RtspDeviceResult">
+        <include refid="selectRtspDeviceVo"/>
+        <where>
+            <if test="deptId != null">and (r.dept_id = #{deptId} OR r.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))</if>
+            <if test="ip != null  and ip != ''"> and r.ip = #{ip}</if>
+            <if test="name != null  and name != ''"> and r.name like concat('%', #{name}, '%')</if>
+            <if test="firm != null  and firm != ''"> and r.firm = #{firm}</if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+
+        order by r.create_time desc
+    </select>
+
+    <select id="selectRtspDeviceById" parameterType="Long" resultMap="RtspDeviceResult">
+        <include refid="selectRtspDeviceVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectRtspDeviceListMap" parameterType="RtspDevice" resultMap="RtspDeviceResult">
+        <include refid="selectRtspDeviceVo"/>
+        <where>
+            <if test="deptId != null">and (r.dept_id = #{deptId} OR r.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))</if>
+            <if test="ip != null  and ip != ''"> and r.ip = #{ip}</if>
+            <if test="name != null  and name != ''"> and r.name like concat('%', #{name}, '%')</if>
+            <if test="firm != null  and firm != ''"> and r.firm = #{firm}</if>
+            and lat IS NOT NULL AND lng IS NOT NULL
+
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+
+        order by r.create_time desc
+    </select>
+
+    <insert id="insertRtspDevice" parameterType="RtspDevice" useGeneratedKeys="true" keyProperty="id">
+        insert into rtsp_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">dept_id,</if>
+            <if test="ip != null and ip != ''">ip,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="password != null and password != ''">password,</if>
+            <if test="channel != null and channel != ''">channel,</if>
+            <if test="playType != null">play_type,</if>
+            <if test="url != null">url,</if>
+            <if test="streamId != null">stream_id,</if>
+            <if test="easyNTSUrl != null">easy_NTS_url,</if>
+            <if test="firm != null">firm,</if>
+            <if test="lat != null">lat,</if>
+            <if test="lng != null">lng,</if>
+            <if test="addressMap != null">address_map,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">#{deptId},</if>
+            <if test="ip != null and ip != ''">#{ip},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="password != null and password != ''">#{password},</if>
+            <if test="channel != null and channel != ''">#{channel},</if>
+            <if test="playType != null">#{playType},</if>
+            <if test="url != null">#{url},</if>
+            <if test="streamId != null">#{streamId},</if>
+            <if test="easyNTSUrl != null">#{easyNTSUrl},</if>
+            <if test="firm != null">#{firm},</if>
+            <if test="lat != null">#{lat},</if>
+            <if test="lng != null">#{lng},</if>
+            <if test="addressMap != null">#{addressMap},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRtspDevice" parameterType="RtspDevice">
+        update rtsp_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="ip != null and ip != ''">ip = #{ip},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="channel != null and channel != ''">channel = #{channel},</if>
+            <if test="playType != null">play_type = #{playType},</if>
+            <if test="url != null">url = #{url},</if>
+            <if test="streamId != null">stream_id = #{streamId},</if>
+            <if test="easyNTSUrl != null">easy_NTS_url = #{easyNTSUrl},</if>
+            <if test="firm != null">firm = #{firm},</if>
+            <if test="lat != null">lat = #{lat},</if>
+            <if test="lng != null">lng = #{lng},</if>
+            <if test="addressMap != null">address_map = #{addressMap},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRtspDeviceById" parameterType="Long">
+        delete from rtsp_device where id = #{id}
+    </delete>
+
+    <delete id="deleteRtspDeviceByIds" parameterType="String">
+        delete from rtsp_device where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

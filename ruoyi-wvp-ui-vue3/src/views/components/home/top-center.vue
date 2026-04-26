@@ -1,0 +1,154 @@
+<template>
+  <div style="width: 100%;height: 350px;" id="topCenterChart"></div>
+</template>
+
+<script setup name="TopCenter">
+import * as echarts from 'echarts';
+import {countGbNum} from "../../../api/index.js";
+import {graphic} from "echarts/core";
+
+const myChart = ref({})
+
+const state = reactive({
+  offlineNum: 0,
+  onlineNum: 0,
+  totalNum: 0,
+});
+
+let colors = ["#0BFC7F", "#A0A0A0", "#F48C02", "#F4023C"];
+
+const echartsGraphic = (colors) => {
+  return new graphic.LinearGradient(1, 0, 0, 0, [
+    { offset: 0, color: colors[0] },
+    { offset: 1, color: colors[1] },
+  ]);
+};
+
+onMounted(()=>{
+  countGbNum().then((res)=>{
+    nextTick(() => {
+      const chartDom = document.getElementById('topCenterChart');
+      let chart = echarts.init(chartDom);
+
+      state.offlineNum = res.data.offlineNum;
+      state.onlineNum = res.data.onlineNum;
+      state.totalNum = res.data.totalNum;
+
+      myChart.value = chart
+      let option;
+
+      option = {
+        title: {
+          top: "center",
+          left: "center",
+          text: [`{value|${state.totalNum}}`, "{name|总数}"].join("\n"),
+          textStyle: {
+            rich: {
+              value: {
+                color: "#ffffff",
+                fontSize: 24,
+                fontWeight: "bold",
+                lineHeight: 20,
+                padding:[4,0,4,0]
+              },
+              name: {
+                color: "#ffffff",
+                lineHeight: 20,
+              },
+            },
+          },
+        },
+        tooltip: {
+          trigger: "item",
+          backgroundColor: "rgba(0,0,0,.6)",
+          borderColor: "rgba(147, 235, 248, .8)",
+          textStyle: {
+            color: "#FFF",
+          },
+        },
+        series: [
+          {
+            name: "国标总览",
+            type: "pie",
+            radius: ["40%", "70%"],
+            // avoidLabelOverlap: false,
+            itemStyle: {
+              borderRadius: 6,
+              borderColor: "rgba(255,255,255,0)",
+              borderWidth: 2,
+            },
+            color: colors,
+            label: {
+              show: true,
+              formatter: "   {b|{b}}   \n   {c|{c}个}   {per|{d}%}  ",
+              //   position: "outside",
+              rich: {
+                b: {
+                  color: "#000",
+                  fontSize: 12,
+                  lineHeight: 26,
+                },
+                c: {
+                  color: "#31ABE3",
+                  fontSize: 14,
+                },
+                per: {
+                  color: "#31ABE3",
+                  fontSize: 14,
+                },
+              },
+            },
+            emphasis: {
+              show: false,
+            },
+            legend: {
+              show: false,
+            },
+            tooltip: { show: true },
+
+            labelLine: {
+              show: true,
+              length: 20, // 第一段线 长度
+              length2: 36, // 第二段线 长度
+              smooth: 0.2,
+              lineStyle: {},
+            },
+            data: [
+              {
+                value: state.onlineNum,
+                name: "在线",
+                itemStyle: {
+                  color: echartsGraphic(["#0BFC7F", "#A3FDE0"]),
+                },
+              },
+              {
+                value: state.offlineNum,
+                name: "离线",
+                itemStyle: {
+                  color: echartsGraphic(["#A0A0A0", "#DBDFDD"]),
+                },
+              },
+            ],
+          },
+        ],
+      };
+
+      window.addEventListener("resize", resize);
+
+      chart.setOption(option);
+    })
+  })
+})
+
+function resize() {
+  myChart.value.resize();
+}
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize",resize);
+})
+</script>
+
+<style scoped>
+
+</style>
