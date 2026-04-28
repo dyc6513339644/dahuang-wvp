@@ -2,7 +2,6 @@ package com.ruoyi.web.controller.system;
 
 import cn.hutool.http.HttpUtil;
 import com.ruoyi.common.annotation.Anonymous;
-import com.ruoyi.common.config.JustAuthConfig;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -59,47 +58,6 @@ public class SysLoginController {
     @Autowired
     private ISysConfigService configService;
 
-    @Autowired
-    private JustAuthConfig justAuthConfig;
-
-    /**
-     * 登录方法
-     *
-     * @return 结果
-     */
-    @Anonymous
-    @GetMapping("/gitee-login")
-    public AjaxResult giteeLogin() throws IOException {
-        AuthRequest authRequest = getAuthRequest();
-        return AjaxResult.success(authRequest.authorize(AuthStateUtils.createState()));
-    }
-
-    @Anonymous
-    @GetMapping("/gitee-callback")
-    public void login(AuthCallback callback,HttpServletResponse response) throws IOException {
-        AuthRequest authRequest = getAuthRequest();
-        AuthResponse<AuthUser> login = authRequest.login(callback);
-        String accessToken = login.getData().getToken().getAccessToken();
-
-        String url = "https://gitee.com/api/v5/user/starred/xiaochemgzi/RuoYi-Wvp?access_token="+accessToken;
-        //get请求有参并设置超时时间 单位为毫秒
-        String result = HttpUtil.get(url, 30000);
-        System.out.println(result);
-        if("".equals(result)){
-            System.out.println("已关注");
-            response.sendRedirect(justAuthConfig.getGiteeFrontUrl() + "?redirect=/index&code=true");
-        }else {
-            response.sendRedirect(justAuthConfig.getGiteeFrontUrl() + "?redirect=/index&code=false");
-        }
-    }
-
-    private AuthRequest getAuthRequest() {
-        return new AuthGiteeRequest(AuthConfig.builder()
-                .clientId(justAuthConfig.getGiteeClientId())
-                .clientSecret(justAuthConfig.getGiteeSecret())
-                .redirectUri(justAuthConfig.getGiteeRedirectUri())
-                .build());
-    }
 
     /**
      * 登录方法
@@ -109,12 +67,6 @@ public class SysLoginController {
      */
     @PostMapping("/login")
     public AjaxResult login(@RequestBody LoginBody loginBody) {
-        if(Boolean.parseBoolean(configService.selectConfigByKey("sys_public_demonstrate")) && !Constants.SUPER_ADMIN.equals(loginBody.getUsername())) {
-            if (!ruoYiConfig.getPublicCode().equals(loginBody.getPublicCode())) {
-                return AjaxResult.error("公众号code错误，请关注ruoyi-wvp公众号获取正确的公众号code");
-            }
-        }
-
         AjaxResult ajax = AjaxResult.success();
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
