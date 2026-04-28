@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : 宝塔本地
+ Source Server         : 本地
  Source Server Type    : MySQL
- Source Server Version : 50738
+ Source Server Version : 50726 (5.7.26)
  Source Host           : localhost:3306
- Source Schema         : git-wvp
+ Source Schema         : dahuang-wvp
 
  Target Server Type    : MySQL
- Target Server Version : 50738
+ Target Server Version : 50726 (5.7.26)
  File Encoding         : 65001
 
- Date: 28/08/2025 12:52:48
+ Date: 28/04/2026 23:55:14
 */
 
 SET NAMES utf8mb4;
@@ -130,37 +130,6 @@ INSERT INTO `gen_table_column` VALUES (42, 2, 'remark', '备注', 'varchar(500)'
 INSERT INTO `gen_table_column` VALUES (43, 2, 'user_name', '用户名', 'varchar(20)', 'String', 'userName', '0', '0', '0', '1', '1', '1', '1', 'LIKE', 'input', '', 4, '', '2025-04-10 09:18:46', '', '2025-04-10 10:29:30');
 INSERT INTO `gen_table_column` VALUES (44, 2, 'password', '密码', 'varchar(50)', 'String', 'password', '0', '0', '0', '1', '1', '1', '1', 'EQ', 'input', '', 5, '', '2025-04-10 09:18:46', '', '2025-04-10 10:29:30');
 INSERT INTO `gen_table_column` VALUES (45, 2, 'name', '摄像头名称', 'varchar(30)', 'String', 'name', '0', '0', '0', '1', '1', '1', '1', 'LIKE', 'input', '', 3, '', '2025-04-10 10:29:30', '', NULL);
-
--- ----------------------------
--- Table structure for onvif_device
--- ----------------------------
-DROP TABLE IF EXISTS `onvif_device`;
-CREATE TABLE `onvif_device`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `ip` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT 'ip',
-  `name` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '摄像头名称',
-  `user_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '用户名',
-  `password` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '密码',
-  `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '默认直播流播放地址',
-  `firm` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '设备厂商',
-  `model` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '设备型号',
-  `firmware_version` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '固件版本',
-  `stream_uris` json NULL COMMENT '球机多条播放',
-  `create_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
-  `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '备注',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = 'onvif 设备表' ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of onvif_device
--- ----------------------------
-INSERT INTO `onvif_device` VALUES (2, '192.168.158.63', '大华球机', 'admin', 'admin123', 'rtsp://192.168.158.63:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif', 'Dahua', 'DH-IPC-HDP2230C-ST', '2.820.0000000.65.R, Build Date 2025-01-21', '{\"MediaProfile_Channel1_MainStream\": \"rtsp://192.168.158.63:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif\", \"MediaProfile_Channel1_SubStream1\": \"rtsp://192.168.158.63:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif\"}', '', '2025-04-10 09:47:55', '', '2025-04-12 14:59:36', NULL);
-INSERT INTO `onvif_device` VALUES (5, '192.168.158.189', 'haikang球机', 'admin', 'hx147258', 'rtsp://192.168.212.189:554/Streaming/Channels/102?transportmode=unicast&profile=Profile_102', 'HIKVISION', 'DS-2DE3Q144MY-T/GLSE', 'V5.8.3', '{\"Stream_101\": \"rtsp://192.168.212.189:554/Streaming/Channels/101?transportmode=unicast&profile=Profile_101\", \"Stream_102\": \"rtsp://192.168.212.189:554/Streaming/Channels/102?transportmode=unicast&profile=Profile_102\", \"Stream_201\": \"rtsp://192.168.212.189:554/Streaming/Channels/201?transportmode=unicast&profile=Profile_201\", \"Stream_202\": \"rtsp://192.168.212.189:554/Streaming/Channels/202?transportmode=unicast&profile=Profile_202\"}', '', '2025-04-10 17:19:10', '', '2025-04-17 14:37:08', NULL);
-INSERT INTO `onvif_device` VALUES (6, '192.168.158.62', '办公室大华', 'admin', 'admin123', 'rtsp://192.168.158.62:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif', 'Dahua', 'DH-IPC-HDP2230C-ST', '2.820.0000000.65.R, Build Date 2025-01-21', '{\"MediaProfile_Channel1_MainStream\": \"rtsp://192.168.158.62:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif\", \"MediaProfile_Channel1_SubStream1\": \"rtsp://192.168.158.62:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif\"}', '', '2025-04-11 09:31:50', '', '2025-04-14 11:41:52', NULL);
-INSERT INTO `onvif_device` VALUES (7, '192.168.158.200', '球机', 'admin', 'admin', 'rtsp://192.168.158.200/media/video2', 'UNIVIEW', 'IPC-S360', 'IPC_Q1201-B5022P30D1711C31', '{\"media_profile1\": \"rtsp://192.168.158.200/media/video1\", \"media_profile2\": \"rtsp://192.168.158.200/media/video2\", \"media_profile3\": \"rtsp://192.168.158.200/media/video3\"}', '', '2025-04-17 14:25:41', '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for qrtz_blob_triggers
@@ -377,38 +346,6 @@ CREATE TABLE `qrtz_triggers`  (
 
 -- ----------------------------
 -- Records of qrtz_triggers
--- ----------------------------
-
--- ----------------------------
--- Table structure for rtsp_device
--- ----------------------------
-DROP TABLE IF EXISTS `rtsp_device`;
-CREATE TABLE `rtsp_device`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `dept_id` bigint(20) NULL DEFAULT NULL COMMENT '部门ID',
-  `ip` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT 'ip',
-  `name` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '摄像头名称',
-  `user_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '用户名',
-  `password` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '密码',
-  `channel` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '通道号',
-  `play_type` char(2) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '播放类型（1=本地，2=推流，3=EasyNTS）',
-  `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '直播流播放地址',
-  `stream_id` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '流id',
-  `easy_NTS_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT 'EasyNTS播放地址',
-  `firm` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '设备厂商',
-  `lat` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '纬度',
-  `lng` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '经度',
-  `address_map` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '地图定位地址',
-  `create_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
-  `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '备注',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = 'rtsp设备表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of rtsp_device
 -- ----------------------------
 
 -- ----------------------------
@@ -1673,7 +1610,7 @@ CREATE TABLE `wvp_common_group`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_common_group_device_platform`(`device_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_common_group
@@ -1695,7 +1632,7 @@ CREATE TABLE `wvp_common_region`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_common_region_device_id`(`device_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_common_region
