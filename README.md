@@ -109,90 +109,24 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 
 <table>
     <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/c11404f40b3344719c5e17055972e35b.png"/></td>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/9238d06790764f3b9317f7b0a9abd056.png"/></td>
+        <td><img src="https://www.jhpic.zgdahuan.com/login.png"/></td>
+        <td><img src="https://www.jhpic.zgdahuan.com/device.png"/></td>
     </tr>
     <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/749121d82e4844c4827afaaaa5172af2.png"/></td>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/1752defdedd44aea9d4b94440c0a56cd.png"/></td>
+        <td><img src="https://www.jhpic.zgdahuan.com/channel.png"/></td>
+        <td><img src="https://www.jhpic.zgdahuan.com/play.png"/></td>
     </tr>
     <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/350dcf28536448349a8ab4927a9e192e.png"/></td>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/a383b8369edb421080168fea74e4e4f2.png"/></td>
+        <td><img src="https://www.jhpic.zgdahuan.com/record.png"/></td>
+        <td><img src="https://www.jhpic.zgdahuan.com/fenping.png"/></td>
     </tr>
     <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/34c300506ce74302be2f5bd63fca270f.png"/></td>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/f0c4aa1e694c4282853ebcb304503e28.png"/></td>
+        <td><img src="https://www.jhpic.zgdahuan.com/jilian.png"/></td>
+        <td></td>
     </tr>
-	<tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/43d4a7c839a64916a89ce6146acb4db4.png"/></td>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/389dff88a839449483518868154c804c.png"/></td>
-    </tr>	 
-    <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/690c87e89f80463298d48136b99998bc.png"/></td>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/b276ace519b541eba6b05e640b450e44.png"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/1b0dca2be11a44bab60bed1f6fefb0a7.png"/></td>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/27211331ad6246699cb3019ba9c92a64.png"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/a832fa6d9a50413385cbd2ed1b700797.png"/></td>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/17/ae58f01bff6c49a4bad5d622490bede6.png"/></td>
-    </tr>
+	
 </table>
 
-## onvif演示图
-
-<table>
-    <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/05/07/ff16b289ad6c47899da28490ce20dd5c.png"/></td>
-    </tr>
-</table>
-
-## isup播放示例图
-<table>
-    <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/24/8ac1339ac5584a2090f529f61da50093.png"/></td>
-    </tr>
-</table>
-
-## rtsp播放示例图
-
-<table>
-    <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/04/24/e35fc83314c54b9a91eb6ddbe2185e7b.png"/></td>
-    </tr>
-</table>
-
-## 大屏
-
-<table>
-    <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/05/07/c0c59e92d0c74a20a9b177af2332e6d3.png"/></td>
-    </tr>
-</table>
-
-## 工作台
-
-<table>
-    <tr>
-        <td><img src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/05/07/16ae29a3eaa24471a061d7364b113ab8.png"/></td>
-    </tr>
-</table>
-
-## 小程序
-
-<table>
-    <tr>
-        <td><img width="200" src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/05/07/7f4b35186a2041b1a04f4c71a534a29d.png"/></td>
-        <td><img width="200" src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/05/07/fee62e3df1a8458f810a7818561a7530.png"/></td>
-    </tr>
-    <tr>
-        <td><img width="200" src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/05/07/c7f62a49119f4f7cb44fc9afb2e77107.png"/></td>
-        <td><img width="200" src="https://gdhxkj.oss-cn-guangzhou.aliyuncs.com/2025/05/07/77a2f2dc4fc141c6918fe9f5df129605.png"/></td>
-    </tr>
-</table>
 
 ## 授权协议
 
