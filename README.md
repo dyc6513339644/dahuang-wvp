@@ -21,7 +21,7 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 
 ## 技术栈
 
-* 前端基于Vue3与Element-Plus构建高效优雅前端界面。
+* 前端基于Vue2与Element-Plus构建高效优雅前端界面。
 * 后端运用Spring Boot构建基础，结合Spring Security保障安全，辅以Redis缓存与Jwt认证，打造稳健高效服务。
 
 
@@ -99,7 +99,7 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 * 支持电子地图。支持展示通道位置，支持在地图上修改通道位置。支持了数据分层抽稀数据能力，百万级数据也可以轻松展示。提供标准的矢量瓦片图层，常见地图引擎都可以直接展示。
 ## 前端源码
 
-加qq群获取最新前端vue3代码
+加qq群获取最新前端vue代码
 
 <p align="center">
  <img width="400" alt="logo" src="https://www.jhpic.zgdahuan.com/qr_code_qq.ef46655e.png">
