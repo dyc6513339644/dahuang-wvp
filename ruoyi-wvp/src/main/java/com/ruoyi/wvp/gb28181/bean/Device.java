@@ -217,4 +217,19 @@ public class Device extends WvpBaseEntity {
      * 控制语音对讲流程，释放收到ACK后发流
      */
     private boolean broadcastPushAfterAck;
+
+    /**
+     * 纬度
+     */
+    private String lat;
+
+    /**
+     * 经度
+     */
+    private String lng;
+
+    /**
+     * 地图定位地址
+     */
+    private String addressMap;
 }
