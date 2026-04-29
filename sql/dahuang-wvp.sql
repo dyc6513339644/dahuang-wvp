@@ -11,7 +11,7 @@
  Target Server Version : 50726 (5.7.26)
  File Encoding         : 65001
 
- Date: 28/04/2026 23:55:14
+ Date: 29/04/2026 21:38:17
 */
 
 SET NAMES utf8mb4;
@@ -564,7 +564,7 @@ CREATE TABLE `sys_logininfor`  (
   PRIMARY KEY (`info_id`) USING BTREE,
   INDEX `idx_sys_logininfor_s`(`status`) USING BTREE,
   INDEX `idx_sys_logininfor_lt`(`login_time`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 276 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 277 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_logininfor
@@ -745,6 +745,7 @@ INSERT INTO `sys_logininfor` VALUES (272, 'admin', '14.19.63.87', 'XX XX', 'Chro
 INSERT INTO `sys_logininfor` VALUES (273, 'admin', '14.19.63.87', 'XX XX', 'Chrome 13', 'Windows 10', '0', '登录成功', '2025-04-19 01:02:08');
 INSERT INTO `sys_logininfor` VALUES (274, 'admin', '14.19.63.87', 'XX XX', 'Chrome 13', 'Windows 10', '0', '退出成功', '2025-04-19 01:02:29');
 INSERT INTO `sys_logininfor` VALUES (275, 'admin', '127.0.0.1', '内网IP', 'Chrome 11', 'Windows 10', '0', '登录成功', '2025-08-28 12:38:51');
+INSERT INTO `sys_logininfor` VALUES (276, 'admin', '127.0.0.1', '内网IP', 'Chrome 14', 'Windows 10', '0', '登录成功', '2026-04-29 21:26:55');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -1529,7 +1530,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2025-08-28 12:38:52', '3e80d1762a324d5b0ff636e0bd16f1e3', 'admin', '2025-04-03 09:03:39', '', '2025-08-28 12:38:51', '管理员');
+INSERT INTO `sys_user` VALUES (1, 103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2026-04-29 21:26:56', '3e80d1762a324d5b0ff636e0bd16f1e3', 'admin', '2025-04-03 09:03:39', '', '2026-04-29 21:26:55', '管理员');
 INSERT INTO `sys_user` VALUES (2, 105, 'ry', '若依', '00', 'ry@qq.com', '15666666666', '1', '', '$2a$10$fVU9rE/8SmZAnCy.XfpekuaCzl8OPBt3qDyBeHgtnZww1vtwCDDou', '0', '0', '14.19.63.87', '2025-04-19 08:56:07', NULL, 'admin', '2025-04-03 09:03:39', 'admin', '2025-04-19 00:56:07', '测试员');
 INSERT INTO `sys_user` VALUES (3, 100, 'ry-wvp', 'ry-wvp', '00', '', '', '2', '', '$2a$10$eNWt0Hk7xN/TssYt2fiNJOMOdRniky7I786vFes5Z7ny1NJM6sPri', '0', '0', '127.0.0.1', '2025-04-18 11:20:20', NULL, 'admin', '2025-04-18 10:57:08', '', '2025-04-18 11:20:20', NULL);
 
@@ -1587,7 +1588,7 @@ CREATE TABLE `wvp_cloud_record`  (
   `time_len` bigint(20) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 127 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_cloud_record
@@ -1679,16 +1680,20 @@ CREATE TABLE `wvp_device`  (
   `heart_beat_count` int(11) NULL DEFAULT NULL,
   `position_capability` int(11) NULL DEFAULT NULL,
   `broadcast_push_after_ack` tinyint(1) NULL DEFAULT 0,
+  `lat` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '纬度',
+  `lng` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '经度',
+  `address_map` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '地图定位地址',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_device_device`(`device_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_device
 -- ----------------------------
-INSERT INTO `wvp_device` VALUES (17, NULL, '34020000001320000001', NULL, 'Hikvision', 'DS-2CD2110FDV2-IS', 'V5.5.92', 'UDP', 'UDP', 1, '2025-08-28 12:35:23', '2025-08-28 12:52:24', '192.168.2.204', '2025-04-18 10:25:34', '2025-08-28 12:52:24', 5060, 3600, 0, 0, 5, 0, '192.168.2.204:5060', 'GB2312', 0, 'WGS84', 'auto', NULL, NULL, '192.168.2.199', NULL, 0, 60, 3, 0, 0);
-INSERT INTO `wvp_device` VALUES (18, NULL, '34020000001330000001', '', 'UNIVIEW', 'IPC-S362-IR@DACP-IR3-M28-F', 'IPC_Q1201-B5022P30D1711C31 build 2018-06-19 22:03:52', 'UDP', 'TCP-PASSIVE', 1, '2025-08-28 12:35:23', '2025-08-28 12:52:24', '192.168.2.101', '2025-08-28 12:35:23', '2025-08-28 12:52:24', 5060, 3600, 0, 0, 5, 0, '192.168.2.101:5060', 'GB2312', 0, 'WGS84', 'auto', NULL, NULL, '192.168.2.199', NULL, 0, 60, 3, 0, 0);
+INSERT INTO `wvp_device` VALUES (17, NULL, '34020000001320000001', NULL, 'Hikvision', 'DS-2CD2110FDV2-IS', 'V5.5.92', 'UDP', 'UDP', 0, '2025-08-28 12:35:23', '2025-08-28 12:52:24', '192.168.2.204', '2025-04-18 10:25:34', '2025-08-28 12:52:24', 5060, 3600, 0, 0, 5, 0, '192.168.2.204:5060', 'GB2312', 0, 'WGS84', 'auto', '测试2', NULL, '192.168.2.199', NULL, 0, 60, 3, 0, 0, '40.092654', '116.240628', '');
+INSERT INTO `wvp_device` VALUES (18, NULL, '34020000001330000001', '', 'UNIVIEW', 'IPC-S362-IR@DACP-IR3-M28-F', 'IPC_Q1201-B5022P30D1711C31 build 2018-06-19 22:03:52', 'UDP', 'TCP-PASSIVE', 0, '2025-08-28 12:35:23', '2025-08-28 12:52:24', '192.168.2.101', '2025-08-28 12:35:23', '2025-08-28 12:52:24', 5060, 3600, 0, 0, 5, 0, '192.168.2.101:5060', 'GB2312', 0, 'WGS84', 'auto', '测试1', NULL, '192.168.2.199', NULL, 0, 60, 3, 0, 0, '40.09226', '116.206468', '');
+INSERT INTO `wvp_device` VALUES (19, NULL, '34020000001110000001', 'HTIPC', 'Happytimesoft', 'HTIPC', 'V1.0', 'UDP', 'TCP-PASSIVE', 0, '2026-04-28 23:59:39', '2026-04-28 23:59:39', '192.168.1.7', '2026-04-28 23:59:39', '2026-04-28 23:59:39', 62447, 3600, 0, 0, 5, 0, '192.168.1.7:62447', 'GB2312', 0, 'WGS84', 'auto', NULL, NULL, '192.168.1.7', NULL, 0, 60, 3, 0, 0, '40.07361', '116.270669', '');
 
 -- ----------------------------
 -- Table structure for wvp_device_alarm
@@ -1802,13 +1807,14 @@ CREATE TABLE `wvp_device_channel`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_wvp_unique_channel`(`gb_device_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 31 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_device_channel
 -- ----------------------------
 INSERT INTO `wvp_device_channel` VALUES (29, '34020000001320000001', 'Camera 01', 'Hikvision', 'IP Camera', 'Owner', NULL, NULL, 'Address', 0, NULL, 0, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'ON', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-18 10:25:36', '2025-04-18 11:25:48', 0, NULL, 0, NULL, NULL, 0, '34020000001320000001', 'Camera 01', 'Hikvision', 'IP Camera', 'Owner', '44011801', NULL, 'Address', 0, '11010101002157000001', 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ON', NULL, NULL, '11010101002157000001', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, 1, 17);
 INSERT INTO `wvp_device_channel` VALUES (30, '34020000001330000001', '', 'UNIVIEW', 'IPC-S360', 'IPC-B5022P30D1711C31', NULL, NULL, 'Address', 1, NULL, 0, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'ON', 0, 0, 3, NULL, NULL, NULL, NULL, NULL, '5/4/2', NULL, '0', NULL, NULL, '2025-08-28 12:35:24', '2025-08-28 12:35:24', 0, NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 18);
+INSERT INTO `wvp_device_channel` VALUES (31, '34020000001410000001', 'HTIPC', 'Happytimesoft', 'IPC', 'Owner', NULL, NULL, 'Address', 0, '34020000001110000001', NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, 'ON', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-28 23:59:39', '2026-04-28 23:59:39', 0, NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 19);
 
 -- ----------------------------
 -- Table structure for wvp_device_mobile_position
@@ -1877,7 +1883,7 @@ CREATE TABLE `wvp_media_server`  (
 -- ----------------------------
 -- Records of wvp_media_server
 -- ----------------------------
-INSERT INTO `wvp_media_server` VALUES ('hxkj_zlm', '192.168.2.199', '192.168.2.199', '192.168.2.199', '192.168.2.199', 8092, 443, 1935, 0, 10000, 554, 0, 8092, 443, 8092, 443, 1, 'hxkj_zlm', 'zlm', 1, '30000,30500', '30000,30500', 0, 1, '2025-08-28 12:30:31', '2025-08-28 12:35:23', 10, '', 3, NULL);
+INSERT INTO `wvp_media_server` VALUES ('FQ3TF8yT83wh5Wvz', '127.0.0.1', '127.0.0.1', '127.0.0.1', '127.0.0.1', 8089, 443, 1935, 0, 10000, 554, 0, 8089, 443, 8089, 443, 1, 'zAH8Muz7KMz3XzkbQXPKJSnGOWKrjJ73', 'zlm', 1, '40000,40300', '40000,40300', 0, 1, '2026-04-28 23:59:11', '2026-04-29 21:23:29', 10, '', 7, NULL);
 
 -- ----------------------------
 -- Table structure for wvp_platform
@@ -1921,7 +1927,7 @@ CREATE TABLE `wvp_platform`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_platform_unique_server_gb_id`(`server_gb_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_platform
@@ -1973,7 +1979,7 @@ CREATE TABLE `wvp_platform_channel`  (
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_platform_gb_channel_platform_id_catalog_id_device_channel_id`(`platform_id`, `device_channel_id`) USING BTREE,
   UNIQUE INDEX `uk_platform_gb_channel_device_id`(`custom_device_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_platform_channel
@@ -1990,7 +1996,7 @@ CREATE TABLE `wvp_platform_group`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_wvp_platform_group_platform_id_group_id`(`platform_id`, `group_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_platform_group
@@ -2007,7 +2013,7 @@ CREATE TABLE `wvp_platform_region`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_wvp_platform_region_platform_id_group_id`(`platform_id`, `region_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_platform_region
@@ -2025,7 +2031,7 @@ CREATE TABLE `wvp_record_plan`  (
   `update_time` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_record_plan
@@ -2045,7 +2051,7 @@ CREATE TABLE `wvp_record_plan_item`  (
   `update_time` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_record_plan_item
@@ -2099,7 +2105,7 @@ CREATE TABLE `wvp_stream_proxy`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_stream_proxy_app_stream`(`app`, `stream`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_stream_proxy
@@ -2125,7 +2131,7 @@ CREATE TABLE `wvp_stream_push`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_stream_push_app_stream`(`app`, `stream`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_stream_push
