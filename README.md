@@ -110,20 +110,20 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 
 <table>
     <tr>
-        <td><img src="https://www.jhpic.zgdahuan.com/login.png"/></td>
-        <td><img src="https://www.jhpic.zgdahuan.com/device.png"/></td>
+        <td><img src="images/login.png"/></td>
+        <td><img src="images/device.png"/></td>
     </tr>
     <tr>
-        <td><img src="https://www.jhpic.zgdahuan.com/channel.png"/></td>
-        <td><img src="https://www.jhpic.zgdahuan.com/play.png"/></td>
+        <td><img src="images/channel.png"/></td>
+        <td><img src="images/play.png"/></td>
     </tr>
     <tr>
-        <td><img src="https://www.jhpic.zgdahuan.com/record.png"/></td>
-        <td><img src="https://www.jhpic.zgdahuan.com/fenping.png"/></td>
+        <td><img src="images/record.png"/></td>
+        <td><img src="images/fenping.png"/></td>
     </tr>
     <tr>
-        <td><img src="https://www.jhpic.zgdahuan.com/jilian.png"/></td>
-        <td></td>
+        <td><img src="images/jilian.png"/></td>
+        <td><img src="images/ditu.png"/></td>
     </tr>
 	
 </table>
@@ -145,7 +145,7 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 * 如果你感觉项目对你有帮助,请我们喝杯咖啡吧！
 <table>
     <tr>
-        <td><img width="400" src="https://www.jhpic.zgdahuan.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260428234733_407_2191.png"/></td>
-        <td><img width="400" src="https://www.jhpic.zgdahuan.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260428234732_406_2191.png"/></td>
+        <td><img width="400" src="images/wx1.png"/></td>
+        <td><img width="400" src="images/wx2.png"/></td>
     </tr>
 </table>
