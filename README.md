@@ -102,7 +102,7 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 加qq群获取最新前端vue代码
 
 <p align="center">
- <img width="400" alt="logo" src="https://www.jhpic.zgdahuan.com/qr_code_qq.ef46655e.png">
+ <img width="400" alt="logo" src="images/qq.png">
 </p>
 
 
