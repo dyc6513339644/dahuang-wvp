@@ -1,5 +1,5 @@
 <p align="center">
-![](https://gitee.com/yunluxianju/dahuang-wvp/blob/master/images/logo.png)
+<img src="images/logo.png" alt="Logo" width="200">
 </p>
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Dahuang-Wvp</h1>
 <h4 align="center">基于ruoyi和wvp的国标视频管理平台，开箱即用、完全开源、使用MIT许可协议</h4>
