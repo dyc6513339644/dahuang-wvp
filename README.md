@@ -110,7 +110,7 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 
 <table>
     <tr>
-        <td><img src="https://www.jhpic.zgdahuan.com/login.png"/></td>
+        <td><img src="https://gitee.com/yunluxianju/dahuang-wvp/blob/master/images/logo.png"/></td>
         <td><img src="https://www.jhpic.zgdahuan.com/device.png"/></td>
     </tr>
     <tr>
