@@ -12,10 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import javax.sip.*;
+import java.util.Map;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -205,5 +207,79 @@ public class SipLayer implements CommandLineRunner {
 		// 最后的兜底方案：返回本地回环地址
 		log.error("[SIP SERVER] SIP服务未启动且无法获取有效IP，返回默认地址127.0.0.1");
 		return "127.0.0.1";
+	}
+
+	/**
+	 * 停止SIP服务
+	 */
+	public synchronized void stop() {
+		log.info("[SIP SERVER] 开始停止SIP服务...");
+		try {
+			// 停止UDP Provider
+			for (Map.Entry<String, SipProviderImpl> entry : udpSipProviderMap.entrySet()) {
+				String ip = entry.getKey();
+				SipProviderImpl provider = entry.getValue();
+				try {
+					provider.removeSipListener(sipProcessorObserver);
+					SipStack stack = provider.getSipStack();
+					stack.deleteSipProvider(provider);
+					log.info("[SIP SERVER] UDP监听点 {} 已停止", ip);
+				} catch (Exception e) {
+					log.error("[SIP SERVER] 停止UDP监听点 {} 失败", ip, e);
+				}
+			}
+			udpSipProviderMap.clear();
+
+			// 停止TCP Provider
+			for (Map.Entry<String, SipProviderImpl> entry : tcpSipProviderMap.entrySet()) {
+				String ip = entry.getKey();
+				SipProviderImpl provider = entry.getValue();
+				try {
+					provider.removeSipListener(sipProcessorObserver);
+					SipStack stack = provider.getSipStack();
+					stack.deleteSipProvider(provider);
+					log.info("[SIP SERVER] TCP监听点 {} 已停止", ip);
+				} catch (Exception e) {
+					log.error("[SIP SERVER] 停止TCP监听点 {} 失败", ip, e);
+				}
+			}
+			tcpSipProviderMap.clear();
+
+			monitorIps.clear();
+			log.info("[SIP SERVER] SIP服务已停止");
+		} catch (Exception e) {
+			log.error("[SIP SERVER] 停止SIP服务时发生错误", e);
+		}
+	}
+
+	/**
+	 * 重启SIP服务
+	 */
+	public synchronized void restart() {
+		log.info("[SIP SERVER] 开始重启SIP服务...");
+		stop();
+		// 重新加载配置
+		sipConfig.reload();
+		// 重新启动
+		run();
+		log.info("[SIP SERVER] SIP服务重启完成");
+	}
+
+	/**
+	 * 检查SIP服务是否正在运行
+	 *
+	 * @return true: 运行中, false: 已停止
+	 */
+	public boolean isRunning() {
+		return !udpSipProviderMap.isEmpty() || !tcpSipProviderMap.isEmpty();
+	}
+
+	/**
+	 * 获取监控的IP列表
+	 *
+	 * @return IP列表
+	 */
+	public List<String> getMonitorIps() {
+		return new ArrayList<>(monitorIps);
 	}
 }

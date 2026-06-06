@@ -244,6 +244,9 @@ public class ZLMServerConfig extends HookParam {
     @JSONField(name = "http.sslport")
     private int httpSSLport;
 
+    @JSONField(name = "ws.port")
+    private int wsPort;
+
     @JSONField(name = "multicast.addrMax")
     private String multicastAddrMax;
 

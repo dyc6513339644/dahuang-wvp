@@ -6,7 +6,6 @@ import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.common.CommonCallback;
 import com.ruoyi.wvp.common.StreamInfo;
 import com.ruoyi.wvp.common.VideoManagerConstants;
-import com.ruoyi.wvp.conf.MediaConfig;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
@@ -77,8 +76,6 @@ public class MediaServerServiceImpl implements IMediaServerService {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @Autowired
-    private MediaConfig mediaConfig;
 
 
     /**
@@ -302,6 +299,21 @@ public class MediaServerServiceImpl implements IMediaServerService {
 
     @Override
     public void update(MediaServer mediaSerItem) {
+        // sdpIp/streamIp 为空时默认使用 ip
+        if (ObjectUtils.isEmpty(mediaSerItem.getSdpIp())) {
+            mediaSerItem.setSdpIp(mediaSerItem.getIp());
+        }
+        if (ObjectUtils.isEmpty(mediaSerItem.getStreamIp())) {
+            mediaSerItem.setStreamIp(mediaSerItem.getIp());
+        }
+        // sendRtpPortRange 为空时默认复用 rtpPortRange
+        if (ObjectUtils.isEmpty(mediaSerItem.getSendRtpPortRange())) {
+            mediaSerItem.setSendRtpPortRange(mediaSerItem.getRtpPortRange());
+        }
+        // hookIp 为空时默认使用 ip
+        if (ObjectUtils.isEmpty(mediaSerItem.getHookIp())) {
+            mediaSerItem.setHookIp(mediaSerItem.getIp());
+        }
         mediaServerMapper.update(mediaSerItem);
         MediaServer mediaServerInRedis = getOne(mediaSerItem.getId());
         // 获取完整数据
@@ -315,6 +327,8 @@ public class MediaServerServiceImpl implements IMediaServerService {
         }
         String key = VideoManagerConstants.MEDIA_SERVER_PREFIX + userSetting.getServerId();
         redisTemplate.opsForHash().put(key, mediaServerInDataBase.getId(), mediaServerInDataBase);
+
+        log.info(" ========更新流媒体[mediaServerInDataBase.isStatus(), {}", mediaServerInDataBase.isStatus());
         if (mediaServerInDataBase.isStatus()) {
             resetOnlineServerItem(mediaServerInDataBase);
         }
@@ -422,12 +436,27 @@ public class MediaServerServiceImpl implements IMediaServerService {
             mediaServer.setHookAliveInterval(10F);
         }
         if (mediaServer.getType() == null) {
-            log.info("[添加媒体节点] 失败, mediaServer的类型：为空");
-            return;
+            log.error("[添加媒体节点] 失败, mediaServer的类型为空, id={}", mediaServer.getId());
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "添加媒体节点失败：类型为空");
         }
         if (mediaServerMapper.getMediaServerById(mediaServer.getId()) != null) {
             log.info("[添加媒体节点] 失败, 媒体服务ID已存在，请修改媒体服务器配置, {}", mediaServer.getId());
             throw new ControllerException(ErrorCode.ERROR100.getCode(),"保存失败，媒体服务ID [ " + mediaServer.getId() + " ] 已存在，请修改媒体服务器配置");
+        }
+        // sdpIp/streamIp 为空时默认使用 ip
+        if (ObjectUtils.isEmpty(mediaServer.getSdpIp())) {
+            mediaServer.setSdpIp(mediaServer.getIp());
+        }
+        if (ObjectUtils.isEmpty(mediaServer.getStreamIp())) {
+            mediaServer.setStreamIp(mediaServer.getIp());
+        }
+        // sendRtpPortRange 为空时默认复用 rtpPortRange
+        if (ObjectUtils.isEmpty(mediaServer.getSendRtpPortRange())) {
+            mediaServer.setSendRtpPortRange(mediaServer.getRtpPortRange());
+        }
+        // hookIp 为空时默认使用 ip
+        if (ObjectUtils.isEmpty(mediaServer.getHookIp())) {
+            mediaServer.setHookIp(mediaServer.getIp());
         }
         IMediaNodeServerService mediaNodeServerService = nodeServerServiceMap.get(mediaServer.getType());
         if (mediaNodeServerService == null) {
@@ -443,6 +472,8 @@ public class MediaServerServiceImpl implements IMediaServerService {
 
     @Override
     public void resetOnlineServerItem(MediaServer serverItem) {
+
+        log.info("[resetOnlineServerItem： {}", serverItem.getId());
         // 更新缓存
         String key = VideoManagerConstants.ONLINE_MEDIA_SERVERS_PREFIX + userSetting.getServerId();
         // 使用zset的分数作为当前并发量， 默认值设置为0
@@ -781,7 +812,11 @@ public class MediaServerServiceImpl implements IMediaServerService {
     @Override
     public StreamInfo getStreamInfoByAppAndStreamWithCheck(String app, String stream, String mediaServerId, String addr, boolean authority) {
         if (mediaServerId == null) {
-            mediaServerId = mediaConfig.getId();
+            // 从数据库查询默认节点作为兜底
+            MediaServer defaultServer = getDefaultMediaServer();
+            if (defaultServer != null) {
+                mediaServerId = defaultServer.getId();
+            }
         }
         MediaServer mediaInfo = getOne(mediaServerId);
         if (mediaInfo == null) {

@@ -109,7 +109,7 @@ public class WvpServerController extends BaseController {
     }
 
     /**
-     * 获取流媒体服务列表
+     * 获取流媒体服务
      *
      * @param id 流媒体服务ID
      * @return
@@ -118,7 +118,15 @@ public class WvpServerController extends BaseController {
     @GetMapping(value = "/media_server/one/{id}")
     @ResponseBody
     public AjaxResult getMediaServer(@PathVariable String id) {
-        return success(mediaServerService.getOne(id));
+        // 先从缓存获取
+        MediaServer mediaServer = mediaServerService.getOne(id);
+        
+        // 缓存中没有，再查数据库
+        if (mediaServer == null) {
+            mediaServer = mediaServerService.getOneFromDatabase(id);
+        }
+        
+        return success(mediaServer);
     }
 
     /**
@@ -166,6 +174,10 @@ public class WvpServerController extends BaseController {
         if (mediaServerItemInDatabase != null) {
             mediaServerService.update(mediaServer);
         } else {
+            // 检查数据库中是否已有流媒体，如果为空则设置为默认流媒体
+            if (mediaServerService.getAllFromDatabase().isEmpty()) {
+                mediaServer.setDefaultServer(true);
+            }
             mediaServerService.add(mediaServer);
             // 发送事件
             MediaServerChangeEvent event = new MediaServerChangeEvent(this);
@@ -182,7 +194,14 @@ public class WvpServerController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wvp:server:delete')")
     @DeleteMapping(value = "/media_server/delete/{id}")
     public AjaxResult deleteMediaServer(@PathVariable String id) {
+        // 先从缓存获取
         MediaServer mediaServer = mediaServerService.getOne(id);
+        
+        // 缓存中没有，再查数据库
+        if (mediaServer == null) {
+            mediaServer = mediaServerService.getOneFromDatabase(id);
+        }
+        
         if (mediaServer == null) {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "流媒体不存在");
         }
@@ -201,7 +220,14 @@ public class WvpServerController extends BaseController {
     @GetMapping(value = "/media_server/media_info")
     @ResponseBody
     public AjaxResult getMediaInfo(String app, String stream, String mediaServerId) {
+        // 先从缓存获取
         MediaServer mediaServer = mediaServerService.getOne(mediaServerId);
+        
+        // 缓存中没有，再查数据库
+        if (mediaServer == null) {
+            mediaServer = mediaServerService.getOneFromDatabase(mediaServerId);
+        }
+        
         if (mediaServer == null) {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "流媒体不存在");
         }
