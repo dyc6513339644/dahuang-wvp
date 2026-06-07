@@ -132,6 +132,36 @@ public class DeviceQueryController extends BaseController {
     }
 
     /**
+     * 查询所有通道适配地图
+     * @param query
+     * @return
+     */
+
+    @PreAuthorize("@ss.hasPermi('wvp:device:channels')")
+    @GetMapping("/devices/allChannelsForMap")
+    public TableDataInfo allChannelsForMap( @RequestParam(required = false) String query) {
+        if (ObjectUtils.isEmpty(query)) {
+            query = null;
+        }
+        List<DeviceChannel> list = deviceChannelService.queryAllChannels(query);
+        return getDataTable(list);
+    }
+
+
+    /**
+     * 查询设备下所有通道（不分页）
+     *
+     * @param deviceId 设备国标编号
+     * @return 设备通道列表
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:device:channels')")
+    @GetMapping("/devices/channels/all")
+    public AjaxResult channelsAll(String deviceId) {
+        List<DeviceChannel> list = deviceChannelService.queryChaneListByDeviceId(deviceId);
+        return success(list);
+    }
+
+    /**
      * 同步设备通道
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:sync')")

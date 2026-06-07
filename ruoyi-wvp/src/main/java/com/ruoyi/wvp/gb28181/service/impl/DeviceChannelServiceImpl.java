@@ -694,6 +694,17 @@ public class DeviceChannelServiceImpl implements IDeviceChannelService {
     }
 
     @Override
+    public List<DeviceChannel> queryAllChannels(String query) {
+        if (query != null) {
+            query = query.replaceAll("/", "//")
+                    .replaceAll("%", "/%")
+                    .replaceAll("_", "/_");
+        }
+        return channelMapper.queryAllNewChannels(query);
+    }
+
+
+    @Override
     public List<Device> queryDeviceWithAsMessageChannel() {
         return deviceMapper.queryDeviceWithAsMessageChannel();
     }

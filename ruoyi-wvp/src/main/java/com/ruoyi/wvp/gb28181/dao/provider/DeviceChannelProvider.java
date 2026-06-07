@@ -105,10 +105,29 @@ public class DeviceChannelProvider {
     }
 
 
+    public String queryAllNewChannels(Map<String, Object> params ){
+        StringBuilder sqlBuild = new StringBuilder();
+        sqlBuild.append(getBaseSelectSql());
+        sqlBuild.append(" where dc.sub_count = 0");
+        if (params.get("query") != null && !ObjectUtils.isEmpty(params.get("query"))) {
+            sqlBuild.append(" AND (coalesce(dc.gb_device_id, dc.device_id) LIKE concat('%',#{query},'%') escape '/'" +
+                    " OR coalesce(dc.gb_name, dc.name) LIKE concat('%',#{query},'%') escape '/')")
+            ;
+        }
+        sqlBuild.append(" AND dc.gb_longitude is not null");
+        sqlBuild.append(" AND dc.gb_latitude is not null");
+        return sqlBuild.toString();
+    }
+
+
+
+
+
     public String queryChannelsByDeviceDbId(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
         sqlBuild.append(getBaseSelectSql());
         sqlBuild.append(" where data_type = " + ChannelDataType.GB28181.value + " and dc.data_device_id = #{dataDeviceId}");
+
         return sqlBuild.toString();
     }
 

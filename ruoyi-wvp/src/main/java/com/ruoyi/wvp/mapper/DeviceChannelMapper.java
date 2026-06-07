@@ -94,6 +94,17 @@ public interface DeviceChannelMapper {
     @SelectProvider(type = DeviceChannelProvider.class, method = "queryChannelsByDeviceDbId")
     List<DeviceChannel> queryChannelsByDeviceDbId(@Param("dataDeviceId") int dataDeviceId);
 
+
+
+
+    @SelectProvider(type = DeviceChannelProvider.class, method = "queryAllNewChannels")
+    List<DeviceChannel> queryAllNewChannels(@Param("query") String query);
+
+
+
+
+
+
     @Select("<script> " +
             "select id from wvp_device_channel where data_type =1 and data_device_id in  " +
             " <foreach item='item' index='index' collection='deviceDbIds' open='(' separator=',' close=')'> #{item} </foreach>" +

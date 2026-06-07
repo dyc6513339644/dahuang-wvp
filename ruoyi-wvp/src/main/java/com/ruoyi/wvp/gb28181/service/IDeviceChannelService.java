@@ -103,6 +103,7 @@ public interface IDeviceChannelService {
 
     List<DeviceChannel> queryChannelsByDeviceId(String deviceId, String query, Boolean channelType, Boolean online, int pageNum, int pageSize);
 
+    List<DeviceChannel> queryAllChannels(String query);
 
     List<Device> queryDeviceWithAsMessageChannel();
 
