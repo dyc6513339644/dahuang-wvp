@@ -3,7 +3,6 @@ package com.ruoyi.wvp.media.zlm;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.annotation.Anonymous;
-import com.ruoyi.common.utils.sign.Md5Utils;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.wvp.media.bean.ResultForOnPublish;
@@ -19,14 +18,12 @@ import com.ruoyi.wvp.utils.MediaServerUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 
