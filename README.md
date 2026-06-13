@@ -91,24 +91,29 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 
 <table>
     <tr>
-        <td><img src="images/login.png"/></td>
-        <td><img src="images/device.png"/></td>
+        <td><img src="images/mvp1.png"/></td>
+        <td><img src="images/mvp2.png"/></td>
     </tr>
     <tr>
-        <td><img src="images/channel.png"/></td>
-        <td><img src="images/play.png"/></td>
+        <td><img src="images/mvp3.png"/></td>
+        <td><img src="images/mvp4.png"/></td>
     </tr>
     <tr>
-        <td><img src="images/record.png"/></td>
-        <td><img src="images/fenping.png"/></td>
+        <td><img src="images/mvp5.png"/></td>
+        <td><img src="images/mvp6.png"/></td>
     </tr>
     <tr>
-        <td><img src="images/jilian.png"/></td>
-        <td><img src="images/ditu.png"/></td>
+        <td><img src="images/mvp7.png"/></td>
+        <td><img src="images/mvp8.png"/></td>
     </tr>
     <tr>
-        <td><img src="images/uni-app.jpg"/></td>        
-    </tr>	
+        <td><img src="images/mvp9.png"/></td>
+        <td><img src="images/mvp10.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="images/mvp11.png"/></td>
+        <td><img src="images/mvp12.png"/></td>
+    </tr>    
 </table>
 
 

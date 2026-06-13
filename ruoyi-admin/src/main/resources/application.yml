@@ -164,7 +164,7 @@ sip:
 media:
   id: FQ3TF8yT83wh5Wvz
   # [必须修改] zlm服务器的内网IP
-  ip: 127.0.0.1
+  ip: 192.168.99.222
   # [必须修改] zlm服务器的http.port
   http-port: 8089
   # [必选选] zlm服务器的hook.admin_params=secret
