@@ -91,6 +91,9 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 
 <table>
     <tr>
+        <td colspan="2" align="center">基础版功能</td>        
+    </tr>
+    <tr>
         <td><img src="images/mvp1.png"/></td>
         <td><img src="images/mvp2.png"/></td>
     </tr>
