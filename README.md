@@ -17,20 +17,10 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 * 支持加载动态权限菜单，多方式轻松权限控制,支持多终端认证系统。
 * 重点对前端UI进行升级优化，请查看效果图
 
-
-
 ## 技术栈
 
 * 前端基于Vue2与Element-Plus构建高效优雅前端界面。
 * 后端运用Spring Boot构建基础，结合Spring Security保障安全，辅以Redis缓存与Jwt认证，打造稳健高效服务。
-
-## 前端源码
-
-加qq群获取最新前端vue代码
-
-<p align="center">
- <img width="400" alt="logo" src="images/qq.png">
-</p>
 
 
 ## 演示效果图
@@ -67,6 +57,14 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
         <td><img src="images/mvp-pro12.png"/></td>
     </tr>
 </table>
+
+## 前端源码
+
+加qq群获取最新前端vue代码
+
+<p align="center">
+ <img width="400" alt="logo" src="images/qq.png">
+</p>
 
 
 ## 功能特性
