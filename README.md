@@ -24,6 +24,50 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 * 前端基于Vue2与Element-Plus构建高效优雅前端界面。
 * 后端运用Spring Boot构建基础，结合Spring Security保障安全，辅以Redis缓存与Jwt认证，打造稳健高效服务。
 
+## 前端源码
+
+加qq群获取最新前端vue代码
+
+<p align="center">
+ <img width="400" alt="logo" src="images/qq.png">
+</p>
+
+
+## 演示效果图
+
+<table>
+    <tr>
+        <td colspan="2" align="center">基础版功能</td>        
+    </tr>
+    <tr>
+        <td><img src="images/mvp1.png"/></td>
+        <td><img src="images/mvp2.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="images/mvp3.png"/></td>
+        <td><img src="images/mvp4.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="images/mvp5.png"/></td>
+        <td><img src="images/mvp6.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="images/mvp7.png"/></td>
+        <td><img src="images/mvp8.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="images/mvp9.png"/></td>
+        <td><img src="images/mvp10.png"/></td>
+    </tr>
+    <tr>
+        <td colspan="2" align="center">Pro版功能</td>        
+    </tr>
+    <tr>
+        <td><img src="images/mvp-pro11.png"/></td>
+        <td><img src="images/mvp-pro12.png"/></td>
+    </tr>
+</table>
+
 
 ## 功能特性
 * 集成web界面
@@ -78,49 +122,6 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 * 目录订阅与通知
 * 录像查看与播放
 * 支持电子地图。等WVP相关功能
-## 前端源码
-
-加qq群获取最新前端vue代码
-
-<p align="center">
- <img width="400" alt="logo" src="images/qq.png">
-</p>
-
-
-## 平台演示效果图
-
-<table>
-    <tr>
-        <td colspan="2" align="center">基础版功能</td>        
-    </tr>
-    <tr>
-        <td><img src="images/mvp1.png"/></td>
-        <td><img src="images/mvp2.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="images/mvp3.png"/></td>
-        <td><img src="images/mvp4.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="images/mvp5.png"/></td>
-        <td><img src="images/mvp6.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="images/mvp7.png"/></td>
-        <td><img src="images/mvp8.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="images/mvp9.png"/></td>
-        <td><img src="images/mvp10.png"/></td>
-    </tr>
-    <tr>
-        <td colspan="2" align="center">Pro版功能</td>        
-    </tr>
-    <tr>
-        <td><img src="images/mvp-pro11.png"/></td>
-        <td><img src="images/mvp-pro12.png"/></td>
-    </tr>
-</table>
 
 
 ## 授权协议
