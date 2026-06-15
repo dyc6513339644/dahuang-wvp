@@ -30,8 +30,6 @@ public class MediaConfig {
     @Value("${media.hook-ip:127.0.0.1}")
     private String hookIp;
 
-    @Value("${sip.domain}")
-    private String sipDomain;
 
     @Value("${media.sdp-ip:${media.wan_ip:}}")
     private String sdpIp;
@@ -191,9 +189,7 @@ public class MediaConfig {
         }
     }
 
-    public String getSipDomain() {
-        return sipDomain;
-    }
+
 
     public MediaServer getMediaSerItem(){
         MediaServer mediaServer = new MediaServer();
