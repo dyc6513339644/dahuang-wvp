@@ -143,6 +143,10 @@ public class CatalogResponseMessageHandler extends SIPRequestProcessorParent imp
                             if (channel.getParentId() != null && channel.getParentId().equals(sipConfig.getId())) {
                                 channel.setParentId(null);
                             }
+                            // 若设备未上报 ParentID，默认设置为父设备的 GB 编码
+                            if (channel.getParentId() == null) {
+                                channel.setParentId(take.getDevice().getDeviceId());
+                            }
                             // 解析通道类型
                             if (channel.getDeviceId().length() <= 8) {
                                 // 行政区划

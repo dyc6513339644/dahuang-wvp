@@ -1,45 +1,74 @@
 package com.ruoyi.wvp.streamPush.bean;
 
-import com.ruoyi.wvp.common.StreamInfo;
-import com.ruoyi.wvp.common.enums.ChannelDataType;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
-import com.ruoyi.wvp.media.event.media.MediaArrivalEvent;
-import com.ruoyi.wvp.utils.DateUtil;
+import com.ruoyi.wvp.gb28181.bean.Device;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.util.ObjectUtils;
 
 /**
- * 推流信息
+ * 推流信息 DTO（数据来自 wvp_device + wvp_device_channel）
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class StreamPush extends CommonGBChannel implements Comparable<StreamPush> {
+public class StreamPush {
+
     /**
-     * ID
+     * 设备数据库ID（wvp_device.id）
      */
     private Integer id;
 
     /**
-     * 应用名
+     * 通道数据库ID（wvp_device_channel.id）
+     */
+    private Integer channelId;
+
+    /**
+     * 应用名（设备ID）
      */
     private String app;
 
     /**
-     * 流ID
+     * 流ID（通道编码）
      */
     private String stream;
+
+    /**
+     * 设备名称
+     */
+    private String deviceName;
+
+    /**
+     * 通道数
+     */
+    private Integer channelCount;
+
+    /**
+     * 推流名称（用户输入，添加/编辑时使用）
+     */
+    private String name;
+
+    /**
+     * 国标编码
+     */
+    private String gbDeviceId;
+
+    /**
+     * 国标名称
+     */
+    private String gbName;
+
+    /**
+     * 经度
+     */
+    private Double gbLongitude;
+
+    /**
+     * 纬度
+     */
+    private Double gbLatitude;
 
     /**
      * 使用的流媒体ID
      */
     private String mediaServerId;
-
-    /**
-     * 使用的服务ID
-     */
-    private String serverId;
 
     /**
      * 推流时间
@@ -66,52 +95,30 @@ public class StreamPush extends CommonGBChannel implements Comparable<StreamPush
      */
     private boolean startOfflinePush;
 
-    private String uniqueKey;
+    /**
+     * 从 Device 和 CommonGBChannel 构建 StreamPush DTO
+     */
+    public static StreamPush buildFromDevice(Device device, CommonGBChannel channel) {
+        StreamPush push = new StreamPush();
+        push.setId(device.getId());
+        push.setApp(device.getDeviceId());
+        push.setDeviceName(device.getName());
+        push.setName(device.getName());
+        push.setMediaServerId(device.getMediaServerId());
+        push.setPushing(device.isOnLine());
+        push.setStartOfflinePush(device.isStartOfflinePush());
+        push.setCreateTime(device.getCreateTime());
+        push.setUpdateTime(device.getUpdateTime());
+        push.setPushTime(device.getPushTime());
 
-    private Integer dataType = ChannelDataType.STREAM_PUSH.value;
-
-    @Override
-    public int compareTo(@NotNull StreamPush streamPushItem) {
-        return Long.valueOf(DateUtil.yyyy_MM_dd_HH_mm_ssToTimestamp(this.createTime)
-                - DateUtil.yyyy_MM_dd_HH_mm_ssToTimestamp(streamPushItem.getCreateTime())).intValue();
-    }
-
-    public static StreamPush getInstance(StreamInfo streamInfo) {
-        StreamPush streamPush = new StreamPush();
-        streamPush.setApp(streamInfo.getApp());
-        if (streamInfo.getMediaServer() != null) {
-            streamPush.setMediaServerId(streamInfo.getMediaServer().getId());
+        if (channel != null) {
+            push.setChannelId(channel.getGbId());
+            push.setStream(channel.getDeviceId());
+            push.setGbDeviceId(channel.getGbDeviceId());
+            push.setGbName(channel.getGbName());
+            push.setGbLongitude(channel.getGbLongitude());
+            push.setGbLatitude(channel.getGbLatitude());
         }
-
-        streamPush.setStream(streamInfo.getStream());
-        streamPush.setCreateTime(DateUtil.getNow());
-        streamPush.setServerId(streamInfo.getServerId());
-        return streamPush;
-
+        return push;
     }
-
-    public static StreamPush getInstance(MediaArrivalEvent event, String serverId) {
-        StreamPush streamPushItem = new StreamPush();
-        streamPushItem.setApp(event.getApp());
-        streamPushItem.setMediaServerId(event.getMediaServer().getId());
-        streamPushItem.setStream(event.getStream());
-        streamPushItem.setCreateTime(DateUtil.getNow());
-        streamPushItem.setServerId(serverId);
-        return streamPushItem;
-    }
-
-    public CommonGBChannel buildCommonGBChannel() {
-        if (ObjectUtils.isEmpty(this.getGbDeviceId())) {
-            return null;
-        }
-        if (ObjectUtils.isEmpty(this.getGbName())) {
-            this.setGbName(app + "-" + stream);
-        }
-        this.setDataType(ChannelDataType.STREAM_PUSH.value);
-        this.setDataDeviceId(this.getId());
-        return this;
-    }
-
-
 }
-

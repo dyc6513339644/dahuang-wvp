@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -120,6 +121,30 @@ public class CommonChannelController extends BaseController {
     @PostMapping("/reset/{id}")
     public AjaxResult reset(@PathVariable Integer id) {
         channelService.reset(id);
+        return success();
+    }
+
+    /**
+     * 删除通道
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:channel:edit')")
+    @PostMapping("/delete/{id}")
+    public AjaxResult delete(@PathVariable Integer id) {
+        channelService.delete(id);
+        return success();
+    }
+
+    /**
+     * 更新通道地图位置
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:channel:edit')")
+    @PostMapping("/map/update")
+    public AjaxResult updateMapLocation(@RequestBody Map<String, Object> params) {
+        int id = Integer.parseInt(params.get("id").toString());
+        String longitude = (String) params.get("longitude");
+        String latitude = (String) params.get("latitude");
+        String address = (String) params.get("address");
+        channelService.updateMapLocation(id, longitude, latitude, address);
         return success();
     }
 

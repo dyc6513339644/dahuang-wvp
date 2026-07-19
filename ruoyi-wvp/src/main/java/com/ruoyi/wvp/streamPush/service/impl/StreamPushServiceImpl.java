@@ -2,11 +2,16 @@ package com.ruoyi.wvp.streamPush.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.ruoyi.wvp.common.StreamInfo;
-import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
+import com.ruoyi.common.enums.ErrorCode;
+import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.wvp.common.enums.ChannelDataType;
+import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
+import com.ruoyi.wvp.gb28181.bean.Device;
 import com.ruoyi.wvp.gb28181.service.IGbChannelService;
+import com.ruoyi.wvp.mapper.CommonGBChannelMapper;
+import com.ruoyi.wvp.mapper.DeviceMapper;
 import com.ruoyi.wvp.mapper.StreamPushMapper;
 import com.ruoyi.wvp.media.bean.MediaInfo;
 import com.ruoyi.wvp.media.bean.MediaServer;
@@ -22,9 +27,10 @@ import com.ruoyi.wvp.service.bean.GPSMsgInfo;
 import com.ruoyi.wvp.service.bean.StreamPushItemFromRedis;
 import com.ruoyi.wvp.storager.IRedisCatchStorage;
 import com.ruoyi.wvp.streamPush.bean.StreamPush;
+import com.ruoyi.wvp.streamPush.cache.TalkCacheItem;
+import com.ruoyi.wvp.streamPush.cache.TalkCacheManager;
 import com.ruoyi.wvp.streamPush.service.IStreamPushService;
 import com.ruoyi.wvp.utils.DateUtil;
-import com.ruoyi.common.enums.ErrorCode;
 import com.ruoyi.wvp.vmanager.bean.ResourceBaseInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +38,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -44,6 +49,12 @@ public class StreamPushServiceImpl implements IStreamPushService {
 
     @Autowired
     private StreamPushMapper streamPushMapper;
+
+    @Autowired
+    private DeviceMapper deviceMapper;
+
+    @Autowired
+    private CommonGBChannelMapper commonGBChannelMapper;
 
     @Autowired
     private IRedisCatchStorage redisCatchStorage;
@@ -58,10 +69,15 @@ public class StreamPushServiceImpl implements IStreamPushService {
     private ISendRtpServerService sendRtpServerService;
 
     @Autowired
+    private TalkCacheManager talkCacheManager;
+
+    @Autowired
     private IGbChannelService gbChannelService;
 
     /**
      * 流到来的处理
+     * deviceId = app（即 wvp_device.device_id）
+     * channelDeviceId = stream = app_01（即 wvp_device_channel.device_id）
      */
     @Async("taskExecutor")
     @EventListener
@@ -85,16 +101,19 @@ public class StreamPushServiceImpl implements IStreamPushService {
         }
         redisCatchStorage.updateStreamAuthorityInfo(event.getApp(), event.getStream(), streamAuthorityInfo);
 
-        StreamPush streamPushInDb = getPush(event.getApp(), event.getStream());
-        if (streamPushInDb == null) {
-            StreamPush streamPush = StreamPush.getInstance(event, userSetting.getServerId());
-            streamPush.setPushing(true);
-            streamPush.setUpdateTime(DateUtil.getNow());
-            streamPush.setPushTime(DateUtil.getNow());
-            add(streamPush);
+        // deviceId = app_stream（语音/广播对讲等 app 固定的流类型，用 app+stream 保证 device_id 唯一）
+        String deviceId = event.getApp() + "_" + event.getStream();
+
+        // 语音/广播对讲流走纯内存缓存，不落DB（临时流无需持久化）
+        boolean isBroadcastOrTalk = "broadcast".equals(event.getApp()) || "talk".equals(event.getApp());
+        if (isBroadcastOrTalk) {
+            talkCacheManager.put(event.getApp(), event.getStream(), event.getApp(),
+                    event.getMediaServer().getId(), DateUtil.getNow());
+            log.info("[语音流上线-缓存] app: {}, stream: {}, deviceId: {}", event.getApp(), event.getStream(), deviceId);
         } else {
-            updatePushStatus(streamPushInDb, true);
+            handlePushArrival(event, deviceId);
         }
+
         // 冗余数据，自己系统中自用
         if (!"broadcast".equals(event.getApp()) && !"talk".equals(event.getApp())) {
             redisCatchStorage.addPushListItem(event.getApp(), event.getStream(), event.getMediaInfo());
@@ -111,13 +130,62 @@ public class StreamPushServiceImpl implements IStreamPushService {
     }
 
     /**
+     * 普通推流上线（写DB）
+     */
+    private void handlePushArrival(MediaArrivalEvent event, String deviceId) {
+        Device deviceInDb = deviceMapper.getPushDeviceByDeviceId(deviceId);
+
+        if (deviceInDb == null) {
+            // 自动创建推流设备
+            Device device = new Device();
+            device.setDeviceId(deviceId);
+            device.setName(event.getApp());
+            device.setMediaServerId(event.getMediaServer().getId());
+            device.setOnLine(true);
+            device.setStartOfflinePush(true);
+            device.setCreateTime(DateUtil.getNow());
+            device.setUpdateTime(DateUtil.getNow());
+            device.setPushTime(DateUtil.getNow());
+            deviceMapper.addPushDevice(device);
+
+            // 创建通道，channel deviceId = stream
+            String channelDeviceId = event.getStream();
+            CommonGBChannel gbChannel = new CommonGBChannel();
+            gbChannel.setDeviceId(channelDeviceId);
+            gbChannel.setName(device.getName());
+            gbChannel.setParentId(deviceId);
+            gbChannel.setDataType(ChannelDataType.STREAM_PUSH.value);
+            gbChannel.setDataDeviceId(device.getId());
+            gbChannel.setStatus("ON");
+            gbChannel.setCreateTime(DateUtil.getNow());
+            gbChannel.setUpdateTime(DateUtil.getNow());
+            gbChannelService.add(gbChannel);
+            log.info("[推流上线-新增] device: {}, channel: {}", deviceId, channelDeviceId);
+        } else {
+            // 更新推流状态
+            deviceInDb.setMediaServerId(event.getMediaServer().getId());
+            deviceInDb.setOnLine(true);
+            deviceInDb.setPushTime(DateUtil.getNow());
+            deviceInDb.setUpdateTime(DateUtil.getNow());
+            deviceMapper.updatePushDevice(deviceInDb);
+
+            // 同步通道状态，channel deviceId = stream
+            String channelDeviceId = event.getStream();
+            CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+            if (channel != null && !"ON".equals(channel.getGbStatus())) {
+                commonGBChannelMapper.updateStatusById(channel.getGbId(), "ON");
+            }
+            log.info("[推流上线-更新] device: {}", deviceId);
+        }
+    }
+
+    /**
      * 流离开的处理
      */
     @Async("taskExecutor")
     @EventListener
     @Transactional
     public void onApplicationEvent(MediaDepartureEvent event) {
-
         // 兼容流注销时类型从redis记录获取
         MediaInfo mediaInfo = redisCatchStorage.getStreamInfo(
                 event.getApp(), event.getStream(), event.getMediaServer().getId());
@@ -125,11 +193,9 @@ public class StreamPushServiceImpl implements IStreamPushService {
             String type = OriginType.values()[mediaInfo.getOriginType()].getType();
             redisCatchStorage.removeStream(event.getMediaServer().getId(), type, event.getApp(), event.getStream());
             if ("PUSH".equalsIgnoreCase(type)) {
-                // 冗余数据，自己系统中自用
                 redisCatchStorage.removePushListItem(event.getApp(), event.getStream(), event.getMediaServer().getId());
             }
             if (type != null) {
-                // 发送流变化redis消息
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("serverId", userSetting.getServerId());
                 jsonObject.put("app", event.getApp());
@@ -139,14 +205,40 @@ public class StreamPushServiceImpl implements IStreamPushService {
                 redisCatchStorage.sendStreamChangeMsg(type, jsonObject);
             }
         }
-        StreamPush streamPush = getPush(event.getApp(), event.getStream());
-        if (streamPush == null) {
+
+        // deviceId = app_stream（与上线时一致，保证唯一性）
+        String deviceId = event.getApp() + "_" + event.getStream();
+
+        // 语音/广播对讲流从缓存移除，不查DB
+        boolean isBroadcastOrTalk = "broadcast".equals(event.getApp()) || "talk".equals(event.getApp());
+        if (isBroadcastOrTalk) {
+            talkCacheManager.remove(deviceId);
+            log.info("[语音流离线-缓存] deviceId: {}, stream: {}", deviceId, event.getStream());
             return;
         }
-        if (streamPush.getGbDeviceId() != null) {
-            updatePushStatus(streamPush, false);
+
+        // 检查是否有国标编码，有国标编码的不删除，只标记离线
+        String channelDeviceId = event.getStream();
+        Device device = deviceMapper.getPushDeviceByDeviceId(deviceId);
+        if (device == null) {
+            return;
+        }
+        CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+        if (channel != null && !ObjectUtils.isEmpty(channel.getGbDeviceId())) {
+            // 有国标编码，只标记离线
+            device.setOnLine(false);
+            device.setUpdateTime(DateUtil.getNow());
+            deviceMapper.updatePushDeviceStatus(device);
+            if ("ON".equals(channel.getGbStatus())) {
+                commonGBChannelMapper.updateStatusById(channel.getGbId(), "OFF");
+            }
         } else {
-            deleteByAppAndStream(event.getApp(), event.getStream());
+            // 没有国标编码，删除
+            if (channel != null) {
+                gbChannelService.delete(channel.getGbId());
+            }
+            deviceMapper.deletePushDevice(device.getId());
+            log.info("[推流离线-删除] device: {}", deviceId);
         }
     }
 
@@ -182,130 +274,156 @@ public class StreamPushServiceImpl implements IStreamPushService {
 
     @Override
     public List<StreamPush> getPushList(String mediaServerId) {
-        return streamPushMapper.selectAllByMediaServerIdWithOutGbID(mediaServerId);
+        List<Device> devices = deviceMapper.getPushDeviceListByMediaServerId(mediaServerId);
+        List<StreamPush> result = new ArrayList<>();
+        for (Device device : devices) {
+            // channel deviceId = app + "01"
+            String channelDeviceId = device.getDeviceId() + "01";
+            CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+            result.add(StreamPush.buildFromDevice(device, channel));
+        }
+        return result;
     }
-
 
     @Override
     public StreamPush getPush(String app, String stream) {
-        return streamPushMapper.selectByAppAndStream(app, stream);
+        // 广播/对讲流优先从缓存查
+        String cacheKey = app + "_" + stream;
+        TalkCacheItem cacheItem = talkCacheManager.get(cacheKey);
+        if (cacheItem != null) {
+            return cacheItem.toStreamPush();
+        }
+        // deviceId = app（普通推流）
+        Device device = deviceMapper.getPushDeviceByDeviceId(app);
+        if (device == null) {
+            return null;
+        }
+        // channel deviceId = stream
+        CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(stream);
+        return StreamPush.buildFromDevice(device, channel);
     }
 
     @Override
     @Transactional
     public boolean add(StreamPush stream) {
-        log.info("[添加推流] app: {}, stream: {}, 国标编号: {}", stream.getApp(), stream.getStream(), stream.getGbDeviceId());
-        StreamPush streamPushInDb = streamPushMapper.selectByAppAndStream(stream.getApp(), stream.getStream());
-        if (streamPushInDb != null) {
-            throw new ControllerException(ErrorCode.ERROR100.getCode(), "应用名+流ID已存在");
+        String app = stream.getApp();
+        String streamVal = stream.getStream();
+        log.info("[添加推流] name: {}, app: {}, stream: {}", stream.getName(), app, streamVal);
+
+        // deviceId = app
+        Device deviceInDb = deviceMapper.getPushDeviceByDeviceId(app);
+        if (deviceInDb != null) {
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "推流设备已存在");
         }
-        stream.setUpdateTime(DateUtil.getNow());
-        stream.setCreateTime(DateUtil.getNow());
-        int addResult = streamPushMapper.add(stream);
-        if (addResult <= 0) {
-            return false;
-        }
-        if (ObjectUtils.isEmpty(stream.getGbDeviceId())) {
-            return true;
-        }
-        CommonGBChannel channel = gbChannelService.queryByDeviceId(stream.getGbDeviceId());
-        if (channel != null) {
-            log.info("[添加推流]失败，国标编号已存在: {} app: {}, stream: {}, ", stream.getGbDeviceId(), stream.getApp(), stream.getStream());
-        }
-        int addChannelResult = gbChannelService.add(stream.buildCommonGBChannel());
+
+        Device device = new Device();
+        device.setDeviceId(app);
+        device.setName(stream.getName());
+        device.setOnLine(false);
+        device.setStartOfflinePush(stream.isStartOfflinePush());
+        device.setCreateTime(DateUtil.getNow());
+        device.setUpdateTime(DateUtil.getNow());
+        deviceMapper.addPushDevice(device);
+
+        // 创建通道，channel deviceId = stream = app_01
+        CommonGBChannel channel = new CommonGBChannel();
+        channel.setDeviceId(streamVal);
+        channel.setName(stream.getName());
+        channel.setParentId(app);
+        channel.setDataType(ChannelDataType.STREAM_PUSH.value);
+        channel.setDataDeviceId(device.getId());
+        channel.setGbDeviceId(stream.getGbDeviceId());
+        channel.setGbName(stream.getGbName());
+        channel.setStatus("OFF");
+        channel.setCreateTime(DateUtil.getNow());
+        channel.setUpdateTime(DateUtil.getNow());
+        int addChannelResult = gbChannelService.add(channel);
+
         return addChannelResult > 0;
     }
 
     @Override
     @Transactional
-    public void deleteByAppAndStream(String app, String stream) {
-        log.info("[删除推流] app: {}, stream: {}, ", app, stream);
-        StreamPush streamPush = streamPushMapper.selectByAppAndStream(app, stream);
-        if (streamPush == null) {
-            log.info("[删除推流]失败， 不存在 app: {}, stream: {}, ", app, stream);
-            return;
-        }
-        if (streamPush.isPushing()) {
-            stop(streamPush);
-        }
-        if (streamPush.getGbId() > 0) {
-            gbChannelService.delete(streamPush.getGbId());
-        }
-        streamPushMapper.del(streamPush.getId());
-    }
-
-    @Override
-    @Transactional
     public boolean update(StreamPush streamPush) {
-        Assert.notNull(streamPush, "推流信息不可为NULL");
-        Assert.isTrue(streamPush.getId() > 0, "推流信息ID必须存在");
-        log.info("[更新推流]：id: {}, app: {}, stream: {}, ", streamPush.getId(), streamPush.getApp(), streamPush.getStream());
-        StreamPush streamPushInDb = streamPushMapper.queryOne(streamPush.getId());
-        if (!streamPushInDb.getApp().equals(streamPush.getApp()) || !streamPushInDb.getStream().equals(streamPush.getStream())) {
-            // app或者stream变化
-            StreamPush streamPushInDbForAppAndStream = streamPushMapper.selectByAppAndStream(streamPush.getApp(), streamPush.getStream());
-            if (streamPushInDbForAppAndStream != null && !streamPushInDbForAppAndStream.getId().equals(streamPush.getId())) {
-                throw new ControllerException(ErrorCode.ERROR100.getCode(), "应用名+流ID已存在");
+        log.info("[更新推流] id: {}, name: {}", streamPush.getId(), streamPush.getName());
+        Device device = deviceMapper.query(streamPush.getId());
+        if (device == null) {
+            throw new ControllerException(ErrorCode.ERROR400.getCode(), "推流设备不存在");
+        }
+
+        // 更新设备名称
+        if (!ObjectUtils.isEmpty(streamPush.getName())) {
+            device.setName(streamPush.getName());
+            device.setUpdateTime(DateUtil.getNow());
+            // 直接更新设备名称
+            deviceMapper.update(device);
+        }
+
+        if (streamPush.isStartOfflinePush() != device.isStartOfflinePush()) {
+            device.setStartOfflinePush(streamPush.isStartOfflinePush());
+            device.setUpdateTime(DateUtil.getNow());
+            deviceMapper.updatePushDeviceStatus(device);
+        }
+
+        // 更新通道名称（与设备名称保持一致）
+        String channelDeviceId = device.getDeviceId() + "01";
+        CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+        if (channel != null) {
+            if (!ObjectUtils.isEmpty(streamPush.getName())) {
+                channel.setName(streamPush.getName());
             }
+            if (!ObjectUtils.isEmpty(streamPush.getGbDeviceId())) {
+                channel.setGbDeviceId(streamPush.getGbDeviceId());
+                channel.setGbName(streamPush.getGbName());
+            }
+            gbChannelService.update(channel);
         }
-        streamPush.setUpdateTime(DateUtil.getNow());
-        streamPushMapper.update(streamPush);
-        if (streamPush.getGbId() > 0 && streamPush.buildCommonGBChannel() != null)  {
-            gbChannelService.update(streamPush.buildCommonGBChannel());
-        }
+
         return true;
     }
-
 
     @Override
     @Transactional
     public boolean stop(StreamPush streamPush) {
-        log.info("[主动停止推流] id: {}, app: {}, stream: {}, ", streamPush.getId(), streamPush.getApp(), streamPush.getStream());
-        MediaServer mediaServer = null;
-        if (streamPush.getMediaServerId() == null) {
-            log.info("[主动停止推流]未找到使用MediaServer，开始自动检索 id: {}, app: {}, stream: {}, ", streamPush.getId(), streamPush.getApp(), streamPush.getStream());
+        log.info("[主动停止推流] id: {}, app: {}, stream: {}", streamPush.getId(), streamPush.getApp(), streamPush.getStream());
+        // deviceId = app
+        Device device = deviceMapper.getPushDeviceByDeviceId(streamPush.getApp());
+        if (device == null) {
+            return false;
+        }
+
+        MediaServer mediaServer = mediaServerService.getOne(device.getMediaServerId());
+        if (mediaServer == null) {
             mediaServer = mediaServerService.getMediaServerByAppAndStream(streamPush.getApp(), streamPush.getStream());
-            if (mediaServer != null) {
-                log.info("[主动停止推流] 检索到MediaServer为{}， id: {}, app: {}, stream: {}, ", mediaServer.getId(), streamPush.getId(), streamPush.getApp(), streamPush.getStream());
-            } else {
-                log.info("[主动停止推流]未找到使用MediaServer id: {}, app: {}, stream: {}, ", streamPush.getId(), streamPush.getApp(), streamPush.getStream());
-            }
-        } else {
-            mediaServer = mediaServerService.getOne(streamPush.getMediaServerId());
-            if (mediaServer == null) {
-                log.info("[主动停止推流]未找到使用的MediaServer： {}，开始自动检索 id: {}, app: {}, stream: {}, ", streamPush.getMediaServerId(), streamPush.getId(), streamPush.getApp(), streamPush.getStream());
-                mediaServer = mediaServerService.getMediaServerByAppAndStream(streamPush.getApp(), streamPush.getStream());
-                if (mediaServer != null) {
-                    log.info("[主动停止推流] 检索到MediaServer为{}， id: {}, app: {}, stream: {}, ", mediaServer.getId(), streamPush.getId(), streamPush.getApp(), streamPush.getStream());
-                } else {
-                    log.info("[主动停止推流]未找到使用MediaServer id: {}, app: {}, stream: {}, ", streamPush.getId(), streamPush.getApp(), streamPush.getStream());
-                }
-            }
         }
         if (mediaServer != null) {
             mediaServerService.closeStreams(mediaServer, streamPush.getApp(), streamPush.getStream());
         }
-        streamPush.setPushing(false);
-        if (userSetting.getUsePushingAsStatus()) {
-            CommonGBChannel commonGBChannel = streamPush.buildCommonGBChannel();
-            if (commonGBChannel != null) {
-                gbChannelService.offline(commonGBChannel);
+
+        device.setOnLine(false);
+        device.setUpdateTime(DateUtil.getNow());
+        deviceMapper.updatePushDeviceStatus(device);
+
+        String channelDeviceId = streamPush.getStream();
+        CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+        if (channel != null) {
+            if (userSetting.getUsePushingAsStatus()) {
+                commonGBChannelMapper.updateStatusById(channel.getGbId(), "OFF");
             }
         }
+
         sendRtpServerService.deleteByStream(streamPush.getStream());
         mediaServerService.stopSendRtp(mediaServer, streamPush.getApp(), streamPush.getStream(), null);
-        streamPush.setUpdateTime(DateUtil.getNow());
-        streamPushMapper.update(streamPush);
         return true;
     }
 
     @Override
     @Transactional
     public boolean stopByAppAndStream(String app, String stream) {
-        log.info("[主动停止推流] ： app: {}, stream: {}, ", app, stream);
-        StreamPush streamPushItem = streamPushMapper.selectByAppAndStream(app, stream);
-        if (streamPushItem != null) {
-            stop(streamPushItem);
+        log.info("[主动停止推流] app: {}, stream: {}", app, stream);
+        StreamPush streamPush = getPush(app, stream);
+        if (streamPush != null) {
+            stop(streamPush);
         }
         return true;
     }
@@ -313,53 +431,66 @@ public class StreamPushServiceImpl implements IStreamPushService {
     @Override
     @Transactional
     public void zlmServerOnline(MediaServer mediaServer) {
-        // 同步zlm推流信息
         if (mediaServer == null) {
             return;
         }
-        // 数据库记录
-        List<StreamPush> pushList = getPushList(mediaServer.getId());
-        Map<String, StreamPush> pushItemMap = new HashMap<>();
-        // redis记录
+        // 获取数据库中的推流设备
+        List<Device> devices = deviceMapper.getPushDeviceListByMediaServerId(mediaServer.getId());
+        Map<String, Device> deviceMapForDb = new HashMap<>();
+        for (Device device : devices) {
+            // deviceId = app
+            deviceMapForDb.put(device.getDeviceId(), device);
+        }
+
+        // 获取Redis中的推流信息
         List<MediaInfo> mediaInfoList = redisCatchStorage.getStreams(mediaServer.getId(), "PUSH");
         Map<String, MediaInfo> streamInfoPushItemMap = new HashMap<>();
-        if (!pushList.isEmpty()) {
-            for (StreamPush streamPushItem : pushList) {
-                if (ObjectUtils.isEmpty(streamPushItem.getGbId())) {
-                    pushItemMap.put(streamPushItem.getApp() + streamPushItem.getStream(), streamPushItem);
-                }
-            }
-        }
         if (!mediaInfoList.isEmpty()) {
             for (MediaInfo mediaInfo : mediaInfoList) {
-                streamInfoPushItemMap.put(mediaInfo.getApp() + mediaInfo.getStream(), mediaInfo);
+                // key = app（deviceId）
+                streamInfoPushItemMap.put(mediaInfo.getApp(), mediaInfo);
             }
         }
-        // 获取所有推流鉴权信息，清理过期的
+
+        // 获取所有推流鉴权信息
         List<StreamAuthorityInfo> allStreamAuthorityInfo = redisCatchStorage.getAllStreamAuthorityInfo();
         Map<String, StreamAuthorityInfo> streamAuthorityInfoInfoMap = new HashMap<>();
         for (StreamAuthorityInfo streamAuthorityInfo : allStreamAuthorityInfo) {
-            streamAuthorityInfoInfoMap.put(streamAuthorityInfo.getApp() + streamAuthorityInfo.getStream(), streamAuthorityInfo);
+            streamAuthorityInfoInfoMap.put(streamAuthorityInfo.getApp(), streamAuthorityInfo);
         }
+
         List<StreamInfo> mediaList = mediaServerService.getMediaList(mediaServer, null, null, null);
         if (mediaList == null) {
             return;
         }
-        List<StreamPush> streamPushItems = handleJSON(mediaList);
-        if (streamPushItems != null) {
-            for (StreamPush streamPushItem : streamPushItems) {
-                pushItemMap.remove(streamPushItem.getApp() + streamPushItem.getStream());
-                streamInfoPushItemMap.remove(streamPushItem.getApp() + streamPushItem.getStream());
-                streamAuthorityInfoInfoMap.remove(streamPushItem.getApp() + streamPushItem.getStream());
-            }
-        }
-        List<StreamPush> changedStreamPushList = new ArrayList<>(pushItemMap.values());
-        if (!changedStreamPushList.isEmpty()) {
-            for (StreamPush streamPush : changedStreamPushList) {
-                stop(streamPush);
+
+        for (StreamInfo streamInfo : mediaList) {
+            if (streamInfo.getOriginType() == OriginType.RTSP_PUSH.ordinal()
+                    || streamInfo.getOriginType() == OriginType.RTMP_PUSH.ordinal()
+                    || streamInfo.getOriginType() == OriginType.RTC_PUSH.ordinal()) {
+                // key = app（直接匹配 deviceId）
+                deviceMapForDb.remove(streamInfo.getApp());
+                streamInfoPushItemMap.remove(streamInfo.getApp());
+                streamAuthorityInfoInfoMap.remove(streamInfo.getApp());
             }
         }
 
+        // 处理在DB中但不在ZLM中的设备（标记离线或停止）
+        if (!deviceMapForDb.isEmpty()) {
+            for (Device device : deviceMapForDb.values()) {
+                device.setOnLine(false);
+                device.setUpdateTime(DateUtil.getNow());
+                deviceMapper.updatePushDeviceStatus(device);
+
+                String channelDeviceId = device.getDeviceId() + "01";
+                CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+                if (channel != null && "ON".equals(channel.getGbStatus())) {
+                    commonGBChannelMapper.updateStatusById(channel.getGbId(), "OFF");
+                }
+            }
+        }
+
+        // 清理Redis中的过期数据
         Collection<MediaInfo> mediaInfos = streamInfoPushItemMap.values();
         if (!mediaInfos.isEmpty()) {
             String type = "PUSH";
@@ -371,9 +502,7 @@ public class StreamPushServiceImpl implements IStreamPushService {
                 jsonObject.put("register", false);
                 jsonObject.put("mediaServerId", mediaServer.getId());
                 redisCatchStorage.sendStreamChangeMsg(type, jsonObject);
-                // 移除redis内流的信息
                 redisCatchStorage.removeStream(mediaServer.getId(), "PUSH", mediaInfo.getApp(), mediaInfo.getStream());
-                // 冗余数据，自己系统中自用
                 redisCatchStorage.removePushListItem(mediaInfo.getApp(), mediaInfo.getStream(), mediaServer.getId());
             }
         }
@@ -381,7 +510,6 @@ public class StreamPushServiceImpl implements IStreamPushService {
         Collection<StreamAuthorityInfo> streamAuthorityInfos = streamAuthorityInfoInfoMap.values();
         if (!streamAuthorityInfos.isEmpty()) {
             for (StreamAuthorityInfo streamAuthorityInfo : streamAuthorityInfos) {
-                // 移除redis内流的信息
                 redisCatchStorage.removeStreamAuthorityInfo(streamAuthorityInfo.getApp(), streamAuthorityInfo.getStream());
             }
         }
@@ -390,24 +518,28 @@ public class StreamPushServiceImpl implements IStreamPushService {
     @Override
     @Transactional
     public void zlmServerOffline(MediaServer mediaServer) {
-        List<StreamPush> streamPushItems = streamPushMapper.selectAllByMediaServerId(mediaServer.getId());
-        if (!streamPushItems.isEmpty()) {
-            for (StreamPush streamPushItem : streamPushItems) {
-                stop(streamPushItem);
+        List<Device> devices = deviceMapper.getPushDeviceListByMediaServerId(mediaServer.getId());
+        if (!devices.isEmpty()) {
+            for (Device device : devices) {
+                device.setOnLine(false);
+                device.setUpdateTime(DateUtil.getNow());
+                deviceMapper.updatePushDeviceStatus(device);
+
+                String channelDeviceId = device.getDeviceId() + "01";
+                CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+                if (channel != null && "ON".equals(channel.getGbStatus())) {
+                    commonGBChannelMapper.updateStatusById(channel.getGbId(), "OFF");
+                }
             }
         }
-//        // 移除没有GBId的推流
-//        streamPushMapper.deleteWithoutGBId(mediaServerId);
-//        // 其他的流设置未启用
-//        streamPushMapper.updateStatusByMediaServerId(mediaServerId, false);
-//        streamProxyMapper.updateStatusByMediaServerId(mediaServerId, false);
-        // 发送流停止消息
+
+        // 清理该 ZLM 节点上的语音/广播对讲缓存
+        talkCacheManager.removeByMediaServerId(mediaServer.getId());
+
         String type = "PUSH";
-        // 发送redis消息
         List<MediaInfo> mediaInfoList = redisCatchStorage.getStreams(mediaServer.getId(), type);
         if (!mediaInfoList.isEmpty()) {
             for (MediaInfo mediaInfo : mediaInfoList) {
-                // 移除redis内流的信息
                 redisCatchStorage.removeStream(mediaServer.getId(), type, mediaInfo.getApp(), mediaInfo.getStream());
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("serverId", userSetting.getServerId());
@@ -416,8 +548,6 @@ public class StreamPushServiceImpl implements IStreamPushService {
                 jsonObject.put("register", false);
                 jsonObject.put("mediaServerId", mediaServer.getId());
                 redisCatchStorage.sendStreamChangeMsg(type, jsonObject);
-
-                // 冗余数据，自己系统中自用
                 redisCatchStorage.removePushListItem(mediaInfo.getApp(), mediaInfo.getStream(), mediaServer.getId());
             }
         }
@@ -426,163 +556,199 @@ public class StreamPushServiceImpl implements IStreamPushService {
     @Override
     @Transactional
     public void batchAdd(List<StreamPush> streamPushItems) {
-        streamPushMapper.addAll(streamPushItems);
-        List<CommonGBChannel> commonGBChannels = new ArrayList<>();
         for (StreamPush streamPush : streamPushItems) {
-            if (!ObjectUtils.isEmpty(streamPush.getGbDeviceId())) {
-                commonGBChannels.add(streamPush.buildCommonGBChannel());
-            }
+            add(streamPush);
         }
-        gbChannelService.batchAdd(commonGBChannels);
     }
 
     @Override
     public void allOffline() {
-        List<StreamPush> streamPushList = streamPushMapper.selectAll(null, null, null);
-        if (streamPushList.isEmpty()) {
+        List<Device> devices = deviceMapper.getPushDeviceList();
+        if (devices.isEmpty()) {
             return;
         }
-        List<CommonGBChannel> commonGBChannelList = new ArrayList<>();
-        for (StreamPush streamPush : streamPushList) {
-            CommonGBChannel commonGBChannel = streamPush.buildCommonGBChannel();
-            if (commonGBChannel != null) {
-                commonGBChannelList.add(streamPush.buildCommonGBChannel());
+        for (Device device : devices) {
+            String channelDeviceId = device.getDeviceId() + "01";
+            CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+            if (channel != null) {
+                commonGBChannelMapper.updateStatusById(channel.getGbId(), "OFF");
             }
         }
-        gbChannelService.offline(commonGBChannelList);
     }
 
     @Override
     public void offline(List<StreamPushItemFromRedis> offlineStreams) {
-        // 更新部分设备离线
-        List<StreamPush> streamPushList = streamPushMapper.getListFromRedis(offlineStreams);
-        List<CommonGBChannel> commonGBChannelList = gbChannelService.queryListByStreamPushList(streamPushList);
-        gbChannelService.offline(commonGBChannelList);
+        for (StreamPushItemFromRedis item : offlineStreams) {
+            // deviceId = app
+            Device device = deviceMapper.getPushDeviceByDeviceId(item.getApp());
+            if (device != null) {
+                device.setOnLine(false);
+                device.setUpdateTime(DateUtil.getNow());
+                deviceMapper.updatePushDeviceStatus(device);
+
+                String channelDeviceId = item.getApp() + "01";
+                CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+                if (channel != null) {
+                    commonGBChannelMapper.updateStatusById(channel.getGbId(), "OFF");
+                }
+            }
+        }
     }
 
     @Override
     public void online(List<StreamPushItemFromRedis> onlineStreams) {
-        // 更新部分设备上线streamPushService
-        List<StreamPush> streamPushList = streamPushMapper.getListFromRedis(onlineStreams);
-        List<CommonGBChannel> commonGBChannelList = gbChannelService.queryListByStreamPushList(streamPushList);
-        gbChannelService.online(commonGBChannelList);
+        for (StreamPushItemFromRedis item : onlineStreams) {
+            // deviceId = app
+            Device device = deviceMapper.getPushDeviceByDeviceId(item.getApp());
+            if (device != null) {
+                device.setOnLine(true);
+                device.setUpdateTime(DateUtil.getNow());
+                deviceMapper.updatePushDeviceStatus(device);
+
+                String channelDeviceId = item.getApp() + "01";
+                CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+                if (channel != null) {
+                    commonGBChannelMapper.updateStatusById(channel.getGbId(), "ON");
+                }
+            }
+        }
     }
 
     @Override
     public List<String> getAllAppAndStream() {
-        return streamPushMapper.getAllAppAndStream();
+        List<Device> devices = deviceMapper.getPushDeviceList();
+        List<String> result = new ArrayList<>();
+        for (Device device : devices) {
+            result.add(device.getDeviceId());
+        }
+        return result;
     }
 
     @Override
     public ResourceBaseInfo getOverview() {
         int total = streamPushMapper.getAllCount();
-        int online = streamPushMapper.getAllPushing(userSetting.getUsePushingAsStatus());
-
+        int online = streamPushMapper.getAllPushing();
         return new ResourceBaseInfo(total, online);
     }
 
     @Override
     public Map<String, StreamPush> getAllAppAndStreamMap() {
-        return streamPushMapper.getAllAppAndStreamMap();
+        List<Device> devices = deviceMapper.getPushDeviceList();
+        Map<String, StreamPush> result = new HashMap<>();
+        for (Device device : devices) {
+            String channelDeviceId = device.getDeviceId() + "01";
+            CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+            StreamPush push = StreamPush.buildFromDevice(device, channel);
+            result.put(device.getDeviceId(), push);
+        }
+        // 合并广播/对讲缓存条目
+        for (TalkCacheItem cacheItem : talkCacheManager.getAll()) {
+            StreamPush push = cacheItem.toStreamPush();
+            result.put(cacheItem.getDeviceId(), push);
+        }
+        return result;
     }
 
     @Override
     public Map<String, StreamPush> getAllGBId() {
-        return streamPushMapper.getAllGBId();
+        List<Device> devices = deviceMapper.getPushDeviceList();
+        Map<String, StreamPush> result = new HashMap<>();
+        for (Device device : devices) {
+            String channelDeviceId = device.getDeviceId() + "01";
+            CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+            if (channel != null && !ObjectUtils.isEmpty(channel.getGbDeviceId())) {
+                StreamPush push = StreamPush.buildFromDevice(device, channel);
+                result.put(channel.getGbDeviceId(), push);
+            }
+        }
+        return result;
     }
 
     @Override
     public void updateStatus(StreamPush push) {
-
     }
-
 
     @Override
     @Transactional
     public void updatePushStatus(StreamPush streamPush, boolean pushIng) {
-        streamPush.setPushing(pushIng);
-        if (userSetting.getUsePushingAsStatus()) {
-            streamPush.setGbStatus(pushIng ? "ON" : "OFF");
-        }
-        streamPush.setPushTime(DateUtil.getNow());
-        streamPushMapper.updatePushStatus(streamPush.getId(), pushIng);
-        if (ObjectUtils.isEmpty(streamPush.getGbDeviceId())) {
+        // deviceId = app
+        Device device = deviceMapper.getPushDeviceByDeviceId(streamPush.getApp());
+        if (device == null) {
             return;
         }
-        if (userSetting.getUsePushingAsStatus()) {
-            if ("ON".equalsIgnoreCase(streamPush.getGbStatus())) {
-                gbChannelService.online(streamPush.buildCommonGBChannel());
-            } else {
-                gbChannelService.offline(streamPush.buildCommonGBChannel());
-            }
-        }
-    }
+        device.setOnLine(pushIng);
+        device.setPushTime(DateUtil.getNow());
+        device.setUpdateTime(DateUtil.getNow());
+        deviceMapper.updatePushDevice(device);
 
-    private List<StreamPush> handleJSON(List<StreamInfo> streamInfoList) {
-        if (streamInfoList == null || streamInfoList.isEmpty()) {
-            return null;
+        String channelDeviceId = streamPush.getStream();
+        CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(channelDeviceId);
+        if (channel != null) {
+            String status = pushIng ? "ON" : "OFF";
+            commonGBChannelMapper.updateStatusById(channel.getGbId(), status);
         }
-        Map<String, StreamPush> result = new HashMap<>();
-        for (StreamInfo streamInfo : streamInfoList) {
-            // 不保存国标推理以及拉流代理的流
-            if (streamInfo.getOriginType() == OriginType.RTSP_PUSH.ordinal()
-                    || streamInfo.getOriginType() == OriginType.RTMP_PUSH.ordinal()
-                    || streamInfo.getOriginType() == OriginType.RTC_PUSH.ordinal()) {
-                String key = streamInfo.getApp() + "_" + streamInfo.getStream();
-                StreamPush streamPushItem = result.get(key);
-                if (streamPushItem == null) {
-                    streamPushItem = StreamPush.getInstance(streamInfo);
-                    result.put(key, streamPushItem);
-                }
-            }
-        }
-        return new ArrayList<>(result.values());
     }
 
     @Override
-    public void batchUpdate(List<StreamPush> streamPushItemForUpdate) {
-        streamPushMapper.batchUpdate(streamPushItemForUpdate);
-        List<CommonGBChannel> commonGBChannels = new ArrayList<>();
-        for (StreamPush streamPush : streamPushItemForUpdate) {
-            if (!ObjectUtils.isEmpty(streamPush.getGbDeviceId())) {
-                commonGBChannels.add(streamPush.buildCommonGBChannel());
+    @Transactional
+    public void deleteByAppAndStream(String app, String stream) {
+        log.info("[删除推流] app: {}, stream: {}", app, stream);
+        // deviceId = app
+        Device device = deviceMapper.getPushDeviceByDeviceId(app);
+        if (device == null) {
+            return;
+        }
+        if (device.isOnLine()) {
+            MediaServer mediaServer = mediaServerService.getOne(device.getMediaServerId());
+            if (mediaServer != null) {
+                mediaServerService.closeStreams(mediaServer, app, stream);
             }
         }
-        gbChannelService.batchUpdate(commonGBChannels);
+        // channel deviceId = stream
+        CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(stream);
+        if (channel != null) {
+            gbChannelService.delete(channel.getGbId());
+        }
+        deviceMapper.deletePushDevice(device.getId());
     }
 
     @Override
     @Transactional
     public int delete(int id) {
-        StreamPush streamPush = streamPushMapper.queryOne(id);
-        if (streamPush == null) {
+        Device device = deviceMapper.query(id);
+        if (device == null) {
             return 0;
         }
-        if (streamPush.isPushing()) {
-            MediaServer mediaServer = mediaServerService.getOne(streamPush.getMediaServerId());
-            mediaServerService.closeStreams(mediaServer, streamPush.getApp(), streamPush.getStream());
+        // deviceId = app
+        String app = device.getDeviceId();
+        String stream = app + "01";
+        if (device.isOnLine()) {
+            MediaServer mediaServer = mediaServerService.getOne(device.getMediaServerId());
+            if (mediaServer != null) {
+                mediaServerService.closeStreams(mediaServer, app, stream);
+            }
         }
-        if (streamPush.getGbDeviceId() != null) {
-            gbChannelService.delete(streamPush.getGbId());
+        // channel deviceId = stream
+        CommonGBChannel channel = commonGBChannelMapper.queryByDeviceId(stream);
+        if (channel != null) {
+            gbChannelService.delete(channel.getGbId());
         }
-        return streamPushMapper.del(id);
+        return deviceMapper.deletePushDevice(device.getId());
     }
 
     @Override
     @Transactional
     public void batchRemove(Set<Integer> ids) {
-        List<StreamPush> streamPushList = streamPushMapper.selectInSet(ids);
-        if (streamPushList.isEmpty()) {
-            return;
+        for (Integer id : ids) {
+            delete(id);
         }
-        List<CommonGBChannel> commonGBChannelList = new ArrayList<>();
-        streamPushList.stream().forEach(streamPush -> {
-            if (streamPush.getGbDeviceId() != null) {
-                commonGBChannelList.add(streamPush.buildCommonGBChannel());
-            }
-        });
-        streamPushMapper.batchDel(streamPushList);
-        gbChannelService.delete(ids);
+    }
+
+    @Override
+    public void batchUpdate(List<StreamPush> streamPushItemForUpdate) {
+        for (StreamPush push : streamPushItemForUpdate) {
+            update(push);
+        }
     }
 
     @Override

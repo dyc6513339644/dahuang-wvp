@@ -16,6 +16,31 @@ public class CommonGBChannel {
     private int gbId;
 
     /**
+     * 编码（非国标通道使用）
+     */
+    private String deviceId;
+
+    /**
+     * 名称（非国标通道使用）
+     */
+    private String name;
+
+    /**
+     * 父节点ID（非国标通道使用）
+     */
+    private String parentId;
+
+    /**
+     * 状态（非国标通道使用）
+     */
+    private String status;
+
+    /**
+     * 地址（非国标通道使用）
+     */
+    private String address;
+
+    /**
      * 国标-编码
      */
     private String gbDeviceId;
@@ -211,6 +236,21 @@ public class CommonGBChannel {
      * 更新时间
      */
     private String updateTime;
+
+    /**
+     * 通道号（ONVIF Profile token）
+     */
+    private String channelNo;
+
+    /**
+     * 取流地址（ONVIF RTSP URL）
+     */
+    private String srcUrl;
+
+    /**
+     * 是否开启音频
+     */
+    private boolean hasAudio;
 
     public String encode(String serverDeviceId) {
         return encode(null, serverDeviceId);
@@ -433,7 +473,7 @@ public class CommonGBChannel {
         commonGBChannel.setGbDeviceId(platform.getDeviceGBId());
         commonGBChannel.setGbName(platform.getName());
         commonGBChannel.setGbManufacturer(platform.getManufacturer());
-        commonGBChannel.setGbModel(platform.getModel());
+        commonGBChannel.setGbModel(platform.getDbModel());
         commonGBChannel.setGbCivilCode(platform.getCivilCode());
         commonGBChannel.setGbAddress(platform.getAddress());
         commonGBChannel.setGbRegisterWay(platform.getRegisterWay());

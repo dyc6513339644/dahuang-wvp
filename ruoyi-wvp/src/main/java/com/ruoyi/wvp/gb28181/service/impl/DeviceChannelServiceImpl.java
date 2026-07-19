@@ -570,7 +570,7 @@ public class DeviceChannelServiceImpl implements IDeviceChannelService {
                     subContMap.put(deviceChannel.getParentId(), 1);
                 } else {
                     Integer count = subContMap.get(deviceChannel.getParentId());
-                    subContMap.put(deviceChannel.getParentId(), count++);
+                    subContMap.put(deviceChannel.getParentId(), count + 1);
                 }
             }
         }
@@ -701,6 +701,17 @@ public class DeviceChannelServiceImpl implements IDeviceChannelService {
                     .replaceAll("_", "/_");
         }
         return channelMapper.queryAllNewChannels(query);
+    }
+
+    @Override
+    public List<DeviceChannel> queryAllChannelsForPage(String query,int pageNum, int pageSize) {
+        if (query != null) {
+            query = query.replaceAll("/", "//")
+                    .replaceAll("%", "/%")
+                    .replaceAll("_", "/_");
+        }
+        startPage();
+        return channelMapper.queryAllChannelsForPage(query);
     }
 
 

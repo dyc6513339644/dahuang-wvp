@@ -46,4 +46,9 @@ public class CacheConstants
      * 工作台数据 redis key
      */
     public static final String SYS_WORK_LIST = "sys_work_list:";
+
+    /**
+     * goview工作台数据 redis key
+     */
+    public static final String SYS_GOVIEW_WORK_LIST = "sys_goview_work_list:";
 }

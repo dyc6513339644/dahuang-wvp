@@ -60,10 +60,13 @@ public class GbChannelServiceImpl implements IGbChannelService {
         if (commonGBChannel.getDataType() == null || commonGBChannel.getDataDeviceId() == null) {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "缺少通道数据类型或通道数据关联设备ID");
         }
-        CommonGBChannel commonGBChannelInDb = commonGBChannelMapper.queryByDataId(commonGBChannel.getDataType(), commonGBChannel.getDataDeviceId());
-        if (commonGBChannelInDb != null) {
-            throw new ControllerException(ErrorCode.ERROR100.getCode(), "此推流已经关联通道");
+        if (commonGBChannel.getDataType() == ChannelDataType.GB28181.value) {
+            CommonGBChannel commonGBChannelInDb = commonGBChannelMapper.queryByDataId(commonGBChannel.getDataType(), commonGBChannel.getDataDeviceId());
+            if (commonGBChannelInDb != null) {
+                throw new ControllerException(ErrorCode.ERROR100.getCode(), "此推流已经关联通道");
+            }
         }
+
         commonGBChannel.setCreateTime(DateUtil.getNow());
         commonGBChannel.setUpdateTime(DateUtil.getNow());
         return commonGBChannelMapper.insert(commonGBChannel);
@@ -126,6 +129,11 @@ public class GbChannelServiceImpl implements IGbChannelService {
             }
         }
         return result;
+    }
+
+    @Override
+    public void updateMapLocation(int id, String longitude, String latitude, String address) {
+        commonGBChannelMapper.updateMapLocation(id, longitude, latitude, address, DateUtil.getNow());
     }
 
     @Override

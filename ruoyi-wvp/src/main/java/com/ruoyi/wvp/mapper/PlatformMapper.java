@@ -16,11 +16,11 @@ public interface PlatformMapper {
     @Insert("INSERT INTO wvp_platform (enable, name, server_gb_id, server_gb_domain, server_ip, server_port,device_gb_id,device_ip,"+
             " device_port,username,password,expires,keep_timeout,transport,character_set,ptz,rtcp,status,catalog_group, update_time," +
             " create_time, as_message_channel, send_stream_ip, auto_push_channel, catalog_with_platform,catalog_with_group,catalog_with_region, "+
-            " civil_code,manufacturer,model,address,register_way,secrecy) " +
+            " civil_code,manufacturer,db_model,address,register_way,secrecy) " +
             " VALUES (#{enable}, #{name}, #{serverGBId}, #{serverGBDomain}, #{serverIp}, #{serverPort}, #{deviceGBId}, #{deviceIp}, " +
             " #{devicePort}, #{username}, #{password}, #{expires}, #{keepTimeout}, #{transport}, #{characterSet}, #{ptz}, #{rtcp}, #{status}, #{catalogGroup},#{updateTime}," +
             " #{createTime}, #{asMessageChannel}, #{sendStreamIp}, #{autoPushChannel}, #{catalogWithPlatform}, #{catalogWithGroup},#{catalogWithRegion}, " +
-            " #{civilCode}, #{manufacturer}, #{model}, #{address}, #{registerWay}, #{secrecy})")
+            " #{civilCode}, #{manufacturer}, #{dbModel}, #{address}, #{registerWay}, #{secrecy})")
     int add(Platform parentPlatform);
 
     @Update("UPDATE wvp_platform " +
@@ -52,7 +52,7 @@ public interface PlatformMapper {
             " catalog_with_region=#{catalogWithRegion}, " +
             " civil_code=#{civilCode}, " +
             " manufacturer=#{manufacturer}, " +
-            " model=#{model}, " +
+            " db_model=#{dbModel}, " +
             " address=#{address}, " +
             " register_way=#{registerWay}, " +
             " secrecy=#{secrecy} " +

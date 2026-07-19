@@ -428,7 +428,7 @@ public class CloudRecordController extends BaseController {
         if (!ObjectUtils.isEmpty(list)) {
             for (CloudRecordItem cloudRecordItem : list) {
                 CloudRecordUrl cloudRecordUrl = new CloudRecordUrl();
-                cloudRecordUrl.setId(cloudRecordItem.getId());
+                cloudRecordUrl.setId(cloudRecordItem.getId().intValue());
                 cloudRecordUrl.setDownloadUrl(remoteHost + "/index/api/downloadFile?file_path=" + cloudRecordItem.getFilePath() + "&save_name=" + cloudRecordItem.getStream() + "_" + cloudRecordItem.getCallId() + "_" + DateUtil.timestampMsToUrlToyyyy_MM_dd_HH_mm_ss(cloudRecordItem.getStartTime()));
                 cloudRecordUrl.setPlayUrl(remoteHost + "/index/api/downloadFile?file_path=" + cloudRecordItem.getFilePath());
                 cloudRecordUrlList.add(cloudRecordUrl);

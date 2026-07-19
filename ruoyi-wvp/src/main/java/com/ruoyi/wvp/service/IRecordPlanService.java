@@ -9,23 +9,23 @@ import java.util.List;
 public interface IRecordPlanService {
 
 
-    RecordPlan get(Integer planId);
+    RecordPlan get(Long planId);
 
     void update(RecordPlan plan);
 
-    void delete(Integer planId);
+    void delete(Long planId);
 
     List<RecordPlan> query(Integer pageNum, Integer pageSize, String query);
 
     void add(RecordPlan plan);
 
-    void link(List<Integer> channelIds, Integer planId);
+    void link(List<Integer> channelIds, Long planId);
 
-    List<CommonGBChannel> queryChannelList(int pageNum, int pageSize, String query, Integer channelType, Boolean online, Integer planId, Boolean hasLink);
+    List<CommonGBChannel> queryChannelList(int pageNum, int pageSize, String query, Integer channelType, Boolean online, Long planId, Boolean hasLink);
 
-    void linkAll(Integer planId);
+    void linkAll(Long planId);
 
-    void cleanAll(Integer planId);
+    void cleanAll(Long planId);
 
     Integer recording(String app, String stream);
 }

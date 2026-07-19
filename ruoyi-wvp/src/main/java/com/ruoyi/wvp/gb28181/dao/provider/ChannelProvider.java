@@ -2,6 +2,7 @@ package com.ruoyi.wvp.gb28181.dao.provider;
 
 
 
+import com.ruoyi.common.utils.DatabaseDialectHolder;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
 import com.ruoyi.wvp.gb28181.bean.Group;
 import com.ruoyi.wvp.streamPush.bean.StreamPush;
@@ -12,7 +13,8 @@ import java.util.Map;
 
 public class ChannelProvider {
 
-    public final static String BASE_SQL = "select\n" +
+    public static String baseSql() {
+        return "select\n" +
             "    id as gb_id,\n" +
             "    data_type,\n" +
             "    data_device_id,\n" +
@@ -20,15 +22,19 @@ public class ChannelProvider {
             "    update_time,\n" +
             "    record_plan_id,\n" +
             "    coalesce(gb_device_id, device_id) as gb_device_id,\n" +
+            "    device_id,\n" +
             "    coalesce(gb_name, name) as gb_name,\n" +
+            "    name,\n" +
             "    coalesce(gb_manufacturer, manufacturer) as gb_manufacturer,\n" +
-            "    coalesce(gb_model, model) as gb_model,\n" +
+            "    coalesce(gb_model, db_model) as gb_model,\n" +
             "    coalesce(gb_owner, owner) as gb_owner,\n" +
             "    coalesce(gb_civil_code, civil_code) as gb_civil_code,\n" +
             "    coalesce(gb_block, block) as gb_block,\n" +
             "    coalesce(gb_address, address) as gb_address,\n" +
+            "    address,\n" +
             "    coalesce(gb_parental, parental) as gb_parental,\n" +
-            "    (SELECT device_id FROM wvp_device WHERE id = data_device_id LIMIT 1) AS gb_parent_id,\n" +
+            "    (SELECT device_id FROM wvp_device WHERE id = data_device_id" + DatabaseDialectHolder.limitOne() + ") AS gb_parent_id,\n" +
+            "    parent_id,\n" +
             "    coalesce(gb_safety_way, safety_way) as gb_safety_way,\n" +
             "    coalesce(gb_register_way, register_way) as gb_register_way,\n" +
             "    coalesce(gb_cert_num, cert_num) as gb_cert_num,\n" +
@@ -40,6 +46,7 @@ public class ChannelProvider {
             "    coalesce(gb_port, port) as gb_port,\n" +
             "    coalesce(gb_password, password) as gb_password,\n" +
             "    coalesce(gb_status, status) as gb_status,\n" +
+            "    status,\n" +
             "    coalesce(gb_longitude, longitude) as gb_longitude,\n" +
             "    coalesce(gb_latitude, latitude) as gb_latitude,\n" +
             "    coalesce(gb_ptz_type, ptz_type) as gb_ptz_type,\n" +
@@ -52,9 +59,13 @@ public class ChannelProvider {
             "    coalesce(gb_business_group_id, business_group_id) as gb_business_group_id,\n" +
             "    coalesce(gb_download_speed, download_speed) as gb_download_speed,\n" +
             "    coalesce(gb_svc_space_support_mod, svc_space_support_mod) as gb_svc_space_support_mod,\n" +
-            "    coalesce(gb_svc_time_support_mode,svc_time_support_mode) as gb_svc_time_support_mode\n" +
+            "    coalesce(gb_svc_time_support_mode,svc_time_support_mode) as gb_svc_time_support_mode,\n" +
+            "    channel_no,\n" +
+            "    src_url,\n" +
+            "    has_audio\n" +
             " from wvp_device_channel\n"
             ;
+    }
 
     private final static String BASE_SQL_FOR_PLATFORM =
             "select\n" +
@@ -66,7 +77,7 @@ public class ChannelProvider {
             "    coalesce(wpgc.custom_device_id, wdc.gb_device_id, wdc.device_id) as gb_device_id,\n" +
             "    coalesce(wpgc.custom_name, wdc.gb_name, wdc.name) as gb_name,\n" +
             "    coalesce(wpgc.custom_manufacturer, wdc.gb_manufacturer, wdc.manufacturer) as gb_manufacturer,\n" +
-            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.model) as gb_model,\n" +
+            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.db_model) as gb_model,\n" +
             "    coalesce(wpgc.custom_owner, wdc.gb_owner, wdc.owner) as gb_owner,\n" +
             "    coalesce(wpgc.custom_civil_code, wdc.gb_civil_code, wdc.civil_code) as gb_civil_code,\n" +
             "    coalesce(wpgc.custom_block, wdc.gb_block, wdc.block) as gb_block,\n" +
@@ -102,20 +113,20 @@ public class ChannelProvider {
             ;
 
     public String queryByDeviceId(Map<String, Object> params ){
-        return BASE_SQL + " where channel_type = 0 and coalesce(gb_device_id, device_id) = #{gbDeviceId}";
+        return baseSql() + " where channel_type = 0 and coalesce(gb_device_id, device_id) = #{gbDeviceId}";
     }
 
     public String queryById(Map<String, Object> params ){
-        return BASE_SQL + " where channel_type = 0 and id = #{gbId}";
+        return baseSql() + " where channel_type = 0 and id = #{gbId}";
     }
 
     public String queryByDataId(Map<String, Object> params ){
-        return BASE_SQL + " where channel_type = 0 and data_type = #{dataType} and data_device_id = #{dataDeviceId}";
+        return baseSql() + " where channel_type = 0 and data_type = #{dataType} and data_device_id = #{dataDeviceId}";
     }
 
     public String queryListByCivilCode(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append(" where channel_type = 0 ");
         if (params.get("query") != null) {
             sqlBuild.append(" AND (coalesce(gb_device_id, device_id) LIKE concat('%',#{query},'%') escape '/'" +
@@ -141,7 +152,7 @@ public class ChannelProvider {
 
     public String queryListByParentId(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append(" where channel_type = 0 ");
         if (params.get("query") != null) {
             sqlBuild.append(" AND (coalesce(gb_device_id, device_id) LIKE concat('%',#{query},'%') escape '/'" +
@@ -167,7 +178,7 @@ public class ChannelProvider {
 
     public String queryList(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append(" where channel_type = 0 ");
         if (params.get("query") != null) {
             sqlBuild.append(" AND (coalesce(gb_device_id, device_id) LIKE concat('%',#{query},'%') escape '/'" +
@@ -191,7 +202,7 @@ public class ChannelProvider {
 
     public String queryInListByStatus(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append("where channel_type = 0 and gb_status=#{status} and id in ( ");
 
         List<CommonGBChannel> commonGBChannelList = (List<CommonGBChannel>)params.get("commonGBChannelList");
@@ -209,7 +220,7 @@ public class ChannelProvider {
 
     public String queryByIds(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append("where channel_type = 0 and id in ( ");
 
         Collection<Integer> ids = (Collection<Integer>)params.get("ids");
@@ -227,7 +238,7 @@ public class ChannelProvider {
 
     public String queryByGbDeviceIds(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append("where channel_type = 0 and data_type = #{dataType} and data_device_id in ( ");
 
         Collection<Integer> ids = (Collection<Integer>)params.get("deviceIds");
@@ -245,7 +256,7 @@ public class ChannelProvider {
 
     public String queryByDeviceIds(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append("where channel_type = 0 and id in ( ");
 
         Collection<Integer> ids = (Collection<Integer>)params.get("deviceIds");
@@ -263,7 +274,7 @@ public class ChannelProvider {
 
     public String queryByIdsOrCivilCode(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append("where channel_type = 0 and ");
         if (params.get("civilCode") != null) {
             sqlBuild.append(" coalesce(gb_civil_code, civil_code) = #{civilCode} ");
@@ -289,28 +300,28 @@ public class ChannelProvider {
 
     public String queryByCivilCode(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append("where channel_type = 0 and coalesce(gb_civil_code, civil_code) = #{civilCode} ");
         return sqlBuild.toString();
     }
 
     public String queryByBusinessGroup(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append("where channel_type = 0 and coalesce(gb_business_group_id, business_group_id) = #{businessGroup} ");
         return sqlBuild.toString() ;
     }
 
     public String queryByParentId(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
         sqlBuild.append("where channel_type = 0 and gb_parent_id = #{parentId} ");
         return sqlBuild.toString() ;
     }
 
     public String queryByGroupList(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
 
         sqlBuild.append(" where channel_type = 0 and gb_parent_id in ( ");
         Collection<Group> ids = (Collection<Group>)params.get("groupList");
@@ -329,7 +340,7 @@ public class ChannelProvider {
 
     public String queryListByStreamPushList(Map<String, Object> params ){
         StringBuilder sqlBuild = new StringBuilder();
-        sqlBuild.append(BASE_SQL);
+        sqlBuild.append(baseSql());
 
         sqlBuild.append(" where channel_type = 0 and  data_type = #{dataType} and data_device_id in ( ");
         Collection<StreamPush> ids = (Collection<StreamPush>)params.get("streamPushList");

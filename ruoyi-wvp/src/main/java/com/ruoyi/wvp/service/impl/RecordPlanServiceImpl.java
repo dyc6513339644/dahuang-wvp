@@ -7,6 +7,8 @@ import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
 import com.ruoyi.wvp.gb28181.service.IGbChannelPlayService;
 import com.ruoyi.wvp.mapper.CommonGBChannelMapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ruoyi.wvp.mapper.RecordPlanItemMapper;
 import com.ruoyi.wvp.mapper.RecordPlanMapper;
 import com.ruoyi.wvp.media.bean.MediaInfo;
 import com.ruoyi.wvp.media.event.media.MediaDepartureEvent;
@@ -37,6 +39,9 @@ public class RecordPlanServiceImpl implements IRecordPlanService {
     private RecordPlanMapper recordPlanMapper;
 
     @Autowired
+    private RecordPlanItemMapper recordPlanItemMapper;
+
+    @Autowired
     private CommonGBChannelMapper channelMapper;
 
     @Autowired
@@ -55,8 +60,11 @@ public class RecordPlanServiceImpl implements IRecordPlanService {
         // 流断开，检查是否还处于录像状态， 如果是则继续录像
         Integer channelId = recording(event.getApp(), event.getStream());
         if (channelId == null) {
+            log.info("[录制计划] 流离开事件: app={}, stream={}，不在录像计划中，忽略", event.getApp(), event.getStream());
             return;
         }
+        log.info("[录制计划] 流离开事件: app={}, stream={}, channelId={}，正在录像计划中，准备重新拉起",
+                event.getApp(), event.getStream(), channelId);
         // 重新拉起
         CommonGBChannel channel = channelMapper.queryById(channelId);
         if (channel == null) {
@@ -175,23 +183,22 @@ public class RecordPlanServiceImpl implements IRecordPlanService {
     public void add(RecordPlan plan) {
         plan.setCreateTime(DateUtil.getNow());
         plan.setUpdateTime(DateUtil.getNow());
-        recordPlanMapper.add(plan);
+        recordPlanMapper.insert(plan);
         if (plan.getId() > 0 && !plan.getPlanItemList().isEmpty()) {
             for (RecordPlanItem recordPlanItem : plan.getPlanItemList()) {
                 recordPlanItem.setPlanId(plan.getId());
+                recordPlanItemMapper.insert(recordPlanItem);
             }
-            recordPlanMapper.batchAddItem(plan.getId(), plan.getPlanItemList());
         }
-        // TODO  更新录像队列
     }
 
     @Override
-    public RecordPlan get(Integer planId) {
-        RecordPlan recordPlan = recordPlanMapper.get(planId);
+    public RecordPlan get(Long planId) {
+        RecordPlan recordPlan = recordPlanMapper.selectById(planId);
         if (recordPlan == null) {
             return null;
         }
-        List<RecordPlanItem> recordPlanItemList = recordPlanMapper.getItemList(planId);
+        List<RecordPlanItem> recordPlanItemList = recordPlanItemMapper.selectList(new QueryWrapper<RecordPlanItem>().eq("plan_id", planId));
         if (!recordPlanItemList.isEmpty()) {
             recordPlan.setPlanItemList(recordPlanItemList);
         }
@@ -202,8 +209,8 @@ public class RecordPlanServiceImpl implements IRecordPlanService {
     @Transactional
     public void update(RecordPlan plan) {
         plan.setUpdateTime(DateUtil.getNow());
-        recordPlanMapper.update(plan);
-        recordPlanMapper.cleanItems(plan.getId());
+        recordPlanMapper.updateById(plan);
+        recordPlanItemMapper.delete(new QueryWrapper<RecordPlanItem>().eq("plan_id", plan.getId()));
         if (plan.getPlanItemList() != null && !plan.getPlanItemList().isEmpty()) {
             List<RecordPlanItem> planItemList = new ArrayList<>();
             for (RecordPlanItem recordPlanItem : plan.getPlanItemList()) {
@@ -216,7 +223,9 @@ public class RecordPlanServiceImpl implements IRecordPlanService {
                 planItemList.add(recordPlanItem);
             }
             if (!planItemList.isEmpty()) {
-                recordPlanMapper.batchAddItem(plan.getId(), planItemList);
+                for (RecordPlanItem item : planItemList) {
+                    recordPlanItemMapper.insert(item);
+                }
             }
         }
         // TODO  更新录像队列
@@ -225,30 +234,33 @@ public class RecordPlanServiceImpl implements IRecordPlanService {
 
     @Override
     @Transactional
-    public void delete(Integer planId) {
-        RecordPlan recordPlan = recordPlanMapper.get(planId);
+    public void delete(Long planId) {
+        RecordPlan recordPlan = recordPlanMapper.selectById(planId);
         if (recordPlan == null) {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "录制计划不存在");
         }
         // 清理关联的通道
         channelMapper.removeRecordPlanByPlanId(recordPlan.getId());
-        recordPlanMapper.cleanItems(planId);
-        recordPlanMapper.delete(planId);
+        recordPlanItemMapper.delete(new QueryWrapper<RecordPlanItem>().eq("plan_id", planId));
+        recordPlanMapper.deleteById(planId);
         // TODO  更新录像队列
     }
 
     @Override
     public List<RecordPlan> query(Integer pageNum, Integer pageSize, String query) {
-        if (query != null) {
-            query = query.replaceAll("/", "//")
+        QueryWrapper<RecordPlan> wrapper = new QueryWrapper<>();
+        if (query != null && !query.isEmpty()) {
+
+            String escaped = query.replaceAll("/", "//")
                     .replaceAll("%", "/%")
                     .replaceAll("_", "/_");
+            wrapper.like("name",escaped);
         }
-        return recordPlanMapper.query(query);
+        return recordPlanMapper.selectList(wrapper);
     }
 
     @Override
-    public void link(List<Integer> channelIds, Integer planId) {
+    public void link(List<Integer> channelIds, Long planId) {
         if (channelIds == null || channelIds.isEmpty()) {
             log.info("[录制计划] 关联/移除关联时, 通道编号必须存在");
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "通道编号必须存在");
@@ -263,7 +275,7 @@ public class RecordPlanServiceImpl implements IRecordPlanService {
     }
 
     @Override
-    public List<CommonGBChannel> queryChannelList(int pageNum, int pageSize, String query, Integer dataType, Boolean online, Integer planId, Boolean hasLink) {
+    public List<CommonGBChannel> queryChannelList(int pageNum, int pageSize, String query, Integer dataType, Boolean online, Long planId, Boolean hasLink) {
         if (query != null) {
             query = query.replaceAll("/", "//")
                     .replaceAll("%", "/%")
@@ -273,12 +285,12 @@ public class RecordPlanServiceImpl implements IRecordPlanService {
     }
 
     @Override
-    public void linkAll(Integer planId) {
+    public void linkAll(Long planId) {
         channelMapper.addRecordPlanForAll(planId);
     }
 
     @Override
-    public void cleanAll(Integer planId) {
+    public void cleanAll(Long planId) {
         channelMapper.removeRecordPlanByPlanId(planId);
     }
 }

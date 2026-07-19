@@ -46,7 +46,7 @@ public class DeviceChannel extends CommonGBChannel {
      * 国标-设备型号
      */
     @MessageElementForCatalog("Model")
-    private String model;
+    private String dbModel;
 
     /**
      * 国标-设备归属

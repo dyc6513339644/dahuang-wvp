@@ -1,8 +1,13 @@
 package com.ruoyi.system.service.impl;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysNotice;
 import com.ruoyi.system.mapper.SysNoticeMapper;
 import com.ruoyi.system.service.ISysNoticeService;
@@ -27,7 +32,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     @Override
     public SysNotice selectNoticeById(Long noticeId)
     {
-        return noticeMapper.selectNoticeById(noticeId);
+        return noticeMapper.selectById(noticeId);
     }
 
     /**
@@ -39,7 +44,22 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     @Override
     public List<SysNotice> selectNoticeList(SysNotice notice)
     {
-        return noticeMapper.selectNoticeList(notice);
+        QueryWrapper<SysNotice> wrapper = new QueryWrapper<>();
+        // 列表查询排除大字段 notice_content
+        wrapper.select(SysNotice.class, info -> !"notice_content".equals(info.getColumn()));
+        if (StringUtils.isNotEmpty(notice.getNoticeTitle()))
+        {
+            wrapper.like("notice_title", notice.getNoticeTitle());
+        }
+        if (StringUtils.isNotEmpty(notice.getNoticeType()))
+        {
+            wrapper.eq("notice_type", notice.getNoticeType());
+        }
+        if (StringUtils.isNotEmpty(notice.getCreateBy()))
+        {
+            wrapper.like("create_by", notice.getCreateBy());
+        }
+        return noticeMapper.selectList(wrapper);
     }
 
     /**
@@ -51,7 +71,8 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     @Override
     public int insertNotice(SysNotice notice)
     {
-        return noticeMapper.insertNotice(notice);
+        notice.setCreateTime(new Date());
+        return noticeMapper.insert(notice);
     }
 
     /**
@@ -63,7 +84,8 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     @Override
     public int updateNotice(SysNotice notice)
     {
-        return noticeMapper.updateNotice(notice);
+        notice.setUpdateTime(new Date());
+        return noticeMapper.updateById(notice);
     }
 
     /**
@@ -75,7 +97,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     @Override
     public int deleteNoticeById(Long noticeId)
     {
-        return noticeMapper.deleteNoticeById(noticeId);
+        return noticeMapper.deleteById(noticeId);
     }
 
     /**
@@ -87,6 +109,6 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     @Override
     public int deleteNoticeByIds(Long[] noticeIds)
     {
-        return noticeMapper.deleteNoticeByIds(noticeIds);
+        return noticeMapper.deleteBatchIds(Arrays.asList(noticeIds));
     }
 }

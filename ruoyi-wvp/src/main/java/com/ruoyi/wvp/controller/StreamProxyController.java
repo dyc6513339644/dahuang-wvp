@@ -1,241 +1,193 @@
 package com.ruoyi.wvp.controller;
 
-import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.dynamic.datasource.annotation.DS;
+import com.ruoyi.wvp.common.StreamInfo;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.wvp.common.StreamInfo;
-import com.ruoyi.common.exception.ControllerException;
+import com.ruoyi.wvp.gb28181.bean.Device;
+import com.ruoyi.wvp.gb28181.bean.DeviceChannel;
+import com.ruoyi.wvp.gb28181.service.IDeviceChannelService;
+import com.ruoyi.wvp.mapper.DeviceMapper;
 import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
-import com.ruoyi.wvp.streamProxy.bean.StreamProxy;
+import com.ruoyi.wvp.service.bean.ErrorCallback;
+import com.ruoyi.wvp.service.bean.InviteErrorCode;
 import com.ruoyi.wvp.streamProxy.bean.StreamProxyParam;
 import com.ruoyi.wvp.streamProxy.service.IStreamProxyPlayService;
 import com.ruoyi.wvp.streamProxy.service.IStreamProxyService;
-import com.ruoyi.common.enums.ErrorCode;
+import com.ruoyi.wvp.vmanager.bean.ResourceBaseInfo;
 import com.ruoyi.wvp.vmanager.bean.StreamContent;
-import lombok.extern.slf4j.Slf4j;
+import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.common.enums.ErrorCode;
+import com.ruoyi.wvp.conf.UserSetting;
+import com.ruoyi.wvp.gb28181.transmit.callback.DeferredResultHolder;
+import com.ruoyi.wvp.gb28181.transmit.callback.RequestMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
- * 拉流代理
+ * 拉流代理控制器（基于 Device + DeviceChannel 表）
  */
-@SuppressWarnings("rawtypes")
 @RestController
-@Slf4j
-@RequestMapping(value = "/api/proxy")
+@RequestMapping("/api/proxy")
 public class StreamProxyController extends BaseController {
-
-    @Autowired
-    private IMediaServerService mediaServerService;
 
     @Autowired
     private IStreamProxyService streamProxyService;
 
     @Autowired
+    private IMediaServerService mediaServerService;
+
+    @Autowired
+    private DeviceMapper deviceMapper;
+
+    @Autowired
     private IStreamProxyPlayService streamProxyPlayService;
 
+    @Autowired
+    private IDeviceChannelService deviceChannelService;
+
+    @Autowired
+    private DeferredResultHolder resultHolder;
+
+    @Autowired
+    private UserSetting userSetting;
 
     /**
-     * 分页获取代理
-     *
-     * @param pageNum       当前页
-     * @param pageSize      每页查询数量
-     * @param query         查询内容
-     * @param pulling       是否正在拉流
-     * @param mediaServerId 流媒体ID
-     * @return
+     * 分页查询拉流代理列表（直接查 wvp_device，protocol_type='STREAM_PROXY'）
      */
-    @PreAuthorize("@ss.hasPermi('wvp:proxy:list')")
-    @GetMapping(value = "/list")
-    @ResponseBody
-    public TableDataInfo list(@RequestParam(required = false) Integer pageNum,
-                              @RequestParam(required = false) Integer pageSize,
-                              @RequestParam(required = false) String query,
-                              @RequestParam(required = false) Boolean pulling,
-                              @RequestParam(required = false) String mediaServerId) {
-
-        if (ObjectUtils.isEmpty(mediaServerId)) {
-            mediaServerId = null;
-        }
-        if (ObjectUtils.isEmpty(query)) {
-            query = null;
-        }
+    @GetMapping("/list")
+    public TableDataInfo list(@RequestParam(required = false) String query, @RequestParam(required = false) Boolean onLine) {
         startPage();
-        List<StreamProxy> list = streamProxyService.getAll(pageNum, pageSize, query, pulling, mediaServerId);
+        List<Device> list = deviceMapper.getProxyDeviceListByCondition(query, onLine);
         return getDataTable(list);
     }
 
     /**
-     * 获取代理
-     *
-     * @param app 应用名
-     * @param stream 流Id
-     * @return
+     * 保存（新增或更新）拉流代理
      */
-    @GetMapping(value = "/one")
-    @ResponseBody
-    public StreamProxy one(String app, String stream) {
-
-        return streamProxyService.getStreamProxyByAppAndStream(app, stream);
-    }
-
-    @PostMapping(value = "/save")
-    @ResponseBody
-    public StreamContent save(@RequestBody StreamProxyParam param) {
-        log.info("添加代理： " + JSONObject.toJSONString(param));
-        if (ObjectUtils.isEmpty(param.getMediaServerId())) {
-            param.setMediaServerId("auto");
-        }
-        if (ObjectUtils.isEmpty(param.getType())) {
-            param.setType("default");
-        }
-
+    @PostMapping("/save")
+    @DS("master")
+    public AjaxResult save(@RequestBody StreamProxyParam param) {
         StreamInfo streamInfo = streamProxyService.save(param);
-        if (param.isEnable()) {
-            if (streamInfo == null) {
-                throw new ControllerException(ErrorCode.ERROR100.getCode(), ErrorCode.ERROR100.getMsg());
-            } else {
-                return new StreamContent(streamInfo);
-            }
-        } else {
-            return null;
-        }
-
-    }
-
-    /**
-     * 新增拉流代理
-     *
-     * @param param
-     * @return
-     */
-    @PreAuthorize("@ss.hasPermi('wvp:proxy:add')")
-    @PostMapping(value = "/add")
-    @ResponseBody
-    public AjaxResult add(@RequestBody StreamProxy param) {
-        log.info("添加代理： " + JSONObject.toJSONString(param));
-        if (ObjectUtils.isEmpty(param.getRelatesMediaServerId())) {
-            param.setRelatesMediaServerId(null);
-        }
-        if (ObjectUtils.isEmpty(param.getType())) {
-            param.setType("default");
-        }
-        if (ObjectUtils.isEmpty(param.getGbId())) {
-            param.setGbDeviceId(null);
-        }
-        streamProxyService.add(param);
-        return success(param);
-    }
-
-    /**
-     * 更新拉流代理
-     *
-     * @param param
-     * @return
-     */
-    @PreAuthorize("@ss.hasPermi('wvp:proxy:edit')")
-    @PostMapping(value = "/update")
-    @ResponseBody
-    public AjaxResult update(@RequestBody StreamProxy param) {
-        log.info("更新代理： " + JSONObject.toJSONString(param));
-        if (param.getId() == 0) {
-            throw new ControllerException(ErrorCode.ERROR400.getCode(), "缺少代理信息的ID");
-        }
-        if (ObjectUtils.isEmpty(param.getRelatesMediaServerId())) {
-            param.setRelatesMediaServerId(null);
-        }
-        if (ObjectUtils.isEmpty(param.getGbId())) {
-            param.setGbDeviceId(null);
-        }
-        streamProxyService.update(param);
-        return success(param);
-    }
-
-    /**
-     * 获取ffmpeg.cmd模板
-     *
-     * @param mediaServerId 流媒体ID
-     * @return
-     */
-    @GetMapping(value = "/ffmpeg_cmd/list")
-    @ResponseBody
-    public AjaxResult getFFmpegCMDs(@RequestParam String mediaServerId) {
-        log.debug("获取节点[ {} ]ffmpeg.cmd模板", mediaServerId);
-
-        MediaServer mediaServerItem = mediaServerService.getOne(mediaServerId);
-        if (mediaServerItem == null) {
-            throw new ControllerException(ErrorCode.ERROR100.getCode(), "流媒体： " + mediaServerId + "未找到");
-        }
-        return success(streamProxyService.getFFmpegCMDs(mediaServerItem));
-    }
-
-    /**
-     * 移除代理
-     *
-     * @param app 应用名
-     * @param stream 流id
-     */
-    @DeleteMapping(value = "/del")
-    @ResponseBody
-    public void del(@RequestParam String app, @RequestParam String stream) {
-        log.info("移除代理： " + app + "/" + stream);
-        if (app == null || stream == null) {
-            throw new ControllerException(ErrorCode.ERROR400.getCode(), app == null ? "app不能为null" : "stream不能为null");
-        } else {
-            streamProxyService.delteByAppAndStream(app, stream);
-        }
+        return AjaxResult.success(streamInfo);
     }
 
     /**
      * 删除拉流代理
-     *
-     * @param id
      */
-    @PreAuthorize("@ss.hasPermi('wvp:proxy:delete')")
-    @DeleteMapping(value = "/delete/{id}")
-    @ResponseBody
+    @DeleteMapping("/delete/{id}")
     public AjaxResult delete(@PathVariable int id) {
-        log.info("移除代理： {}", id);
         streamProxyService.delete(id);
-        return success();
+        return AjaxResult.success();
     }
 
     /**
-     * 播放
-     *
-     * @param id 代理Id
-     * @return
+     * 获取拉流代理详情
      */
-    @GetMapping(value = "/start")
-    @ResponseBody
-    @PreAuthorize("@ss.hasPermi('wvp:proxy:play')")
-    public StreamContent start(int id) {
-        log.info("播放代理： {}", id);
-        StreamInfo streamInfo = streamProxyPlayService.start(id, null, null);
-        if (streamInfo == null) {
-            throw new RuntimeException(ErrorCode.ERROR400.getMsg());
-        } else {
-            return new StreamContent(streamInfo);
+    @GetMapping("/detail/{id}")
+    public AjaxResult detail(@PathVariable int id) {
+        return AjaxResult.success(streamProxyService.getStreamProxy(id));
+    }
+
+    /**
+     * 获取ffmpeg命令列表
+     */
+    @GetMapping("/ffmpegcmds/{mediaServerId}")
+    public AjaxResult getFFmpegCMDs(@PathVariable String mediaServerId) {
+        MediaServer mediaServer = mediaServerService.getOne(mediaServerId);
+        Map<String, String> ffmpegCMDs = streamProxyService.getFFmpegCMDs(mediaServer);
+        return AjaxResult.success(ffmpegCMDs);
+    }
+
+    /**
+     * 获取拉流代理统计概览
+     */
+    @GetMapping("/overview")
+    public AjaxResult overview() {
+        ResourceBaseInfo resourceBaseInfo = streamProxyService.getOverview();
+        return AjaxResult.success(resourceBaseInfo);
+    }
+
+    /**
+     * 启动拉流代理播放（id 为通道 ID，对应 wvp_device_channel.id）
+     */
+    @GetMapping("/start")
+    public DeferredResult<WVPResult<StreamContent>> start(HttpServletRequest request, @RequestParam int id) {
+        // 查询通道
+        DeviceChannel channel = deviceChannelService.getOneById(id);
+        if (channel == null) {
+            throw new com.ruoyi.common.exception.ControllerException(ErrorCode.ERROR404.getCode(), "通道不存在");
         }
+        // 查询设备
+        Device device = deviceMapper.query(channel.getDataDeviceId());
+        if (device == null || !"STREAM_PROXY".equals(device.getProtocolType())) {
+            throw new com.ruoyi.common.exception.ControllerException(ErrorCode.ERROR404.getCode(), "拉流代理设备不存在");
+        }
+
+        RequestMessage requestMessage = new RequestMessage();
+        String key = DeferredResultHolder.CALLBACK_CMD_PLAY + device.getDeviceId() + channel.getDeviceId();
+        requestMessage.setKey(key);
+        String uuid = UUID.randomUUID().toString();
+        requestMessage.setId(uuid);
+        DeferredResult<WVPResult<StreamContent>> result = new DeferredResult<>(userSetting.getPlayTimeout().longValue());
+        resultHolder.put(key, uuid, result);
+
+        streamProxyPlayService.start(device.getId(), null, (code, msg, streamInfo) -> {
+            WVPResult<StreamContent> wvpResult = new WVPResult<>();
+            if (code == InviteErrorCode.SUCCESS.getCode()) {
+                wvpResult.setCode(ErrorCode.SUCCESS.getCode());
+                wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
+                if (streamInfo != null) {
+                    if (userSetting.getUseSourceIpAsStreamIp()) {
+                        streamInfo = streamInfo.clone();
+                        String host;
+                        try {
+                            URL url = new URL(request.getRequestURL().toString());
+                            host = url.getHost();
+                        } catch (MalformedURLException e) {
+                            host = request.getLocalAddr();
+                        }
+                        streamInfo.channgeStreamIp(host);
+                    }
+                    wvpResult.setData(new StreamContent(streamInfo));
+                } else {
+                    wvpResult.setCode(code);
+                    wvpResult.setMsg(msg);
+                }
+            } else {
+                wvpResult.setCode(code);
+                wvpResult.setMsg(msg);
+            }
+            requestMessage.setData(wvpResult);
+            resultHolder.invokeAllResult(requestMessage);
+        });
+        return result;
     }
 
     /**
      * 停止拉流代理
-     *
-     * @param id 代理Id
      */
-    @PreAuthorize("@ss.hasPermi('wvp:proxy:stop')")
-    @PostMapping(value = "/stop/{id}")
-    @ResponseBody
-    public AjaxResult stop(@PathVariable int id) {
-        log.info("停用代理： {}", id);
-        streamProxyPlayService.stop(id);
-        return success();
+    @GetMapping("/stop")
+    public AjaxResult stop(@RequestParam(required = false) Integer id,
+                           @RequestParam(required = false) String app,
+                           @RequestParam(required = false) String stream) {
+        if (id != null) {
+            streamProxyService.stopByAppAndStream(
+                    streamProxyService.getStreamProxy(id).getApp(),
+                    streamProxyService.getStreamProxy(id).getStream());
+        } else if (app != null && stream != null) {
+            streamProxyService.stopByAppAndStream(app, stream);
+        }
+        return AjaxResult.success();
     }
 }

@@ -1,5 +1,7 @@
 package com.ruoyi.wvp.gb28181.bean;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,6 +12,7 @@ import java.io.Serializable;
  * @author ruoyi-wvp
  */
 @Data
+@TableName("wvp_sip_config")
 public class SipConfigEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -37,7 +40,8 @@ public class SipConfigEntity implements Serializable {
     /**
      * 国标域
      */
-    private String domain;
+    @TableField(value = "gb_domain")
+    private String gbDomain;
 
     /**
      * 国标ID
@@ -47,7 +51,8 @@ public class SipConfigEntity implements Serializable {
     /**
      * 密码
      */
-    private String password;
+    @TableField(value = "gb_pwd")
+    private String gbPwd;
 
     /**
      * 云台速度

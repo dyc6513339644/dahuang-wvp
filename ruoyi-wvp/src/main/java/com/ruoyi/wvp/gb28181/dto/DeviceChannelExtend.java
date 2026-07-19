@@ -38,7 +38,7 @@ public class DeviceChannelExtend {
 	/**
 	 * 型号
 	 */
-	private String model;
+	private String dbModel;
 
 	/**
 	 * 设备归属

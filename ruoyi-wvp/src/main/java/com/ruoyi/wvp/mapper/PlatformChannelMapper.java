@@ -106,7 +106,7 @@ public interface PlatformChannelMapper {
             "    coalesce( wdc.gb_device_id, wdc.device_id) as gb_device_id,\n" +
             "    coalesce( wdc.gb_name, wdc.name) as gb_name,\n" +
             "    coalesce( wdc.gb_manufacturer, wdc.manufacturer) as gb_manufacturer,\n" +
-            "    coalesce( wdc.gb_model, wdc.model) as gb_model,\n" +
+            "    coalesce( wdc.gb_model, wdc.db_model) as gb_model,\n" +
             "    coalesce( wdc.gb_owner, wdc.owner) as gb_owner,\n" +
             "    coalesce( wdc.gb_civil_code, wdc.civil_code) as gb_civil_code,\n" +
             "    coalesce( wdc.gb_block, wdc.block) as gb_block,\n" +
@@ -163,7 +163,7 @@ public interface PlatformChannelMapper {
             "    coalesce(wpgc.custom_device_id, wdc.gb_device_id, wdc.device_id) as gb_device_id,\n" +
             "    coalesce(wpgc.custom_name, wdc.gb_name, wdc.name) as gb_name,\n" +
             "    coalesce(wpgc.custom_manufacturer, wdc.gb_manufacturer, wdc.manufacturer) as gb_manufacturer,\n" +
-            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.model) as gb_model,\n" +
+            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.db_model) as gb_model,\n" +
             "    coalesce(wpgc.custom_owner, wdc.gb_owner, wdc.owner) as gb_owner,\n" +
             "    coalesce(wpgc.custom_civil_code, wdc.gb_civil_code, wdc.civil_code) as gb_civil_code,\n" +
             "    coalesce(wpgc.custom_block, wdc.gb_block, wdc.block) as gb_block,\n" +
@@ -212,7 +212,7 @@ public interface PlatformChannelMapper {
             "    coalesce(wpgc.custom_device_id, wdc.gb_device_id, wdc.device_id) as gb_device_id,\n" +
             "    coalesce(wpgc.custom_name, wdc.gb_name, wdc.name) as gb_name,\n" +
             "    coalesce(wpgc.custom_manufacturer, wdc.gb_manufacturer, wdc.manufacturer) as gb_manufacturer,\n" +
-            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.model) as gb_model,\n" +
+            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.db_model) as gb_model,\n" +
             "    coalesce(wpgc.custom_owner, wdc.gb_owner, wdc.owner) as gb_owner,\n" +
             "    coalesce(wpgc.custom_civil_code, wdc.gb_civil_code, wdc.civil_code) as gb_civil_code,\n" +
             "    coalesce(wpgc.custom_block, wdc.gb_block, wdc.block) as gb_block,\n" +
@@ -262,7 +262,7 @@ public interface PlatformChannelMapper {
             "    coalesce(wpgc.custom_device_id, wdc.gb_device_id, wdc.device_id) as gb_device_id,\n" +
             "    coalesce(wpgc.custom_name, wdc.gb_name, wdc.name) as gb_name,\n" +
             "    coalesce(wpgc.custom_manufacturer, wdc.gb_manufacturer, wdc.manufacturer) as gb_manufacturer,\n" +
-            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.model) as gb_model,\n" +
+            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.db_model) as gb_model,\n" +
             "    coalesce(wpgc.custom_owner, wdc.gb_owner, wdc.owner) as gb_owner,\n" +
             "    coalesce(wpgc.custom_civil_code, wdc.gb_civil_code, wdc.civil_code) as gb_civil_code,\n" +
             "    coalesce(wpgc.custom_block, wdc.gb_block, wdc.block) as gb_block,\n" +
@@ -486,7 +486,7 @@ public interface PlatformChannelMapper {
             "    coalesce(wpgc.custom_device_id, wdc.gb_device_id, wdc.device_id) as gb_device_id,\n" +
             "    coalesce(wpgc.custom_name, wdc.gb_name, wdc.name) as gb_name,\n" +
             "    coalesce(wpgc.custom_manufacturer, wdc.gb_manufacturer, wdc.manufacturer) as gb_manufacturer,\n" +
-            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.model) as gb_model,\n" +
+            "    coalesce(wpgc.custom_model, wdc.gb_model, wdc.db_model) as gb_model,\n" +
             "    coalesce(wpgc.custom_owner, wdc.gb_owner, wdc.owner) as gb_owner,\n" +
             "    coalesce(wpgc.custom_civil_code, wdc.gb_civil_code, wdc.civil_code) as gb_civil_code,\n" +
             "    coalesce(wpgc.custom_block, wdc.gb_block, wdc.block) as gb_block,\n" +

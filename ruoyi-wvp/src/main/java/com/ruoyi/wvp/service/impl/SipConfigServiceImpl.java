@@ -31,12 +31,16 @@ public class SipConfigServiceImpl implements ISipConfigService {
 
     @Override
     public SipConfigEntity getSipConfig() {
-        return sipConfigMapper.getSipConfig();
+        List<SipConfigEntity> sipConfigEntities= sipConfigMapper.selectList(null);
+        if(!sipConfigEntities.isEmpty()){
+            return sipConfigEntities.get(0);
+        }
+        return null;
     }
 
     @Override
     public SipConfigEntity getSipConfigById(Long id) {
-        return sipConfigMapper.getSipConfigById(id);
+        return  sipConfigMapper.selectById(id);
     }
 
     @Override
@@ -44,7 +48,7 @@ public class SipConfigServiceImpl implements ISipConfigService {
         String now = LocalDateTime.now().format(FORMATTER);
         sipConfig.setCreateTime(now);
         sipConfig.setUpdateTime(now);
-        int result = sipConfigMapper.add(sipConfig);
+        int result= sipConfigMapper.insert(sipConfig);
         if (result > 0) {
             // 保存成功后重新加载配置
             reloadSipConfig();
@@ -57,7 +61,7 @@ public class SipConfigServiceImpl implements ISipConfigService {
     public boolean update(SipConfigEntity sipConfig) {
         String now = LocalDateTime.now().format(FORMATTER);
         sipConfig.setUpdateTime(now);
-        int result = sipConfigMapper.update(sipConfig);
+        int result = sipConfigMapper.updateById(sipConfig);
         if (result > 0) {
             // 更新成功后重新加载配置
             reloadSipConfig();
@@ -68,18 +72,19 @@ public class SipConfigServiceImpl implements ISipConfigService {
 
     @Override
     public List<SipConfigEntity> getAll() {
-        return sipConfigMapper.getAll();
+
+        return sipConfigMapper.selectList(null);
     }
 
     @Override
     public boolean delete(Long id) {
-        int result = sipConfigMapper.delete(id);
+        int result = sipConfigMapper.deleteById(id);
         return result > 0;
     }
 
     @Override
     public boolean exists() {
-        return sipConfigMapper.getCount() > 0;
+        return  sipConfigMapper.selectCount(null) > 0;
     }
 
     /**
@@ -88,7 +93,6 @@ public class SipConfigServiceImpl implements ISipConfigService {
     private void reloadSipConfig() {
         try {
             sipConfig.reload();
-            log.info("[SIP配置] 配置已重新加载");
         } catch (Exception e) {
             log.error("[SIP配置] 重新加载配置失败", e);
         }

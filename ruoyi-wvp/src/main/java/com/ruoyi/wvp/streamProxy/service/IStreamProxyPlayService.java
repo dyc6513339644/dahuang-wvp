@@ -6,7 +6,7 @@ import com.ruoyi.wvp.streamProxy.bean.StreamProxy;
 
 public interface IStreamProxyPlayService {
 
-    StreamInfo start(int id, Boolean record, ErrorCallback<StreamInfo> callback);
+    StreamInfo start(int id, Boolean record,ErrorCallback<StreamInfo> callback);
 
     void start(int id, ErrorCallback<StreamInfo> callback);
 

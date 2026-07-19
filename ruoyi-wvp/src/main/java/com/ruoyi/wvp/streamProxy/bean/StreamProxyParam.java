@@ -1,9 +1,12 @@
 package com.ruoyi.wvp.streamProxy.bean;
 
+import com.ruoyi.wvp.gb28181.bean.Device;
 import lombok.Data;
 
+import java.util.UUID;
+
 /**
- * 拉流代理的信息
+ * 拉流代理参数
  * @author lin
  */
 @Data
@@ -15,19 +18,9 @@ public class StreamProxyParam {
     private String type;
 
     /**
-     * 应用名
-     */
-    private String app;
-
-    /**
-     * 名称
+     * 设备名称
      */
     private String name;
-
-    /**
-     * 流ID
-     */
-    private String stream;
 
     /**
      * 流媒体服务ID
@@ -79,23 +72,42 @@ public class StreamProxyParam {
      */
     private boolean enableDisableNoneReader;
 
+    /**
+     * 生成唯一的设备ID
+     */
+    public static String generateDeviceId() {
+        return "proxy" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 
-    public StreamProxy buildStreamProxy() {
-        StreamProxy streamProxy = new StreamProxy();
-        streamProxy.setApp(app);
-        streamProxy.setStream(stream);
+    /**
+     * 构建 Device 实体
+     */
+    public Device buildDevice() {
+        Device device = new Device();
+        device.setDeviceId(generateDeviceId());
+        device.setName(name);
+        device.setProtocolType("STREAM_PROXY");
+        device.setSrcUrl(url);
+        device.setStreamType(type != null ? type : "default");
+        device.setExpires(timeoutMs > 0 ? timeoutMs : 15);
+        device.setChannelCount(1);
+        device.setFfmpegCmdKey(ffmpegCmdKey);
+        device.setRtspType(rtpType != null ? rtpType : "0");
+        device.setEnableAudio(enableAudio);
+        device.setEnableMp4(enableMp4);
+        device.setEnableRemoveNoneReader(enableRemoveNoneReader);
+        device.setEnableDisableNoneReader(enableDisableNoneReader);
+        return device;
+    }
+
+    /**
+     * 构建 StreamProxy DTO（兼容旧接口）
+     */
+    public StreamProxy buildStreamProxy(String channelId) {
+        Device device = buildDevice();
+        StreamProxy streamProxy = StreamProxy.buildFromDevice(device);
         streamProxy.setRelatesMediaServerId(mediaServerId);
-        streamProxy.setSrcUrl(url);
-        streamProxy.setTimeout(timeoutMs/1000);
-        streamProxy.setRtspType(rtpType);
         streamProxy.setEnable(enable);
-        streamProxy.setEnableAudio(enableAudio);
-        streamProxy.setEnableMp4(enableMp4);
-        streamProxy.setEnableRemoveNoneReader(enableRemoveNoneReader);
-        streamProxy.setEnableDisableNoneReader(enableDisableNoneReader);
-        streamProxy.setFfmpegCmdKey(ffmpegCmdKey);
-        streamProxy.setGbName(name);
         return streamProxy;
-
     }
 }

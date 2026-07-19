@@ -1,0 +1,101 @@
+ruoyi:
+  # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
+  profile: /home/wvp/uploadPath
+# 服务器配置
+server:
+  port: 28081
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 1000
+    threads:
+      max: 800
+      min-spare: 100
+
+# 日志配置（生产环境只记录 warn 以上）
+logging:
+  level:
+    com.ruoyi: warn
+    org.springframework: warn
+
+# 用户配置
+user:
+  password:
+    maxRetryCount: 5
+    lockTime: 10
+
+# Swagger配置（生产环境关闭）
+swagger:
+  enabled: false
+  pathMapping: /dev-api
+
+# Spring 环境特定配置
+spring:
+  # Redis 配置（生产环境请修改为实际地址和密码）
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 5
+    password: 123456
+    timeout: 10s
+    lettuce:
+      pool:
+        min-idle: 0
+        max-idle: 8
+        max-active: 8
+        max-wait: -1ms
+  # 数据源配置（生产环境请修改为实际数据库地址和密码）
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    # 达梦
+    #driverClassName: dm.jdbc.driver.DmDriver
+    druid:
+      # 主库数据源
+      master:
+        url: jdbc:mysql://127.0.0.1:3309/dahuang_wvp_pro?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowMultiQueries=true
+        username: dahuang_wvp_pro
+        password:
+        # 达梦
+        #url: jdbc:dm://127.0.0.1:5236/dahuang-wvp-pro?COMPATIBLE_MODE=4
+        #username: SYSDBA
+        #password:
+      # 从库数据源
+      slave:
+        enabled: false
+        url:
+        username:
+        password:
+      # 连接池配置（生产环境可适当放大）
+      initialSize: 10
+      minIdle: 20
+      maxActive: 50
+      maxWait: 60000
+      connectTimeout: 30000
+      socketTimeout: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      maxEvictableIdleTimeMillis: 900000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: true
+        allow:
+        url-pattern: /druid/*
+        # 生产环境务必修改 Druid 控制台密码
+        login-username: ruoyi
+        login-password: 123456
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true

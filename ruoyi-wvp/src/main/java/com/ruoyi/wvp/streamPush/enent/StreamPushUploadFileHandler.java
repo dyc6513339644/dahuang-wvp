@@ -10,6 +10,8 @@ import com.ruoyi.wvp.streamPush.service.IStreamPushService;
 import com.ruoyi.wvp.utils.DateUtil;
 import org.springframework.util.ObjectUtils;
 
+import java.util.UUID;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +35,7 @@ public class StreamPushUploadFileHandler extends AnalysisEventListener<StreamPus
     private final String defaultMediaServerId;
 
     /**
-     * 用于存储更具APP+Stream过滤后的数据，可以直接存入stream_push表与gb_stream表
+     * 用于存储根据APP+Stream过滤后的数据，存入wvp_device与wvp_device_channel表
      */
     private final Map<String, StreamPush> streamPushItemForSave = new HashMap<>();
 
@@ -82,39 +84,41 @@ public class StreamPushUploadFileHandler extends AnalysisEventListener<StreamPus
 
     @Override
     public void invoke(StreamPushExcelDto streamPushExcelDto, AnalysisContext analysisContext) {
-        if (ObjectUtils.isEmpty(streamPushExcelDto.getApp())
-                || ObjectUtils.isEmpty(streamPushExcelDto.getStream())
-                || ObjectUtils.isEmpty(streamPushExcelDto.getGbDeviceId())) {
+        if (ObjectUtils.isEmpty(streamPushExcelDto.getGbDeviceId())) {
             return;
         }
         Integer rowIndex = analysisContext.readRowHolder().getRowIndex();
 
-        if (gBMap.get(streamPushExcelDto.getApp() + streamPushExcelDto.getStream()) == null) {
+        // 自动生成 app 和 stream
+        String app = "push" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        String stream = app + "01";
+
+        if (gBMap.get(app + stream) == null) {
             try {
-                gBMap.put(streamPushExcelDto.getApp() + streamPushExcelDto.getStream(), streamPushExcelDto.getGbDeviceId());
+                gBMap.put(app + stream, streamPushExcelDto.getGbDeviceId());
             }catch (IllegalArgumentException e) {
                 errorInfoList.add("行：" + rowIndex + ", " + streamPushExcelDto.getGbDeviceId() + " 国标ID重复使用");
                 return;
             }
         }else {
-            if (!gBMap.get(streamPushExcelDto.getApp() + streamPushExcelDto.getStream()).equals(streamPushExcelDto.getGbDeviceId())) {
+            if (!gBMap.get(app + stream).equals(streamPushExcelDto.getGbDeviceId())) {
                 errorInfoList.add("行：" + rowIndex + ", " + streamPushExcelDto.getGbDeviceId() + " 同样的应用名和流ID使用了不同的国标ID");
                 return;
             }
         }
 
         StreamPush streamPush = new StreamPush();
-        streamPush.setApp(streamPushExcelDto.getApp());
-        streamPush.setStream(streamPushExcelDto.getStream());
+        streamPush.setApp(app);
+        streamPush.setStream(stream);
+        streamPush.setName(streamPushExcelDto.getName());
         streamPush.setGbDeviceId(streamPushExcelDto.getGbDeviceId());
-        streamPush.setGbStatus(streamPushExcelDto.isStatus()?"ON":"OFF");
         streamPush.setCreateTime(DateUtil.getNow());
         streamPush.setMediaServerId(defaultMediaServerId);
         streamPush.setGbName(streamPushExcelDto.getName());
         streamPush.setGbLongitude(streamPushExcelDto.getLongitude());
         streamPush.setGbLatitude(streamPushExcelDto.getLatitude());
         streamPush.setUpdateTime(DateUtil.getNow());
-        streamPushItemForSave.put(streamPush.getApp() + streamPush.getStream(), streamPush);
+        streamPushItemForSave.put(app + stream, streamPush);
 
         loadedSize ++;
         if (loadedSize > 1000) {

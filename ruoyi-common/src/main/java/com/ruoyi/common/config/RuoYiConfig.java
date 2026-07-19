@@ -30,7 +30,25 @@ public class RuoYiConfig
     /** 验证码类型 */
     private static String captchaType;
 
+    /**
+     * 公众号code
+     */
     private String publicCode;
+
+    /**
+     * 萤石url
+     */
+    private String yingshiUrl;
+
+    /**
+     * 乐橙url
+     */
+    private String lechengUrl;
+
+    /**
+     * 协议版本信息
+     */
+    private String lechengVersion;
 
     public String getName()
     {
@@ -96,6 +114,30 @@ public class RuoYiConfig
 
     public void setCaptchaType(String captchaType) {
         RuoYiConfig.captchaType = captchaType;
+    }
+
+    public String getYingshiUrl() {
+        return yingshiUrl;
+    }
+
+    public void setYingshiUrl(String yingshiUrl) {
+        this.yingshiUrl = yingshiUrl;
+    }
+
+    public String getLechengUrl() {
+        return lechengUrl;
+    }
+
+    public void setLechengUrl(String lechengUrl) {
+        this.lechengUrl = lechengUrl;
+    }
+
+    public String getLechengVersion() {
+        return lechengVersion;
+    }
+
+    public void setLechengVersion(String lechengVersion) {
+        this.lechengVersion = lechengVersion;
     }
 
     /**

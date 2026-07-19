@@ -19,6 +19,11 @@ public interface CommonGBChannelMapper {
 
     @Insert(" <script>" +
             "INSERT INTO wvp_device_channel (" +
+            "device_id," +
+            "name," +
+            "parent_id," +
+            "status," +
+            "sub_count," +
             "gb_device_id," +
             "data_type," +
             "data_device_id," +
@@ -56,8 +61,15 @@ public interface CommonGBChannelMapper {
             "gb_business_group_id," +
             "gb_download_speed," +
             "gb_svc_space_support_mod," +
-            "gb_svc_time_support_mode ) " +
+            "gb_svc_time_support_mode," +
+            "channel_no," +
+            "src_url ) " +
             "VALUES (" +
+            "#{deviceId}, " +
+            "#{name}, " +
+            "#{parentId}, " +
+            "#{status}, " +
+            "0, " +
             "#{gbDeviceId}, " +
             "#{dataType}, " +
             "#{dataDeviceId}, " +
@@ -95,7 +107,9 @@ public interface CommonGBChannelMapper {
             "#{gbBusinessGroupId},"+
             "#{gbDownloadSpeed},"+
             "#{gbSvcSpaceSupportMod},"+
-            "#{gbSvcTimeSupportMode}"+
+            "#{gbSvcTimeSupportMode},"+
+            "#{channelNo},"+
+            "#{srcUrl}"+
             ")" +
             " </script>")
     @Options(useGeneratedKeys = true, keyProperty = "gbId", keyColumn = "id")
@@ -106,6 +120,9 @@ public interface CommonGBChannelMapper {
 
     @Delete(value = {"delete from wvp_device_channel where id = #{gbId} "})
     void delete(int gbId);
+
+    @Delete(value = {"delete from wvp_device_channel where data_type = #{dataType} and data_device_id = #{dataDeviceId} "})
+    void deleteByDataDeviceId(@Param("dataType") Integer dataType, @Param("dataDeviceId") Integer dataDeviceId);
 
     @Update(value = {" <script>" +
             "UPDATE wvp_device_channel " +
@@ -118,6 +135,7 @@ public interface CommonGBChannelMapper {
             ", gb_civil_code = #{gbCivilCode}" +
             ", gb_block = #{gbBlock}" +
             ", gb_address = #{gbAddress}" +
+            ", address = #{address}" +
             ", gb_parental = #{gbParental}" +
             ", gb_parent_id = #{gbParentId}" +
             ", gb_safety_way = #{gbSafetyWay}" +
@@ -149,14 +167,23 @@ public interface CommonGBChannelMapper {
 
     @Update(value = {" <script>" +
             " UPDATE wvp_device_channel " +
-            " SET gb_status = #{status}" +
+            " SET gb_status = #{status}, status = #{status}" +
             " WHERE id = #{gbId}"+
             " </script>"})
     int updateStatusById(@Param("gbId") int gbId, @Param("status") String status);
 
+    /**
+     * 按 data_type + data_device_id 批量更新通道状态（用于 ONVIF 设备在线/离线联动）
+     */
+    @Update("UPDATE wvp_device_channel SET gb_status = #{status}, status = #{status} " +
+            "WHERE data_type = #{dataType} AND data_device_id = #{dataDeviceId}")
+    int updateStatusByDataTypeAndDeviceId(@Param("dataType") Integer dataType,
+                                          @Param("dataDeviceId") Integer dataDeviceId,
+                                          @Param("status") String status);
+
     @Update("<script> " +
             "<foreach collection='commonGBChannels' index='index' item='item' separator=';'> " +
-            "UPDATE wvp_device_channel SET gb_status = #{status} WHERE id = #{item.gbId}" +
+            "UPDATE wvp_device_channel SET gb_status = #{status}, status = #{status} WHERE id = #{item.gbId}" +
             "</foreach> " +
             "</script>")
     int updateStatusForListById(@Param("commonGBChannels") List<CommonGBChannel> commonGBChannels, @Param("status") String status);
@@ -393,6 +420,7 @@ public interface CommonGBChannelMapper {
             ", gb_civil_code=#{item.gbCivilCode}" +
             ", gb_block=#{item.gbBlock}" +
             ", gb_address=#{item.gbAddress}" +
+            ", address=#{item.address}" +
             ", gb_parental=#{item.gbParental}" +
             ", gb_safety_way=#{item.gbSafetyWay}" +
             ", gb_register_way=#{item.gbRegisterWay}" +
@@ -442,6 +470,11 @@ public interface CommonGBChannelMapper {
     @SelectProvider(type = ChannelProvider.class, method = "queryListByStreamPushList")
     List<CommonGBChannel> queryListByStreamPushList(@Param("dataType") Integer dataType, List<StreamPush> streamPushList);
 
+    @Update("UPDATE wvp_device_channel SET gb_longitude=#{longitude}, gb_latitude=#{latitude}, longitude=#{longitude}, latitude=#{latitude}, " +
+            "update_time=#{updateTime}, address = CASE WHEN address IS NULL OR address = '' THEN #{address} ELSE address END " +
+            "WHERE id=#{id}")
+    void updateMapLocation(@Param("id") int id, @Param("longitude") String longitude, @Param("latitude") String latitude, @Param("address") String address, @Param("updateTime") String updateTime);
+
     @Update(value = {" <script>" +
             " <foreach collection='channels' item='item' separator=';' >" +
             " UPDATE wvp_device_channel " +
@@ -469,20 +502,20 @@ public interface CommonGBChannelMapper {
             " WHERE id in "+
             " <foreach collection='channelIds'  item='item'  open='(' separator=',' close=')' > #{item}</foreach>" +
             " </script>"})
-    void addRecordPlan(@Param("channelIds") List<Integer> channelIds, @Param("planId") Integer planId);
+    void addRecordPlan(@Param("channelIds") List<Integer> channelIds, @Param("planId") Long planId);
 
     @Update(value = {" <script>" +
             " UPDATE wvp_device_channel " +
             " SET record_plan_id = #{planId}" +
             " </script>"})
-    void addRecordPlanForAll(@Param("planId") Integer planId);
+    void addRecordPlanForAll(@Param("planId") Long planId);
 
     @Update(value = {" <script>" +
             " UPDATE wvp_device_channel " +
             " SET record_plan_id = null" +
             " WHERE record_plan_id = #{planId} "+
             " </script>"})
-    void removeRecordPlanByPlanId( @Param("planId") Integer planId);
+    void removeRecordPlanByPlanId( @Param("planId") Long planId);
 
 
     @Select("<script>" +
@@ -496,7 +529,7 @@ public interface CommonGBChannelMapper {
             "    coalesce( wdc.gb_device_id, wdc.device_id) as gb_device_id,\n" +
             "    coalesce( wdc.gb_name, wdc.name) as gb_name,\n" +
             "    coalesce( wdc.gb_manufacturer, wdc.manufacturer) as gb_manufacturer,\n" +
-            "    coalesce( wdc.gb_model, wdc.model) as gb_model,\n" +
+            "    coalesce( wdc.gb_model, wdc.db_model) as gb_model,\n" +
             "    coalesce( wdc.gb_owner, wdc.owner) as gb_owner,\n" +
             "    coalesce( wdc.gb_civil_code, wdc.civil_code) as gb_civil_code,\n" +
             "    coalesce( wdc.gb_block, wdc.block) as gb_block,\n" +
@@ -538,7 +571,7 @@ public interface CommonGBChannelMapper {
             " <if test='hasLink == false'> AND wdc.record_plan_id is null</if> " +
             " <if test='dataType != null'> AND wdc.data_type = #{dataType}</if> " +
             "</script>")
-    List<CommonGBChannel> queryForRecordPlanForWebList(@Param("planId") Integer planId, @Param("query") String query,
+    List<CommonGBChannel> queryForRecordPlanForWebList(@Param("planId") Long planId, @Param("query") String query,
                                                        @Param("dataType") Integer dataType, @Param("online") Boolean online,
                                                        @Param("hasLink") Boolean hasLink);
 

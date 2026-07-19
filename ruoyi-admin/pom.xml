@@ -44,6 +44,18 @@
             <version>8.0.33</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmJdbcDriver8</artifactId>
+            <version>8.1.5.45</version>
+        </dependency>
+
+        <!-- sqlite3 驱动包 -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+        </dependency>
+
         <!-- 核心模块-->
         <dependency>
             <groupId>com.ruoyi</groupId>
@@ -69,11 +81,37 @@
             <version>3.0.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+            <version>5.6.137</version>
+        </dependency>
 
         <dependency>
             <groupId>me.zhyd.oauth</groupId>
             <artifactId>JustAuth</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-system</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-onvif</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-framework</artifactId>
+        </dependency>
+
+        <!-- 通用工具-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -104,6 +142,23 @@
            </plugin>
         </plugins>
         <finalName>${project.artifactId}</finalName>
-    </build>
 
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>${basedir}/res</directory>-->
+<!--                <filtering>false</filtering>-->
+<!--                <includes>-->
+<!--                    <include>**/*.properties</include>-->
+<!--                    <include>**/*.xml</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--            <resource>-->
+<!--                <directory>${basedir}/libs</directory>-->
+<!--                <filtering>false</filtering>-->
+<!--                <includes>-->
+<!--                    <include>**/*.dll</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
+    </build>
 </project>

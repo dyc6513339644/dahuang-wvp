@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.wvp.conf.DynamicTask;
-import com.ruoyi.wvp.conf.MediaConfig;
 import com.ruoyi.wvp.gb28181.event.EventPublisher;
 import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.wvp.media.event.mediaServer.MediaServerChangeEvent;
@@ -13,6 +12,7 @@ import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.media.zlm.dto.ZLMServerConfig;
 import com.ruoyi.wvp.media.zlm.event.HookZlmServerKeepaliveEvent;
 import com.ruoyi.wvp.media.zlm.event.HookZlmServerStartEvent;
+import com.ruoyi.system.config.SslConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,17 +48,14 @@ public class ZLMMediaServerStatusManager {
     @Autowired
     private DynamicTask dynamicTask;
 
-    @Value("${server.ssl.enabled:false}")
-    private boolean sslEnabled;
+    @Autowired
+    private SslConfig sslConfig;
 
     @Value("${server.port}")
     private Integer serverPort;
 
     @Value("${server.servlet.context-path:}")
     private String serverServletContextPath;
-
-    @Autowired
-    private MediaConfig mediaConfig;
 
     @Autowired
     private EventPublisher eventPublisher;
@@ -76,8 +73,11 @@ public class ZLMMediaServerStatusManager {
             if (!type.equals(mediaServerItem.getType())) {
                 continue;
             }
-            mediaServerItem.setHttpPort(mediaConfig.getHttpPort());
+            // 取消旧 keepalive，防止旧对象持有旧 IP 被写回队列
+            dynamicTask.stop("zlm-keepalive-" + mediaServerItem.getId());
             log.info("[ZLM-添加待上线节点] ID：" + mediaServerItem.getId());
+            mediaServerItem.setStatus(false);
+            mediaServerService.update(mediaServerItem);
             offlineZlmPrimaryMap.put(mediaServerItem.getId(), mediaServerItem);
             offlineZlmTimeMap.put(mediaServerItem.getId(), System.currentTimeMillis());
             execute();
@@ -226,6 +226,15 @@ public class ZLMMediaServerStatusManager {
     }
     private void initPort(MediaServer mediaServerItem, ZLMServerConfig zlmServerConfig) {
         // 端口只会从配置中读取一次，一旦自己配置或者读取过了将不在配置
+        if (mediaServerItem.getHttpPort() == 0) {
+            mediaServerItem.setHttpPort(zlmServerConfig.getHttpPort());
+        }
+        if (mediaServerItem.getFlvPort() == 0) {
+            mediaServerItem.setFlvPort(zlmServerConfig.getHttpPort());
+        }
+        if (mediaServerItem.getWsFlvPort() == 0) {
+            mediaServerItem.setWsFlvPort(zlmServerConfig.getHttpPort());
+        }
         if (mediaServerItem.getHttpSSlPort() == 0) {
             mediaServerItem.setHttpSSlPort(zlmServerConfig.getHttpSSLport());
         }
@@ -250,14 +259,21 @@ public class ZLMMediaServerStatusManager {
         if (mediaServerItem.getWsFlvSSLPort() == 0) {
             mediaServerItem.setWsFlvSSLPort(zlmServerConfig.getHttpSSLport());
         }
+        // 录像存储路径：DB 为空时从 ZLM 配置读取
+        if (ObjectUtils.isEmpty(mediaServerItem.getRecordPath())) {
+            mediaServerItem.setRecordPath(zlmServerConfig.getProtocolMp4SavePath());
+        }
         mediaServerItem.setHookAliveInterval(10F);
     }
 
     public void setZLMConfig(MediaServer mediaServerItem, boolean restart) {
         log.info("[媒体服务节点] 正在设置 ：{} -> {}:{}",
                 mediaServerItem.getId(), mediaServerItem.getIp(), mediaServerItem.getHttpPort());
-        String protocol = sslEnabled ? "https" : "http";
-        String hookPrefix = String.format("%s://%s:%s%s/index/hook", protocol, mediaServerItem.getHookIp(), serverPort, (serverServletContextPath == null || "/".equals(serverServletContextPath)) ? "" : serverServletContextPath);
+        String protocol = sslConfig.isEnabled() ? "https" : "http";
+        int port = sslConfig.isEnabled() ? sslConfig.getPort() : serverPort;
+        log.info("[媒体服务节点] 是否开启https{}", protocol);
+
+        String hookPrefix = String.format("%s://%s:%d%s/index/hook", protocol, mediaServerItem.getHookIp(), port, (serverServletContextPath == null || "/".equals(serverServletContextPath)) ? "" : serverServletContextPath);
 
         Map<String, Object> param = new HashMap<>();
         param.put("api.secret",mediaServerItem.getSecret()); // -profile:v Baseline
@@ -297,10 +313,8 @@ public class ZLMMediaServerStatusManager {
         }
 
         if (!ObjectUtils.isEmpty(mediaServerItem.getRecordPath())) {
-            File recordPathFile = new File(mediaServerItem.getRecordPath());
-            param.put("protocol.mp4_save_path", recordPathFile.getParentFile().getPath());
-            param.put("protocol.downloadRoot", recordPathFile.getParentFile().getPath());
-            param.put("record.appName", recordPathFile.getName());
+            param.put("protocol.mp4_save_path", mediaServerItem.getRecordPath());
+            param.put("protocol.downloadRoot", mediaServerItem.getRecordPath());
         }
 
         JSONObject responseJSON = zlmresTfulUtils.setServerConfig(mediaServerItem, param);

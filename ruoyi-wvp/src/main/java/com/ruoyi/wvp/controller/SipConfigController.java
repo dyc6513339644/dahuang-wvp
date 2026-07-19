@@ -43,9 +43,9 @@ public class SipConfigController extends BaseController {
             config.setIp(sipConfig.getIp());
             config.setShowIp(sipConfig.getShowIp());
             config.setPort(sipConfig.getPort());
-            config.setDomain(sipConfig.getDomain());
+            config.setGbDomain(sipConfig.getDomain());
             config.setServerId(sipConfig.getId());
-            config.setPassword(sipConfig.getPassword());
+            config.setGbPwd(sipConfig.getPassword());
             config.setPtzSpeed(sipConfig.getPtzSpeed());
             config.setRegisterTimeInterval(sipConfig.getRegisterTimeInterval());
             config.setAlarm(sipConfig.isAlarm());
@@ -64,7 +64,7 @@ public class SipConfigController extends BaseController {
         if (config.getPort() == null) {
             return error("SIP端口不能为空");
         }
-        if (config.getDomain() == null || config.getDomain().isEmpty()) {
+        if (config.getGbDomain() == null || config.getGbDomain().isEmpty()) {
             return error("国标域不能为空");
         }
         if (config.getServerId() == null || config.getServerId().isEmpty()) {

@@ -2,12 +2,15 @@ package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.constant.Constants;
@@ -16,8 +19,10 @@ import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.DatabaseDialectHolder;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.vo.MetaVo;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.mapper.SysMenuMapper;
@@ -66,10 +71,23 @@ public class SysMenuServiceImpl implements ISysMenuService
     public List<SysMenu> selectMenuList(SysMenu menu, Long userId)
     {
         List<SysMenu> menuList = null;
-        // 管理员显示所有菜单信息
         if (SysUser.isAdmin(userId))
         {
-            menuList = menuMapper.selectMenuList(menu);
+            QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
+            if (StringUtils.isNotEmpty(menu.getMenuName()))
+            {
+                wrapper.like("menu_name", menu.getMenuName());
+            }
+            if (StringUtils.isNotEmpty(menu.getVisible()))
+            {
+                wrapper.eq("visible", menu.getVisible());
+            }
+            if (StringUtils.isNotEmpty(menu.getStatus()))
+            {
+                wrapper.eq("status", menu.getStatus());
+            }
+            wrapper.orderByAsc("parent_id", "order_num");
+            menuList = menuMapper.selectList(wrapper);
         }
         else
         {
@@ -133,7 +151,11 @@ public class SysMenuServiceImpl implements ISysMenuService
         List<SysMenu> menus = null;
         if (SecurityUtils.isAdmin(userId))
         {
-            menus = menuMapper.selectMenuTreeAll();
+            QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
+            wrapper.in("menu_type", "M", "C");
+            wrapper.eq("status", "0");
+            wrapper.orderByAsc("parent_id", "order_num");
+            menus = menuMapper.selectList(wrapper);
         }
         else
         {
@@ -263,7 +285,7 @@ public class SysMenuServiceImpl implements ISysMenuService
     @Override
     public SysMenu selectMenuById(Long menuId)
     {
-        return menuMapper.selectMenuById(menuId);
+        return menuMapper.selectById(menuId);
     }
 
     /**
@@ -275,8 +297,8 @@ public class SysMenuServiceImpl implements ISysMenuService
     @Override
     public boolean hasChildByMenuId(Long menuId)
     {
-        int result = menuMapper.hasChildByMenuId(menuId);
-        return result > 0;
+        Long count = menuMapper.selectCount(new QueryWrapper<SysMenu>().eq("parent_id", menuId));
+        return count > 0;
     }
 
     /**
@@ -288,7 +310,7 @@ public class SysMenuServiceImpl implements ISysMenuService
     @Override
     public boolean checkMenuExistRole(Long menuId)
     {
-        int result = roleMenuMapper.checkMenuExistRole(menuId);
+        Long result = roleMenuMapper.selectCount(new QueryWrapper<SysRoleMenu>().eq("menu_id", menuId));
         return result > 0;
     }
 
@@ -301,7 +323,8 @@ public class SysMenuServiceImpl implements ISysMenuService
     @Override
     public int insertMenu(SysMenu menu)
     {
-        return menuMapper.insertMenu(menu);
+        menu.setCreateTime(new Date());
+        return menuMapper.insert(menu);
     }
 
     /**
@@ -313,7 +336,8 @@ public class SysMenuServiceImpl implements ISysMenuService
     @Override
     public int updateMenu(SysMenu menu)
     {
-        return menuMapper.updateMenu(menu);
+        menu.setUpdateTime(new Date());
+        return menuMapper.updateById(menu);
     }
 
     /**
@@ -325,7 +349,7 @@ public class SysMenuServiceImpl implements ISysMenuService
     @Override
     public int deleteMenuById(Long menuId)
     {
-        return menuMapper.deleteMenuById(menuId);
+        return menuMapper.deleteById(menuId);
     }
 
     /**
@@ -338,7 +362,11 @@ public class SysMenuServiceImpl implements ISysMenuService
     public boolean checkMenuNameUnique(SysMenu menu)
     {
         Long menuId = StringUtils.isNull(menu.getMenuId()) ? -1L : menu.getMenuId();
-        SysMenu info = menuMapper.checkMenuNameUnique(menu.getMenuName(), menu.getParentId());
+        QueryWrapper<SysMenu> wrapper = new QueryWrapper<>();
+        wrapper.eq("menu_name", menu.getMenuName());
+        wrapper.eq("parent_id", menu.getParentId());
+        wrapper.last(DatabaseDialectHolder.limitOne());
+        SysMenu info = menuMapper.selectOne(wrapper);
         if (StringUtils.isNotNull(info) && info.getMenuId().longValue() != menuId.longValue())
         {
             return UserConstants.NOT_UNIQUE;

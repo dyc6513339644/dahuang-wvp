@@ -1,5 +1,7 @@
 package com.ruoyi.system.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -8,12 +10,15 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 
  * @author ruoyi
  */
+@TableName("sys_user_post")
 public class SysUserPost
 {
     /** 用户ID */
+    @TableField("user_id")
     private Long userId;
     
     /** 岗位ID */
+    @TableField("post_id")
     private Long postId;
 
     public Long getUserId()

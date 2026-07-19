@@ -213,19 +213,19 @@ public class StreamPushController extends BaseController {
     @PostMapping(value = "/add")
     @ResponseBody
     public AjaxResult add(@RequestBody StreamPush stream) {
-        if (ObjectUtils.isEmpty(stream.getGbId())) {
-            throw new ControllerException(ErrorCode.ERROR400.getCode(), "国标ID不可为空");
+        if (ObjectUtils.isEmpty(stream.getName())) {
+            throw new ControllerException(ErrorCode.ERROR400.getCode(), "名称不可为空");
         }
-        if (ObjectUtils.isEmpty(stream.getApp()) && ObjectUtils.isEmpty(stream.getStream())) {
-            throw new ControllerException(ErrorCode.ERROR400.getCode(), "app或stream不可为空");
-        }
-        stream.setGbStatus("OFF");
+        // 自动生成 app 和 stream，如果用户填写了自定义推流ID则使用自定义值
+        String app = ObjectUtils.isEmpty(stream.getApp())
+                ? "push_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12)
+                : stream.getApp();
+        stream.setApp(app);
+        stream.setStream(app + "_01");
         stream.setPushing(false);
         if (!streamPushService.add(stream)) {
             throw new ControllerException(ErrorCode.ERROR100);
         }
-        stream.setDataType(ChannelDataType.STREAM_PUSH.value);
-        stream.setDataDeviceId(stream.getId());
         return success(stream);
     }
 

@@ -4,6 +4,10 @@ import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -15,53 +19,67 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 
  * @author ruoyi
  */
+@TableName("sys_role")
 public class SysRole extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 角色ID */
+    @TableId(value = "role_id", type = IdType.AUTO)
     @Excel(name = "角色序号", cellType = ColumnType.NUMERIC)
     private Long roleId;
 
     /** 角色名称 */
+    @TableField("role_name")
     @Excel(name = "角色名称")
     private String roleName;
 
     /** 角色权限 */
+    @TableField("role_key")
     @Excel(name = "角色权限")
     private String roleKey;
 
     /** 角色排序 */
+    @TableField("role_sort")
     @Excel(name = "角色排序")
     private Integer roleSort;
 
-    /** 数据范围（1：所有数据权限；2：自定义数据权限；3：本部门数据权限；4：本部门及以下数据权限；5：仅本人数据权限） */
+    /** 数据范围 */
+    @TableField("data_scope")
     @Excel(name = "数据范围", readConverterExp = "1=所有数据权限,2=自定义数据权限,3=本部门数据权限,4=本部门及以下数据权限,5=仅本人数据权限")
     private String dataScope;
 
-    /** 菜单树选择项是否关联显示（ 0：父子不互相关联显示 1：父子互相关联显示） */
+    /** 菜单树选择项是否关联显示 */
+    @TableField("menu_check_strictly")
     private boolean menuCheckStrictly;
 
-    /** 部门树选择项是否关联显示（0：父子不互相关联显示 1：父子互相关联显示 ） */
+    /** 部门树选择项是否关联显示 */
+    @TableField("dept_check_strictly")
     private boolean deptCheckStrictly;
 
     /** 角色状态（0正常 1停用） */
+    @TableField("status")
     @Excel(name = "角色状态", readConverterExp = "0=正常,1=停用")
     private String status;
 
     /** 删除标志（0代表存在 2代表删除） */
+    @TableField("del_flag")
     private String delFlag;
 
     /** 用户是否存在此角色标识 默认不存在 */
+    @TableField(exist = false)
     private boolean flag = false;
 
     /** 菜单组 */
+    @TableField(exist = false)
     private Long[] menuIds;
 
     /** 部门组（数据权限） */
+    @TableField(exist = false)
     private Long[] deptIds;
 
     /** 角色菜单权限 */
+    @TableField(exist = false)
     private Set<String> permissions;
 
     public SysRole()

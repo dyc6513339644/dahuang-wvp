@@ -15,6 +15,10 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <setting name="logImpl"                  value="SLF4J"  />
         <!-- 使用驼峰命名法转换字段 -->
         <setting name="mapUnderscoreToCamelCase" value="true"/>
-	</settings>
+    </settings>
 
+    <typeHandlers>
+        <!-- 统一 Date 读写走 VARCHAR 通道，兼容 MySQL/SQLite/达梦 -->
+        <typeHandler handler="com.ruoyi.common.handler.UniversalDateTypeHandler" javaType="java.util.Date"/>
+    </typeHandlers>
 </configuration>

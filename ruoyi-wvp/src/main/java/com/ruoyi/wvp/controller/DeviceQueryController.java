@@ -13,6 +13,7 @@ import com.ruoyi.wvp.gb28181.bean.DeviceChannel;
 import com.ruoyi.wvp.gb28181.bean.SyncStatus;
 import com.ruoyi.wvp.gb28181.service.IDeviceChannelService;
 import com.ruoyi.wvp.gb28181.service.IDeviceService;
+import com.ruoyi.wvp.mapper.UserChannelMapper;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
 import com.ruoyi.wvp.gb28181.task.ISubscribeTask;
 import com.ruoyi.wvp.gb28181.task.impl.CatalogSubscribeTask;
@@ -70,6 +71,9 @@ public class DeviceQueryController extends BaseController {
     private IDeviceService deviceService;
 
     @Autowired
+    private UserChannelMapper userChannelMapper;
+
+    @Autowired
     private DynamicTask dynamicTask;
 
     /**
@@ -93,7 +97,7 @@ public class DeviceQueryController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/deviceList")
     public AjaxResult deviceList(Device device) {
-        List<Device> list = deviceService.getAll(device);
+        List<Device> list = deviceService.getAllDeviceTypes(device);
         return success(list);
     }
 
@@ -159,6 +163,13 @@ public class DeviceQueryController extends BaseController {
     public AjaxResult channelsAll(String deviceId) {
         List<DeviceChannel> list = deviceChannelService.queryChaneListByDeviceId(deviceId);
         return success(list);
+    }
+
+    @PreAuthorize("@ss.hasPermi('wvp:device:channels')")
+    @GetMapping("/devices/channels/allForPage")
+    public TableDataInfo channelsAllForPage(@RequestParam(required = false) String query,int pageNum, int pageSize) {
+        List<DeviceChannel> list = deviceChannelService.queryAllChannelsForPage(query,pageNum, pageSize);
+        return getDataTable(list);
     }
 
     /**
@@ -520,5 +531,39 @@ public class DeviceQueryController extends BaseController {
     @PostMapping("/subscribe/mobile-position/{id}/{cycle}/{interval}")
     public void subscribeMobilePosition(@PathVariable int id, @PathVariable int cycle, @PathVariable int interval) {
         deviceService.subscribeMobilePosition(id, cycle, interval);
+    }
+
+    // ========== 用户通道过滤接口（不做权限校验，基于 sys_user_channel 过滤） ==========
+
+    /**
+     * 查询当前用户有权限的设备列表（无关联数据则返回全部）
+     */
+    @GetMapping("/userDeviceList")
+    public AjaxResult userDeviceList(Device device) {
+        Long userId = getUserId();
+        log.info("[userDeviceList] userId={}", userId);
+        if (userChannelMapper.countByUserId(userId) == 0) {
+            return deviceList(device);
+        }
+        List<Device> list = userChannelMapper.selectUserDevices(userId);
+        log.info("[userDeviceList] count={}", list.size());
+        return success(list);
+    }
+
+    /**
+     * 查询当前用户有权限的通道列表（无关联数据则返回全部）
+     */
+    @GetMapping("/userChannels/all")
+    public AjaxResult userChannelsAll(@RequestParam(required = false) String deviceId,
+                                       @RequestParam(required = false) String query,
+                                       @RequestParam(required = false) Boolean online) {
+        Long userId = getUserId();
+        log.info("[userChannelsAll] userId={}, deviceId={}", userId, deviceId);
+        if (userChannelMapper.countByUserId(userId) == 0) {
+            return success(deviceChannelService.queryAllChannels(query));
+        }
+        List<DeviceChannel> list = userChannelMapper.selectUserChannels(userId, deviceId, query, online);
+        log.info("[userChannelsAll] count={}", list.size());
+        return success(list);
     }
 }

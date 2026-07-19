@@ -94,7 +94,7 @@ public class RecordPlanController extends BaseController {
      */
     @ResponseBody
     @GetMapping("/get/{planId}")
-    public AjaxResult get(@PathVariable Integer planId) {
+    public AjaxResult get(@PathVariable Long planId) {
         if (planId == null) {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "计划ID不可为NULL");
         }
@@ -138,7 +138,7 @@ public class RecordPlanController extends BaseController {
     @GetMapping("/channel/list")
     @ResponseBody
     public TableDataInfo queryChannelList(int pageNum, int pageSize,
-                                          @RequestParam(required = false) Integer planId,
+                                          @RequestParam(required = false) Long planId,
                                           @RequestParam(required = false) String query,
                                           @RequestParam(required = false) Integer channelType,
                                           @RequestParam(required = false) Boolean online,
@@ -177,7 +177,7 @@ public class RecordPlanController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wvp:record:delete')")
     @ResponseBody
     @DeleteMapping("/delete/{planId}")
-    public AjaxResult delete(@PathVariable Integer planId) {
+    public AjaxResult delete(@PathVariable Long planId) {
         if (planId == null) {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "计划IDID不可为NULL");
         }

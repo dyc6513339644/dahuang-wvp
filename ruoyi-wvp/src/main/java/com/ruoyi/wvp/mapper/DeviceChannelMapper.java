@@ -21,13 +21,13 @@ public interface DeviceChannelMapper {
 
     @Insert("<script> " +
             "insert into wvp_device_channel " +
-            "(device_id, data_type, data_device_id, name, manufacturer, model, owner, civil_code, block, " +
+            "(device_id, data_type, data_device_id, name, manufacturer, db_model, owner, civil_code, block, " +
             "address, parental, parent_id, safety_way, register_way, cert_num, certifiable, err_code, end_time, secrecy, " +
             "ip_address, port, password, status, longitude, latitude, ptz_type, position_type, room_type, use_type, " +
             "supply_light_type, direction_type, resolution, business_group_id, download_speed, svc_space_support_mod, " +
             "svc_time_support_mode, create_time, update_time, sub_count, stream_id, has_audio, gps_time, stream_identification, channel_type) " +
             "values " +
-            "(#{deviceId}, #{dataType}, #{dataDeviceId}, #{name}, #{manufacturer}, #{model}, #{owner}, #{civilCode}, #{block}, " +
+            "(#{deviceId}, #{dataType}, #{dataDeviceId}, #{name}, #{manufacturer}, #{dbModel}, #{owner}, #{civilCode}, #{block}, " +
             "#{address}, #{parental}, #{parentId}, #{safetyWay}, #{registerWay}, #{certNum}, #{certifiable}, #{errCode}, #{endTime}, #{secrecy}, " +
             "#{ipAddress}, #{port}, #{password}, #{status}, #{longitude}, #{latitude}, #{ptzType}, #{positionType}, #{roomType}, #{useType}, " +
             "#{supplyLightType}, #{directionType}, #{resolution}, #{businessGroupId}, #{downloadSpeed}, #{svcSpaceSupportMod}," +
@@ -44,7 +44,7 @@ public interface DeviceChannelMapper {
             ", data_device_id=#{dataDeviceId}" +
             ", name=#{name}" +
             ", manufacturer=#{manufacturer}" +
-            ", model=#{model}" +
+            ", db_model=#{dbModel}" +
             ", owner=#{owner}" +
             ", civil_code=#{civilCode}" +
             ", block=#{block}" +
@@ -102,7 +102,8 @@ public interface DeviceChannelMapper {
 
 
 
-
+    @SelectProvider(type = DeviceChannelProvider.class, method = "queryAllChannelsForPage")
+    List<DeviceChannel> queryAllChannelsForPage(@Param("query") String query);
 
 
     @Select("<script> " +
@@ -113,6 +114,9 @@ public interface DeviceChannelMapper {
 
     @Delete("DELETE FROM wvp_device_channel WHERE data_type =1 and data_device_id=#{dataDeviceId}")
     int cleanChannelsByDeviceId(@Param("dataDeviceId") int dataDeviceId);
+
+    @Update("UPDATE wvp_device_channel SET status='OFF' WHERE data_type=1 AND data_device_id=#{dataDeviceId}")
+    int offlineByDeviceId(@Param("dataDeviceId") int dataDeviceId);
 
     @Delete("DELETE FROM wvp_device_channel WHERE id=#{id}")
     int del(@Param("id") int id);
@@ -129,7 +133,7 @@ public interface DeviceChannelMapper {
             " de.name as device_name,\n" +
             " de.on_line as device_online,\n" +
             " coalesce(dc.gb_manufacturer, dc.manufacturer) as manufacture,\n" +
-            " coalesce(dc.gb_model, dc.model) as model,\n" +
+            " coalesce(dc.gb_model, dc.db_model) as db_model,\n" +
             " coalesce(dc.gb_owner, dc.owner) as owner,\n" +
             " coalesce(dc.gb_civil_code, dc.civil_code) as civil_code,\n" +
             " coalesce(dc.gb_block, dc.block) as block,\n" +
@@ -207,14 +211,14 @@ public interface DeviceChannelMapper {
 
     @Insert("<script> " +
             "insert into wvp_device_channel " +
-            "(device_id, data_type, data_device_id, name, manufacturer, model, owner, civil_code, block, " +
+            "(device_id, data_type, data_device_id, name, manufacturer, db_model, owner, civil_code, block, " +
             "address, parental, parent_id, safety_way, register_way, cert_num, certifiable, err_code, end_time, secrecy, " +
             "ip_address, port, password, status, longitude, latitude, ptz_type, position_type, room_type, use_type, " +
             "supply_light_type, direction_type, resolution, business_group_id, download_speed, svc_space_support_mod, " +
             "svc_time_support_mode, create_time, update_time, sub_count, stream_id, has_audio, gps_time, stream_identification, channel_type) " +
             "values " +
             "<foreach collection='addChannels' index='index' item='item' separator=','> " +
-            "(#{item.deviceId}, #{item.dataType}, #{item.dataDeviceId}, #{item.name}, #{item.manufacturer}, #{item.model}, #{item.owner}, #{item.civilCode}, #{item.block}, " +
+            "(#{item.deviceId}, #{item.dataType}, #{item.dataDeviceId}, #{item.name}, #{item.manufacturer}, #{item.dbModel}, #{item.owner}, #{item.civilCode}, #{item.block}, " +
             "#{item.address}, #{item.parental}, #{item.parentId}, #{item.safetyWay}, #{item.registerWay}, #{item.certNum}, #{item.certifiable}, #{item.errCode}, #{item.endTime}, #{item.secrecy}, " +
             "#{item.ipAddress}, #{item.port}, #{item.password}, #{item.status}, #{item.longitude}, #{item.latitude}, #{item.ptzType}, #{item.positionType}, #{item.roomType}, #{item.useType}, " +
             "#{item.supplyLightType}, #{item.directionType}, #{item.resolution}, #{item.businessGroupId}, #{item.downloadSpeed}, #{item.svcSpaceSupportMod}," +
@@ -237,7 +241,7 @@ public interface DeviceChannelMapper {
             ", data_device_id=#{item.dataDeviceId}" +
             ", name=#{item.name}" +
             ", manufacturer=#{item.manufacturer}" +
-            ", model=#{item.model}" +
+            ", db_model=#{item.dbModel}" +
             ", owner=#{item.owner}" +
             ", civil_code=#{item.civilCode}" +
             ", block=#{item.block}" +
@@ -290,7 +294,7 @@ public interface DeviceChannelMapper {
             ", data_device_id=#{item.dataDeviceId}" +
             ", name=#{item.name}" +
             ", manufacturer=#{item.manufacturer}" +
-            ", model=#{item.model}" +
+            ", db_model=#{item.dbModel}" +
             ", owner=#{item.owner}" +
             ", civil_code=#{item.civilCode}" +
             ", block=#{item.block}" +
@@ -364,7 +368,7 @@ public interface DeviceChannelMapper {
             " device_id,\n" +
             " name,\n" +
             " manufacturer,\n" +
-            " model,\n" +
+            " db_model,\n" +
             " owner,\n" +
             " civil_code,\n" +
             " block,\n" +
@@ -464,7 +468,7 @@ public interface DeviceChannelMapper {
             " device_id,\n" +
             " name,\n" +
             " manufacturer,\n" +
-            " model,\n" +
+            " db_model,\n" +
             " owner,\n" +
             " civil_code,\n" +
             " block,\n" +
@@ -519,7 +523,7 @@ public interface DeviceChannelMapper {
             " device_id,\n" +
             " name,\n" +
             " manufacturer,\n" +
-            " model,\n" +
+            " db_model,\n" +
             " owner,\n" +
             " civil_code,\n" +
             " block,\n" +
@@ -585,7 +589,7 @@ public interface DeviceChannelMapper {
             ", data_device_id=#{dataDeviceId}" +
             ", name=#{name}" +
             ", manufacturer=#{manufacturer}" +
-            ", model=#{model}" +
+            ", db_model=#{dbModel}" +
             ", owner=#{owner}" +
             ", civil_code=#{civilCode}" +
             ", block=#{block}" +
@@ -642,7 +646,7 @@ public interface DeviceChannelMapper {
             " device_id,\n" +
             " name,\n" +
             " manufacturer,\n" +
-            " model,\n" +
+            " db_model,\n" +
             " owner,\n" +
             " civil_code,\n" +
             " block,\n" +

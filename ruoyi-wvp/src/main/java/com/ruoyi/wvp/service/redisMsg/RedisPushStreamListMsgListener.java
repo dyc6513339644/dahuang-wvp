@@ -67,13 +67,13 @@ public class RedisPushStreamListMsgListener implements MessageListener {
                 Map<String, StreamPush> allAppAndStream = streamPushService.getAllAppAndStreamMap();
                 Map<String, StreamPush> allGBId = streamPushService.getAllGBId();
 
-                // 用于存储更具APP+Stream过滤后的数据，可以直接存入stream_push表与gb_stream表
+                // 用于存储根据APP+Stream过滤后的数据，存入wvp_device与wvp_device_channel表
                 List<StreamPush> streamPushItemForSave = new ArrayList<>();
                 List<StreamPush> streamPushItemForUpdate = new ArrayList<>();
                 for (RedisPushStreamMessage pushStreamMessage : streamPushItems) {
                     String app = pushStreamMessage.getApp();
                     String stream = pushStreamMessage.getStream();
-                    boolean contains = allAppAndStream.containsKey(app + stream);
+                    boolean contains = allAppAndStream.containsKey(app);
                     //不存在就添加
                     if (!contains) {
                         if (allGBId.containsKey(pushStreamMessage.getGbId())) {
@@ -98,11 +98,10 @@ public class RedisPushStreamListMsgListener implements MessageListener {
                                     pushStreamMessage.getGbId(), streamPushInDb.getApp(), streamPushInDb.getStream());
                             continue;
                         }
-                        StreamPush streamPush = allAppAndStream.get(app + stream);
+                        StreamPush streamPush = allAppAndStream.get(app);
                         streamPush.setUpdateTime(DateUtil.getNow());
                         streamPush.setGbDeviceId(pushStreamMessage.getGbId());
                         streamPush.setGbName(pushStreamMessage.getName());
-                        streamPush.setGbStatus(pushStreamMessage.isStatus() ? "ON" : "OFF");
                         //存在就只修改 name和gbId
                         streamPushItemForUpdate.add(streamPush);
                     }

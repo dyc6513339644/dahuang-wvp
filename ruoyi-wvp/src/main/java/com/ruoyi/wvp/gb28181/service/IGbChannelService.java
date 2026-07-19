@@ -19,6 +19,8 @@ public interface IGbChannelService {
 
     int update(CommonGBChannel commonGBChannel);
 
+    void updateMapLocation(int id, String longitude, String latitude, String address);
+
     int offline(CommonGBChannel commonGBChannel);
 
     int offline(List<CommonGBChannel> commonGBChannelList);

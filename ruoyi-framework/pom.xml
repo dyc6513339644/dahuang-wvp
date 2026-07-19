@@ -65,7 +65,24 @@
             <artifactId>ruoyi-wvp</artifactId>
         </dependency>
 
+        <!-- onvif模块-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-onvif</artifactId>
+        </dependency>
 
+        <!-- rtsp模块-->
+<!--        <dependency>-->
+<!--            <groupId>com.ruoyi</groupId>-->
+<!--            <artifactId>ruoyi-rtsp</artifactId>-->
+<!--        </dependency>-->
+
+
+        <!--mybatis-plus-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
 
     </dependencies>
 

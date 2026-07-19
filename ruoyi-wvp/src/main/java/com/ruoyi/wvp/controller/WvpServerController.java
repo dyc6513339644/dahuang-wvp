@@ -7,6 +7,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.wvp.common.SystemAllInfo;
 import com.ruoyi.wvp.common.VersionPo;
 import com.ruoyi.wvp.common.enums.ChannelDataType;
+import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.wvp.conf.SipConfig;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.conf.VersionInfo;
@@ -83,6 +84,9 @@ public class WvpServerController extends BaseController {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private DynamicTask dynamicTask;
 
     /**
      * 获取流媒体服务列表
@@ -172,7 +176,15 @@ public class WvpServerController extends BaseController {
         MediaServer mediaServerItemInDatabase = mediaServerService.getOneFromDatabase(mediaServer.getId());
 
         if (mediaServerItemInDatabase != null) {
+            // 强制标记为离线，保存后用新IP/端口重新检测
+            mediaServer.setStatus(false);
             mediaServerService.update(mediaServer);
+            // 取消旧的 keepalive 看门狗，防止它把旧 IP 写回重连队列
+            dynamicTask.stop("zlm-keepalive-" + mediaServer.getId());
+            // 修改后发布事件，触发立即状态检测（以新的IP/端口重连）
+            MediaServerChangeEvent event = new MediaServerChangeEvent(this);
+            event.setMediaServerItemList(mediaServer);
+            applicationEventPublisher.publishEvent(event);
         } else {
             // 检查数据库中是否已有流媒体，如果为空则设置为默认流媒体
             if (mediaServerService.getAllFromDatabase().isEmpty()) {

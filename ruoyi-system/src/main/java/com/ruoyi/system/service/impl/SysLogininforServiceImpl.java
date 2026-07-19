@@ -1,8 +1,13 @@
 package com.ruoyi.system.service.impl;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysLogininfor;
 import com.ruoyi.system.mapper.SysLogininforMapper;
 import com.ruoyi.system.service.ISysLogininforService;
@@ -27,7 +32,8 @@ public class SysLogininforServiceImpl implements ISysLogininforService
     @Override
     public void insertLogininfor(SysLogininfor logininfor)
     {
-        logininforMapper.insertLogininfor(logininfor);
+        logininfor.setLoginTime(new Date());
+        logininforMapper.insert(logininfor);
     }
 
     /**
@@ -39,7 +45,32 @@ public class SysLogininforServiceImpl implements ISysLogininforService
     @Override
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor)
     {
-        return logininforMapper.selectLogininforList(logininfor);
+        QueryWrapper<SysLogininfor> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotEmpty(logininfor.getIpaddr()))
+        {
+            wrapper.like("ipaddr", logininfor.getIpaddr());
+        }
+        if (StringUtils.isNotEmpty(logininfor.getStatus()))
+        {
+            wrapper.eq("status", logininfor.getStatus());
+        }
+        if (StringUtils.isNotEmpty(logininfor.getUserName()))
+        {
+            wrapper.like("user_name", logininfor.getUserName());
+        }
+        if (logininfor.getParams() != null)
+        {
+            if (StringUtils.isNotEmpty((String) logininfor.getParams().get("beginTime")))
+            {
+                wrapper.ge("login_time", logininfor.getParams().get("beginTime"));
+            }
+            if (StringUtils.isNotEmpty((String) logininfor.getParams().get("endTime")))
+            {
+                wrapper.le("login_time", logininfor.getParams().get("endTime"));
+            }
+        }
+        wrapper.orderByDesc("info_id");
+        return logininforMapper.selectList(wrapper);
     }
 
     /**
@@ -51,7 +82,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService
     @Override
     public int deleteLogininforByIds(Long[] infoIds)
     {
-        return logininforMapper.deleteLogininforByIds(infoIds);
+        return logininforMapper.deleteBatchIds(Arrays.asList(infoIds));
     }
 
     /**
@@ -60,6 +91,6 @@ public class SysLogininforServiceImpl implements ISysLogininforService
     @Override
     public void cleanLogininfor()
     {
-        logininforMapper.cleanLogininfor();
+        logininforMapper.delete(new QueryWrapper<>());
     }
 }

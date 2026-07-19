@@ -8,7 +8,8 @@ public enum ChannelDataType {
 
     GB28181(1,"国标28181"),
     STREAM_PUSH(2,"推流设备"),
-    STREAM_PROXY(3,"拉流代理");
+    STREAM_PROXY(3,"拉流代理"),
+    ONVIF(4,"ONVIF设备");
 
     public final int value;
 

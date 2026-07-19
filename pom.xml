@@ -35,7 +35,7 @@
         <logback.version>1.2.13</logback.version>
         <spring-security.version>5.7.12</spring-security.version>
         <spring-framework.version>5.3.39</spring-framework.version>
-        <hutool.version>5.8.20</hutool.version>
+        <hutool.version>5.8.22</hutool.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -121,11 +121,28 @@
                 <version>${bitwalker.version}</version>
             </dependency>
 
+            <!--mybatis-plus-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>3.5.2</version>
+            </dependency>
+
             <!-- pagehelper 分页插件 -->
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.boot.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>mybatis-spring</artifactId>
+                        <groupId>org.mybatis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>mybatis</artifactId>
+                        <groupId>org.mybatis</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- 获取系统信息 -->
@@ -230,6 +247,20 @@
             </dependency>
 
 
+            <!-- onvif模块-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-onvif</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- rtsp模块-->
+<!--            <dependency>-->
+<!--                <groupId>com.ruoyi</groupId>-->
+<!--                <artifactId>ruoyi-rtsp</artifactId>-->
+<!--                <version>${ruoyi.version}</version>-->
+<!--            </dependency>-->
+
 
             <!-- 通用工具-->
             <dependency>
@@ -242,8 +273,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
-                <scope>provided</scope>
+                <version>1.18.36</version>
             </dependency>
 
             <dependency>
@@ -262,6 +292,7 @@
         <module>ruoyi-quartz</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
+        <module>ruoyi-onvif</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -270,11 +301,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.36</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

@@ -93,6 +93,8 @@ public class MediaServiceImpl implements IMediaService {
                 ResultForOnPublish result = new ResultForOnPublish();
                 result.setEnable_audio(streamProxyItem.isEnableAudio());
                 result.setEnable_mp4(streamProxyItem.isEnableMp4());
+                log.info("[ZLM Hook-推流鉴权] StreamProxy匹配: app={}, stream={}, enableMp4={}",
+                        app, stream, streamProxyItem.isEnableMp4());
                 return result;
             }
             if (userSetting.getPushAuthority()) {

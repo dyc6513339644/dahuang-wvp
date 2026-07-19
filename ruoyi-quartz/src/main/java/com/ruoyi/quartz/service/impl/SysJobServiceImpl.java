@@ -1,5 +1,6 @@
 package com.ruoyi.quartz.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.quartz.JobDataMap;
@@ -38,7 +39,7 @@ public class SysJobServiceImpl implements ISysJobService
     public void init() throws SchedulerException, TaskException
     {
         scheduler.clear();
-        List<SysJob> jobList = jobMapper.selectJobAll();
+        List<SysJob> jobList = jobMapper.selectList(null);
         for (SysJob job : jobList)
         {
             ScheduleUtils.createScheduleJob(scheduler, job);
@@ -66,7 +67,7 @@ public class SysJobServiceImpl implements ISysJobService
     @Override
     public SysJob selectJobById(Long jobId)
     {
-        return jobMapper.selectJobById(jobId);
+        return jobMapper.selectById(jobId);
     }
 
     /**
@@ -81,7 +82,8 @@ public class SysJobServiceImpl implements ISysJobService
         Long jobId = job.getJobId();
         String jobGroup = job.getJobGroup();
         job.setStatus(ScheduleConstants.Status.PAUSE.getValue());
-        int rows = jobMapper.updateJob(job);
+        job.setUpdateTime(new Date());
+        int rows = jobMapper.updateById(job);
         if (rows > 0)
         {
             scheduler.pauseJob(ScheduleUtils.getJobKey(jobId, jobGroup));
@@ -101,7 +103,8 @@ public class SysJobServiceImpl implements ISysJobService
         Long jobId = job.getJobId();
         String jobGroup = job.getJobGroup();
         job.setStatus(ScheduleConstants.Status.NORMAL.getValue());
-        int rows = jobMapper.updateJob(job);
+        job.setUpdateTime(new Date());
+        int rows = jobMapper.updateById(job);
         if (rows > 0)
         {
             scheduler.resumeJob(ScheduleUtils.getJobKey(jobId, jobGroup));
@@ -120,7 +123,7 @@ public class SysJobServiceImpl implements ISysJobService
     {
         Long jobId = job.getJobId();
         String jobGroup = job.getJobGroup();
-        int rows = jobMapper.deleteJobById(jobId);
+        int rows = jobMapper.deleteById(jobId);
         if (rows > 0)
         {
             scheduler.deleteJob(ScheduleUtils.getJobKey(jobId, jobGroup));
@@ -140,7 +143,7 @@ public class SysJobServiceImpl implements ISysJobService
     {
         for (Long jobId : jobIds)
         {
-            SysJob job = jobMapper.selectJobById(jobId);
+            SysJob job = jobMapper.selectById(jobId);
             deleteJob(job);
         }
     }
@@ -202,7 +205,8 @@ public class SysJobServiceImpl implements ISysJobService
     public int insertJob(SysJob job) throws SchedulerException, TaskException
     {
         job.setStatus(ScheduleConstants.Status.PAUSE.getValue());
-        int rows = jobMapper.insertJob(job);
+        job.setCreateTime(new Date());
+        int rows = jobMapper.insert(job);
         if (rows > 0)
         {
             ScheduleUtils.createScheduleJob(scheduler, job);
@@ -220,7 +224,8 @@ public class SysJobServiceImpl implements ISysJobService
     public int updateJob(SysJob job) throws SchedulerException, TaskException
     {
         SysJob properties = selectJobById(job.getJobId());
-        int rows = jobMapper.updateJob(job);
+        job.setUpdateTime(new Date());
+        int rows = jobMapper.updateById(job);
         if (rows > 0)
         {
             updateSchedulerJob(job, properties.getJobGroup());

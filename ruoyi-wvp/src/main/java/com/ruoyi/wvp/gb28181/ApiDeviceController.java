@@ -152,7 +152,7 @@ public class ApiDeviceController {
             deviceJOSNChannel.put("SubCount", deviceChannelExtend.getSubCount()); // TODO ? 子节点数, SubCount > 0 表示该通道为子目录
             deviceJOSNChannel.put("SnapURL", "");
             deviceJOSNChannel.put("Manufacturer ", deviceChannelExtend.getManufacture());
-            deviceJOSNChannel.put("Model", deviceChannelExtend.getModel());
+            deviceJOSNChannel.put("Model", deviceChannelExtend.getDbModel());
             deviceJOSNChannel.put("Owner", deviceChannelExtend.getOwner());
             deviceJOSNChannel.put("CivilCode", deviceChannelExtend.getCivilCode());
             deviceJOSNChannel.put("Address", deviceChannelExtend.getAddress());

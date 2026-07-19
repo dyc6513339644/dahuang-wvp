@@ -116,6 +116,10 @@ public class NotifyRequestForCatalogProcessor extends SIPRequestProcessorParent 
 								continue;
 							}
 							catalogChannelEvent.getChannel().setDataDeviceId(device.getId());
+							// 若设备未上报 ParentID，默认设置为父设备的 GB 编码
+							if (catalogChannelEvent.getChannel().getParentId() == null) {
+								catalogChannelEvent.getChannel().setParentId(device.getDeviceId());
+							}
                         } catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
                                  IllegalAccessException e) {
                             log.error("[解析CatalogChannelEvent]失败，", e);

@@ -1,5 +1,9 @@
 package com.ruoyi.wvp.service.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.wvp.media.event.media.MediaRecordMp4Event;
 import com.ruoyi.wvp.utils.MediaServerUtils;
 
@@ -8,11 +12,13 @@ import java.util.Map;
 /**
  * 云端录像数据
  */
+@TableName("wvp_cloud_record")
 public class CloudRecordItem {
     /**
      * 主键
      */
-    private int id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     /**
      * 应用名
@@ -67,6 +73,7 @@ public class CloudRecordItem {
     /**
      * 保留，收藏的文件不移除
      */
+    @TableField(exist = false)
     private Boolean reserve;
 
     /**
@@ -98,11 +105,11 @@ public class CloudRecordItem {
         return cloudRecordItem;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

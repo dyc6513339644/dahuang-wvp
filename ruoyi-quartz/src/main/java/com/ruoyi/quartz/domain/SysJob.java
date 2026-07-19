@@ -6,6 +6,10 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.constant.ScheduleConstants;
@@ -18,11 +22,13 @@ import com.ruoyi.quartz.util.CronUtils;
  * 
  * @author ruoyi
  */
+@TableName("sys_job")
 public class SysJob extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 任务ID */
+    @TableId(value = "job_id", type = IdType.AUTO)
     @Excel(name = "任务序号", cellType = ColumnType.NUMERIC)
     private Long jobId;
 

@@ -1,6 +1,10 @@
 package com.ruoyi.framework.web.exception;
 
 import javax.servlet.http.HttpServletRequest;
+
+import com.ruoyi.common.exception.ControllerException;
+import com.ruoyi.common.exception.SsrcTransactionNotFoundException;
+import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,7 +25,7 @@ import com.ruoyi.common.utils.html.EscapeUtil;
 
 /**
  * 全局异常处理器
- * 
+ *
  * @author ruoyi
  */
 @RestControllerAdvice
@@ -38,6 +42,11 @@ public class GlobalExceptionHandler
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',权限校验失败'{}'", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.FORBIDDEN, "没有权限，请联系管理员授权");
+    }
+
+    @ExceptionHandler(ClientAbortException.class)
+    public void handleClientAbortException(ClientAbortException ex) {
+        log.debug("客户端连接已中断，请求被中止: {}", ex.getMessage());
     }
 
     /**
@@ -61,6 +70,27 @@ public class GlobalExceptionHandler
         log.error(e.getMessage(), e);
         Integer code = e.getCode();
         return StringUtils.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
+    }
+
+    /**
+     * controller异常
+     */
+    @ExceptionHandler(ControllerException.class)
+    public AjaxResult handleControllerException(ControllerException e, HttpServletRequest request)
+    {
+        log.error(e.getMessage(), e);
+        Integer code = e.getCode();
+        return StringUtils.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
+    }
+
+    /**
+     * 事务未找到异常
+     */
+    @ExceptionHandler(SsrcTransactionNotFoundException.class)
+    public AjaxResult handleSsrcTransactionNotFoundException(SsrcTransactionNotFoundException e, HttpServletRequest request)
+    {
+        log.error(e.getMessage(), e);
+        return  AjaxResult.error(e.getMessage());
     }
 
     /**

@@ -76,7 +76,7 @@ public class DeviceInfoResponseMessageHandler extends SIPRequestProcessorParent 
             device.setName(getText(rootElement, "DeviceName"));
 
             device.setManufacturer(getText(rootElement, "Manufacturer"));
-            device.setModel(getText(rootElement, "Model"));
+            device.setDbModel(getText(rootElement, "Model"));
             device.setFirmware(getText(rootElement, "Firmware"));
             if (ObjectUtils.isEmpty(device.getStreamMode())) {
                 device.setStreamMode("TCP-PASSIVE");

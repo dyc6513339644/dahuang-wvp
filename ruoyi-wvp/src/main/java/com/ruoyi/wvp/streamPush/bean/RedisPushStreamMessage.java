@@ -15,10 +15,10 @@ public class RedisPushStreamMessage {
         StreamPush push = new StreamPush();
         push.setApp(app);
         push.setStream(stream);
+        push.setName(name);
         push.setGbName(name);
         push.setGbDeviceId(gbId);
         push.setStartOfflinePush(true);
-        push.setGbStatus(status?"ON":"OFF");
         return push;
     }
 }

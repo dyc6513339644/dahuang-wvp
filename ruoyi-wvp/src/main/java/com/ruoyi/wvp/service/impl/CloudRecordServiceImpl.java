@@ -3,6 +3,7 @@ package com.ruoyi.wvp.service.impl;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.service.ICloudRecordService;
 import com.ruoyi.wvp.mapper.CloudRecordServiceMapper;
@@ -104,6 +105,10 @@ public class CloudRecordServiceImpl implements ICloudRecordService {
     @Async("taskExecutor")
     @EventListener
     public void onApplicationEvent(MediaRecordMp4Event event) {
+        // 过滤语音对讲和广播，不需要录像
+        if ("talk".equals(event.getApp()) || "broadcast".equals(event.getApp())) {
+            return;
+        }
         CloudRecordItem cloudRecordItem = CloudRecordItem.getInstance(event);
         if (ObjectUtils.isEmpty(cloudRecordItem.getCallId())) {
             StreamAuthorityInfo streamAuthorityInfo = redisCatchStorage.getStreamAuthorityInfo(event.getApp(), event.getStream());
@@ -112,7 +117,7 @@ public class CloudRecordServiceImpl implements ICloudRecordService {
             }
         }
         log.info("[添加录像记录] {}/{}, callId: {}, 内容：{}", event.getApp(), event.getStream(), cloudRecordItem.getCallId(), event.getRecordInfo());
-        cloudRecordServiceMapper.add(cloudRecordItem);
+        cloudRecordServiceMapper.insert(cloudRecordItem);
     }
 
     @Override
@@ -224,12 +229,15 @@ public class CloudRecordServiceImpl implements ICloudRecordService {
 
     @Override
     public int changeCollectById(Integer recordId, boolean result) {
-        return cloudRecordServiceMapper.changeCollectById(result, recordId);
+        UpdateWrapper<CloudRecordItem> wrapper = new UpdateWrapper<>();
+        wrapper.set("collect", result);
+        wrapper.eq("id", recordId);
+        return cloudRecordServiceMapper.update(null, wrapper);
     }
 
     @Override
     public DownloadFileInfo getPlayUrlPath(Integer recordId) {
-        CloudRecordItem recordItem = cloudRecordServiceMapper.queryOne(recordId);
+        CloudRecordItem recordItem = cloudRecordServiceMapper.selectById(recordId);
         if (recordItem == null) {
             throw new ControllerException(ErrorCode.ERROR400.getCode(), "资源不存在");
         }

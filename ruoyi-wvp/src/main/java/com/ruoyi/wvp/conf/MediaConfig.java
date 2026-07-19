@@ -1,273 +1,165 @@
 package com.ruoyi.wvp.conf;
 
 import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.utils.DateUtil;
+import com.ruoyi.wvp.media.service.IMediaServerService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 
+/**
+ * 流媒体配置（从数据库 wvp_media_server 表加载默认节点）
+ */
 @Slf4j
-@Configuration("mediaConfig")
-@Order(0)
+@Service("mediaConfig")
 public class MediaConfig {
 
-    // 修改必须配置，不再支持自动获取
-    @Value("${media.id}")
-    private String id;
+    @Autowired
+    private IMediaServerService mediaServerService;
 
-    @Value("${media.ip}")
-    private String ip;
-
-    @Value("${media.wan_ip:}")
-    private String wanIp;
-
-    @Value("${media.hook-ip:127.0.0.1}")
-    private String hookIp;
-
-
-    @Value("${media.sdp-ip:${media.wan_ip:}}")
-    private String sdpIp;
-
-    @Value("${media.stream-ip:${media.wan_ip:}}")
-    private String streamIp;
-
-    @Value("${media.http-port:0}")
-    private Integer httpPort;
-
-    @Value("${media.flv-port:0}")
-    private Integer flvPort = 0;
-
-    @Value("${media.ws-flv-port:0}")
-    private Integer wsFlvPort = 0;
-
-    @Value("${media.http-ssl-port:0}")
-    private Integer httpSSlPort = 0;
-
-    @Value("${media.flv-ssl-port:0}")
-    private Integer flvSSlPort = 0;
-
-    @Value("${media.ws-flv-ssl-port:0}")
-    private Integer wsFlvSSlPort = 0;
-
-    @Value("${media.rtmp-port:0}")
-    private Integer rtmpPort = 0;
-
-    @Value("${media.rtmp-ssl-port:0}")
-    private Integer rtmpSSlPort = 0;
-
-    @Value("${media.rtp-proxy-port:0}")
-    private Integer rtpProxyPort = 0;
-
-    @Value("${media.rtsp-port:0}")
-    private Integer rtspPort = 0;
-
-    @Value("${media.rtsp-ssl-port:0}")
-    private Integer rtspSSLPort = 0;
-
-    @Value("${media.auto-config:true}")
-    private boolean autoConfig = true;
-
-    @Value("${media.secret}")
-    private String secret;
-
-    @Value("${media.rtp.enable}")
-    private boolean rtpEnable;
-
-    @Value("${media.rtp.port-range}")
-    private String rtpPortRange;
-
-    @Value("${media.rtp.send-port-range}")
-    private String rtpSendPortRange;
-
-    @Value("${media.record-assist-port:0}")
-    private Integer recordAssistPort = 0;
-
-    @Value("${media.record-day:7}")
-    private Integer recordDay;
-
-    @Value("${media.record-path:}")
-    private String recordPath;
-
-    @Value("${media.type:zlm}")
-    private String type;
+    private MediaServer getDefault() {
+        return mediaServerService.getDefaultMediaServer();
+    }
 
     public String getId() {
-        return id;
+        MediaServer def = getDefault();
+        return def != null ? def.getId() : null;
     }
 
     public String getIp() {
-        return ip;
+        MediaServer def = getDefault();
+        return def != null ? def.getIp() : null;
+    }
+
+    public String getWanIp() {
+        return null;
     }
 
     public String getHookIp() {
-        return hookIp;
+        MediaServer def = getDefault();
+        return def != null ? def.getHookIp() : "127.0.0.1";
     }
 
     public int getHttpPort() {
-        return httpPort;
+        MediaServer def = getDefault();
+        return def != null ? def.getHttpPort() : 0;
     }
 
     public int getHttpSSlPort() {
-        return httpSSlPort;
+        MediaServer def = getDefault();
+        return def != null ? def.getHttpSSlPort() : 0;
     }
 
     public int getRtmpPort() {
-        return rtmpPort;
+        MediaServer def = getDefault();
+        return def != null ? def.getRtmpPort() : 0;
     }
 
     public int getRtmpSSlPort() {
-        return rtmpSSlPort;
+        MediaServer def = getDefault();
+        return def != null ? def.getRtmpSSlPort() : 0;
     }
 
     public int getRtpProxyPort() {
-        if (rtpProxyPort == null) {
+        MediaServer def = getDefault();
+        if (def == null) {
             return 0;
-        }else {
-            return rtpProxyPort;
         }
-
+        return def.getRtpProxyPort();
     }
 
     public int getRtspPort() {
-        return rtspPort;
+        MediaServer def = getDefault();
+        return def != null ? def.getRtspPort() : 0;
     }
 
     public int getRtspSSLPort() {
-        return rtspSSLPort;
+        MediaServer def = getDefault();
+        return def != null ? def.getRtspSSLPort() : 0;
     }
 
     public boolean isAutoConfig() {
-        return autoConfig;
+        MediaServer def = getDefault();
+        return def != null && def.isAutoConfig();
     }
 
     public String getSecret() {
-        return secret;
+        MediaServer def = getDefault();
+        return def != null ? def.getSecret() : null;
     }
 
     public boolean isRtpEnable() {
-        return rtpEnable;
+        MediaServer def = getDefault();
+        return def != null && def.isRtpEnable();
     }
 
     public String getRtpPortRange() {
-        return rtpPortRange;
+        MediaServer def = getDefault();
+        return def != null ? def.getRtpPortRange() : null;
+    }
+
+    public String getRtpSendPortRange() {
+        MediaServer def = getDefault();
+        return def != null ? def.getSendRtpPortRange() : null;
     }
 
     public int getRecordAssistPort() {
-        return recordAssistPort;
+        MediaServer def = getDefault();
+        return def != null ? def.getRecordAssistPort() : 0;
+    }
+
+    public Integer getRecordDay() {
+        MediaServer def = getDefault();
+        return def != null ? def.getRecordDay() : null;
+    }
+
+    public String getRecordPath() {
+        MediaServer def = getDefault();
+        return def != null ? def.getRecordPath() : null;
     }
 
     public String getSdpIp() {
-        if (ObjectUtils.isEmpty(sdpIp)){
-            return ip;
-        }else {
-            if (isValidIPAddress(sdpIp)) {
-                return sdpIp;
-            }else {
-                // 按照域名解析
-                String hostAddress = null;
-                try {
-                    hostAddress = InetAddress.getByName(sdpIp).getHostAddress();
-                } catch (UnknownHostException e) {
-                    log.error("[获取SDP IP]: 域名解析失败");
-                }
-                return hostAddress;
-            }
+        MediaServer def = getDefault();
+        if (def == null) {
+            return null;
+        }
+        String sdpIp = def.getSdpIp();
+        if (ObjectUtils.isEmpty(sdpIp)) {
+            return def.getIp();
+        }
+        if (isValidIPAddress(sdpIp)) {
+            return sdpIp;
+        }
+        // 按照域名解析
+        try {
+            return InetAddress.getByName(sdpIp).getHostAddress();
+        } catch (UnknownHostException e) {
+            log.error("[获取SDP IP]: 域名解析失败");
+            return null;
         }
     }
 
     public String getStreamIp() {
-        if (ObjectUtils.isEmpty(streamIp)){
-            return ip;
-        }else {
-            return streamIp;
+        MediaServer def = getDefault();
+        if (def == null) {
+            return null;
         }
-    }
-
-
-
-    public MediaServer getMediaSerItem(){
-        MediaServer mediaServer = new MediaServer();
-        mediaServer.setId(id);
-        mediaServer.setIp(ip);
-        mediaServer.setDefaultServer(true);
-        mediaServer.setHookIp(getHookIp());
-        mediaServer.setSdpIp(getSdpIp());
-        mediaServer.setStreamIp(getStreamIp());
-        mediaServer.setHttpPort(httpPort);
-        if (flvPort == 0) {
-            mediaServer.setFlvPort(httpPort);
-        }else {
-            mediaServer.setFlvPort(flvPort);
+        String streamIp = def.getStreamIp();
+        if (ObjectUtils.isEmpty(streamIp)) {
+            return def.getIp();
         }
-        if (wsFlvPort == 0) {
-            mediaServer.setWsFlvPort(httpPort);
-        }else {
-            mediaServer.setWsFlvPort(wsFlvPort);
-        }
-        if (flvSSlPort == 0) {
-            mediaServer.setFlvSSLPort(httpSSlPort);
-        }else {
-            mediaServer.setFlvSSLPort(flvSSlPort);
-        }
-        if (wsFlvSSlPort == 0) {
-            mediaServer.setWsFlvSSLPort(httpSSlPort);
-        }else {
-            mediaServer.setWsFlvSSLPort(wsFlvSSlPort);
-        }
-
-        mediaServer.setHttpSSlPort(httpSSlPort);
-        mediaServer.setRtmpPort(rtmpPort);
-        mediaServer.setRtmpSSlPort(rtmpSSlPort);
-        mediaServer.setRtpProxyPort(getRtpProxyPort());
-        mediaServer.setRtspPort(rtspPort);
-        mediaServer.setRtspSSLPort(rtspSSLPort);
-        mediaServer.setAutoConfig(autoConfig);
-        mediaServer.setSecret(secret);
-        mediaServer.setRtpEnable(rtpEnable);
-        mediaServer.setRtpPortRange(rtpPortRange);
-        mediaServer.setSendRtpPortRange(rtpSendPortRange);
-        mediaServer.setRecordAssistPort(recordAssistPort);
-        mediaServer.setHookAliveInterval(10f);
-        mediaServer.setRecordDay(recordDay);
-        mediaServer.setStatus(false);
-        mediaServer.setType(type);
-        if (recordPath != null) {
-            mediaServer.setRecordPath(recordPath);
-        }
-        mediaServer.setCreateTime(DateUtil.getNow());
-        mediaServer.setUpdateTime(DateUtil.getNow());
-
-        return mediaServer;
+        return streamIp;
     }
 
-    public Integer getRecordDay() {
-        return recordDay;
-    }
-
-    public void setRecordDay(Integer recordDay) {
-        this.recordDay = recordDay;
-    }
-
-    public String getRecordPath() {
-        return recordPath;
-    }
-
-    public void setRecordPath(String recordPath) {
-        this.recordPath = recordPath;
-    }
-
-    public String getRtpSendPortRange() {
-        return rtpSendPortRange;
-    }
-
-    public void setRtpSendPortRange(String rtpSendPortRange) {
-        this.rtpSendPortRange = rtpSendPortRange;
+    /**
+     * 返回数据库中的默认流媒体节点
+     */
+    public MediaServer getMediaSerItem() {
+        return getDefault();
     }
 
     private boolean isValidIPAddress(String ipAddress) {
@@ -275,13 +167,5 @@ public class MediaConfig {
             return Pattern.matches("^([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}$", ipAddress);
         }
         return false;
-    }
-
-    public String getWanIp() {
-        return wanIp;
-    }
-
-    public void setWanIp(String wanIp) {
-        this.wanIp = wanIp;
     }
 }

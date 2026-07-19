@@ -74,6 +74,9 @@ public class PtzController extends BaseController {
 		Device device = deviceService.getDeviceByDeviceId(deviceId);
 
 		Assert.notNull(device, "设备[" + deviceId + "]不存在");
+		if ("STREAM_PROXY".equals(device.getProtocolType())) {
+			throw new ControllerException(ErrorCode.ERROR100.getCode(), "拉流代理设备不支持云台控制");
+		}
 
 		ptzService.frontEndCommand(device, channelId, cmdCode, parameter1, parameter2, combindCode2);
 	}
@@ -242,6 +245,10 @@ public class PtzController extends BaseController {
 			log.debug("设备预置位查询API调用");
 		}
 		Device device = deviceService.getDeviceByDeviceId(deviceId);
+		Assert.notNull(device, "设备[" + deviceId + "]不存在");
+		if ("STREAM_PROXY".equals(device.getProtocolType())) {
+			throw new ControllerException(ErrorCode.ERROR100.getCode(), "拉流代理设备不支持预置位查询");
+		}
 		String uuid =  UUID.randomUUID().toString();
 		String key =  DeferredResultHolder.CALLBACK_CMD_PRESETQUERY + (ObjectUtils.isEmpty(channelId) ? deviceId : channelId);
 		DeferredResult<String> result = new DeferredResult<String> (3 * 1000L);

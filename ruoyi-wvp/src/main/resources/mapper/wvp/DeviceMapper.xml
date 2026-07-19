@@ -10,7 +10,7 @@
         <result property="deviceId" column="device_id"/>
         <result property="name" column="name"/>
         <result property="manufacturer" column="manufacturer"/>
-        <result property="model" column="model"/>
+        <result property="dbModel" column="db_model"/>
         <result property="firmware" column="firmware"/>
         <result property="transport" column="transport"/>
         <result property="streamMode" column="stream_mode"/>
@@ -41,6 +41,28 @@
         <result property="asMessageChannel" column="as_message_channel"/>
         <result property="broadcastPushAfterAck" column="broadcast_push_after_ack"/>
         <result property="deptName" column="dept_name"/>
+        <result property="addressMap" column="address_map"/>
+        <result property="protocolType" column="protocol_type"/>
+        <result property="srcUrl" column="src_url"/>
+        <result property="streamType" column="stream_type"/>
+        <result property="ffmpegCmdKey" column="ffmpeg_cmd_key"/>
+        <result property="rtspType" column="rtsp_type"/>
+        <result property="enableAudio" column="enable_audio"/>
+        <result property="enableMp4" column="enable_mp4"/>
+        <result property="enableRemoveNoneReader" column="enable_remove_none_reader"/>
+        <result property="enableDisableNoneReader" column="enable_disable_none_reader"/>
+        <result property="streamKey" column="stream_key"/>
+        <result property="startOfflinePush" column="start_offline_push"/>
+        <result property="pushTime" column="push_time"/>
+        <result property="userName" column="user_name"/>
+        <result property="onvifAuthType" column="onvif_auth_type"/>
+        <result property="playType" column="play_type"/>
+        <result property="streamUris" column="stream_uris"/>
+        <result property="easyNTSUrl" column="easy_nts_url"/>
+        <result property="channel" column="channel"/>
+        <result property="url" column="url"/>
+        <result property="streamId" column="stream_id"/>
+        <result property="channelCount" column="channel_count"/>
     </resultMap>
 
     <update id="updateCustom">
@@ -88,7 +110,7 @@
                coalesce(de.custom_name, de.name) as name,
                de.password,
                de.manufacturer,
-               de.model,
+               de.db_model,
                de.firmware,
                de.transport,
                de.stream_mode,
@@ -127,7 +149,7 @@
                COALESCE(custom_name, name)       AS name,
                password,
                manufacturer,
-               model,
+               db_model,
                firmware,
                transport,
                stream_mode,
@@ -152,10 +174,22 @@
                on_line,
                media_server_id,
                broadcast_push_after_ack,
+               address_map,
+               protocol_type,
+               src_url,
+               stream_type,
+               ffmpeg_cmd_key,
+               rtsp_type,
+               enable_audio,
+               enable_mp4,
+               enable_remove_none_reader,
+               enable_disable_none_reader,
+               stream_key,
+               start_offline_push,
+               push_time,
                (SELECT COUNT(0)
                 FROM wvp_device_channel dc
-                WHERE dc.data_type = 1
-                  AND dc.data_device_id = de.id) AS channel_count
+                WHERE dc.data_device_id = de.id) AS channel_count
         FROM wvp_device de
         WHERE de.device_id = #{deviceId}
     </select>
@@ -168,7 +202,7 @@
         coalesce(de.custom_name, de.name) as name,
         de.password,
         de.manufacturer,
-        de.model,
+        de.db_model,
         de.firmware,
         de.transport,
         de.stream_mode,
@@ -196,13 +230,21 @@
         de.lat,
         de.lng,
         de.address_map,
+        de.user_name,
+        de.onvif_auth_type,
         d.dept_name,
         (SELECT count(0) FROM wvp_device_channel dc WHERE dc.data_type = #{dataType} and dc.data_device_id= de.id) as
         channel_count
         FROM wvp_device de
         left join sys_dept d on de.dept_id = d.dept_id
         <where>
-            <if test="device.deptId != null">and (de.dept_id = #{device.deptId} OR de.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{device.deptId}, ancestors) ))</if>
+            AND (de.protocol_type = 'GB28181' OR de.protocol_type IS NULL)
+            <if test="device.deptId != null">and (de.dept_id = #{device.deptId} OR de.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE
+                <choose>
+                    <when test='device.params.dbType == "mysql"'>find_in_set(#{device.deptId}, ancestors)</when>
+                    <otherwise>INSTR(',' || ancestors || ',', ',' || #{device.deptId} || ',') &gt; 0</otherwise>
+                </choose>
+                ))</if>
             <if test="device.status != null">
                 AND de.on_line = #{device.status}
             </if>
@@ -217,6 +259,72 @@
             </if>
 
             <!-- 数据范围过滤 -->
+            ${device.params.dataScope}
+        </where>
+        ORDER BY de.create_time DESC
+    </select>
+
+    <select id="getAllDeviceList" parameterType="com.ruoyi.wvp.gb28181.bean.Device" resultMap="DeviceResult">
+        SELECT
+        de.id,
+        de.dept_id,
+        de.device_id,
+        coalesce(de.custom_name, de.name) as name,
+        de.password,
+        de.manufacturer,
+        de.db_model,
+        de.firmware,
+        de.transport,
+        de.stream_mode,
+        de.ip,
+        de.sdp_ip,
+        de.local_ip,
+        de.port,
+        de.host_address,
+        de.expires,
+        de.register_time,
+        de.keepalive_time,
+        de.create_time,
+        de.update_time,
+        de.charset,
+        de.subscribe_cycle_for_catalog,
+        de.subscribe_cycle_for_mobile_position,
+        de.mobile_position_submission_interval,
+        de.subscribe_cycle_for_alarm,
+        de.ssrc_check,
+        de.as_message_channel,
+        de.broadcast_push_after_ack,
+        de.geo_coord_sys,
+        de.on_line,
+        de.media_server_id,
+        de.lat,
+        de.lng,
+        de.address_map,
+        de.user_name,
+        de.onvif_auth_type,
+        d.dept_name,
+        (SELECT count(0) FROM wvp_device_channel dc WHERE dc.data_device_id= de.id) as channel_count
+        FROM wvp_device de
+        left join sys_dept d on de.dept_id = d.dept_id
+        <where>
+            <if test="device.deptId != null">and (de.dept_id = #{device.deptId} OR de.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE
+                <choose>
+                    <when test='device.params.dbType == "mysql"'>find_in_set(#{device.deptId}, ancestors)</when>
+                    <otherwise>INSTR(',' || ancestors || ',', ',' || #{device.deptId} || ',') &gt; 0</otherwise>
+                </choose>
+                ))</if>
+            <if test="device.status != null">
+                AND de.on_line = #{device.status}
+            </if>
+            <if test="device.name != null">
+                AND de.name LIKE CONCAT('%', #{device.name}, '%')
+            </if>
+            <if test="device.ip != null">
+                AND de.ip LIKE CONCAT('%', #{device.ip}, '%')
+            </if>
+            <if test="device.manufacturer != null">
+                AND de.manufacturer LIKE CONCAT('%', #{device.manufacturer}, '%')
+            </if>
             ${device.params.dataScope}
         </where>
         ORDER BY de.create_time DESC

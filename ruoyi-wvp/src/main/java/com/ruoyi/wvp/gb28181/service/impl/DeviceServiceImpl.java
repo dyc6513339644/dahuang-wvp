@@ -2,6 +2,7 @@ package com.ruoyi.wvp.gb28181.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.dynamic.datasource.annotation.DS;
+import javax.annotation.PostConstruct;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.wvp.common.CommonCallback;
 import com.ruoyi.wvp.common.VideoManagerConstants;
@@ -9,6 +10,7 @@ import com.ruoyi.wvp.common.enums.ChannelDataType;
 import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
+import com.ruoyi.common.utils.DatabaseDialectHolder;
 import com.ruoyi.wvp.gb28181.bean.*;
 import com.ruoyi.wvp.gb28181.service.IDeviceService;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
@@ -31,6 +33,7 @@ import com.ruoyi.common.enums.ErrorCode;
 import com.ruoyi.wvp.vmanager.bean.ResourceBaseInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -93,8 +96,25 @@ public class DeviceServiceImpl implements IDeviceService {
     @Autowired
     private AudioBroadcastManager audioBroadcastManager;
 
+    @Value("${spring.datasource.driver-class-name:}")
+    private String driverClassName;
+
+    private String dbType;
+
+    @PostConstruct
+    public void init() {
+        dbType = DatabaseDialectHolder.resolveDbType(driverClassName);
+    }
+
     private Device getDeviceByDeviceIdFromDb(String deviceId) {
         return deviceMapper.getDeviceByDeviceId(deviceId);
+    }
+
+    /**
+     * 判断是否为GB28181协议设备（兼容旧数据 protocol_type 为 null 的情况）
+     */
+    private boolean isGB28181Protocol(Device device) {
+        return device != null && (device.getProtocolType() == null || "GB28181".equals(device.getProtocolType()));
     }
 
     @Override
@@ -146,16 +166,14 @@ public class DeviceServiceImpl implements IDeviceService {
                 device.setCreateTime(now);
                 deviceMapper.update(device);
                 redisCatchStorage.updateDevice(device);
-                if (userSetting.getSyncChannelOnDeviceOnline()) {
-                    log.info("[设备上线,离线状态下重新注册]: {}，查询设备信息以及通道信息", device.getDeviceId());
-                    try {
-                        commander.deviceInfoQuery(device);
-                    } catch (InvalidArgumentException | SipException | ParseException e) {
-                        log.error("[命令发送失败] 查询设备信息: {}", e.getMessage());
-                    }
-                    sync(device);
-                    // TODO 如果设备下的通道级联到了其他平台，那么需要发送事件或者notify给上级平台
+                log.info("[设备上线,离线状态下重新注册]: {}，查询设备信息以及通道信息", device.getDeviceId());
+                try {
+                    commander.deviceInfoQuery(device);
+                } catch (InvalidArgumentException | SipException | ParseException e) {
+                    log.error("[命令发送失败] 查询设备信息: {}", e.getMessage());
                 }
+                sync(device);
+                // TODO 如果设备下的通道级联到了其他平台，那么需要发送事件或者notify给上级平台
                 // 上线添加订阅
                 if (device.getSubscribeCycleForCatalog() > 0) {
                     // 查询在线设备那些开启了订阅，为设备开启定时的目录订阅
@@ -193,6 +211,10 @@ public class DeviceServiceImpl implements IDeviceService {
             log.warn("[设备不存在] device：{}", deviceId);
             return;
         }
+        if (!isGB28181Protocol(device)) {
+            log.info("[设备离线] 非国标设备，跳过SIP离线处理: {}", deviceId);
+            return;
+        }
         // TODO 主动查询设备状态
         log.info("[设备离线] {}, device：{}， 心跳间隔： {}，心跳超时次数： {}， 上次心跳时间：{}， 上次注册时间： {}", reason, deviceId, device.getHeartBeatInterval(), device.getHeartBeatCount(), device.getKeepaliveTime(), device.getRegisterTime());
         String registerExpireTaskKey = VideoManagerConstants.REGISTER_EXPIRE_TASK_KEY_PREFIX + deviceId;
@@ -208,7 +230,7 @@ public class DeviceServiceImpl implements IDeviceService {
         redisCatchStorage.updateDevice(device);
         deviceMapper.update(device);
         //进行通道离线
-//        deviceChannelMapper.offlineByDeviceId(deviceId);
+        deviceChannelMapper.offlineByDeviceId(device.getId());
         // 离线释放所有ssrc
         List<SsrcTransaction> ssrcTransactions = sessionManager.getSsrcTransactionByDeviceId(deviceId);
         if (ssrcTransactions != null && ssrcTransactions.size() > 0) {
@@ -243,6 +265,10 @@ public class DeviceServiceImpl implements IDeviceService {
         if (device == null || device.getSubscribeCycleForCatalog() < 0) {
             return false;
         }
+        if (!isGB28181Protocol(device)) {
+            log.info("[添加目录订阅] 非国标设备，跳过: {}", device.getDeviceId());
+            return false;
+        }
         log.info("[添加目录订阅] 设备{}", device.getDeviceId());
         // 添加目录订阅
         CatalogSubscribeTask catalogSubscribeTask = new CatalogSubscribeTask(device, sipCommander, dynamicTask);
@@ -258,6 +284,13 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public boolean removeCatalogSubscribe(Device device, CommonCallback<Boolean> callback) {
         if (device == null || device.getSubscribeCycleForCatalog() < 0) {
+            if (callback != null) {
+                callback.run(false);
+            }
+            return false;
+        }
+        if (!isGB28181Protocol(device)) {
+            log.info("[移除目录订阅] 非国标设备，跳过: {}", device.getDeviceId());
             if (callback != null) {
                 callback.run(false);
             }
@@ -291,6 +324,10 @@ public class DeviceServiceImpl implements IDeviceService {
         if (device == null || device.getSubscribeCycleForMobilePosition() < 0) {
             return false;
         }
+        if (!isGB28181Protocol(device)) {
+            log.info("[添加移动位置订阅] 非国标设备，跳过: {}", device.getDeviceId());
+            return false;
+        }
         log.info("[添加移动位置订阅] 设备{}", device.getDeviceId());
         // 添加目录订阅
         MobilePositionSubscribeTask mobilePositionSubscribeTask = new MobilePositionSubscribeTask(device, sipCommander, dynamicTask);
@@ -305,6 +342,13 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public boolean removeMobilePositionSubscribe(Device device, CommonCallback<Boolean> callback) {
         if (device == null || device.getSubscribeCycleForCatalog() < 0) {
+            if (callback != null) {
+                callback.run(false);
+            }
+            return false;
+        }
+        if (!isGB28181Protocol(device)) {
+            log.info("[移除移动位置订阅] 非国标设备，跳过: {}", device.getDeviceId());
             if (callback != null) {
                 callback.run(false);
             }
@@ -345,6 +389,10 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Override
     public void sync(Device device) {
+        if (!isGB28181Protocol(device)) {
+            log.info("[同步通道] 非国标设备，跳过: {}", device.getDeviceId());
+            return;
+        }
         if (catalogResponseMessageHandler.isSyncRunning(device.getDeviceId())) {
             SyncStatus syncStatus = catalogResponseMessageHandler.getChannelSyncProgress(device.getDeviceId());
             log.info("[同步通道] 同步已存在, 设备: {}, 同步信息: {}", device.getDeviceId(), JSON.toJSON(syncStatus));
@@ -389,6 +437,12 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Override
     public boolean expire(Device device) {
+        if (!isGB28181Protocol(device)) {
+            return false;
+        }
+        if (device.getRegisterTime() == null) {
+            return true;
+        }
         Instant registerTimeDate = Instant.from(DateUtil.formatter.parse(device.getRegisterTime()));
         Instant expireInstant = registerTimeDate.plusMillis(TimeUnit.SECONDS.toMillis(device.getExpires()));
         return expireInstant.isBefore(Instant.now());
@@ -397,6 +451,9 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public void checkDeviceStatus(Device device) {
         if (device == null || !device.isOnLine()) {
+            return;
+        }
+        if (!isGB28181Protocol(device)) {
             return;
         }
         try {
@@ -504,7 +561,15 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     @DataScope(deptAlias = "d")
     public List<Device> getAll(Device device) {
+        device.getParams().put("dbType", dbType);
         return deviceMapper.getDeviceList(ChannelDataType.GB28181.value, device);
+    }
+
+    @Override
+    @DataScope(deptAlias = "d")
+    public List<Device> getAllDeviceTypes(Device device) {
+        device.getParams().put("dbType", dbType);
+        return deviceMapper.getAllDeviceList(device);
     }
 
     @Override
@@ -532,6 +597,9 @@ public class DeviceServiceImpl implements IDeviceService {
     public void subscribeCatalog(int id, int cycle) {
         Device device = deviceMapper.query(id);
         Assert.notNull(device, "未找到设备");
+        if (!isGB28181Protocol(device)) {
+            throw new ControllerException(ErrorCode.ERROR400.getCode(), "非国标设备不支持目录订阅");
+        }
         if (device.getSubscribeCycleForCatalog() == cycle) {
             return;
         }
@@ -569,6 +637,9 @@ public class DeviceServiceImpl implements IDeviceService {
     public void subscribeMobilePosition(int id, int cycle, int interval) {
         Device device = deviceMapper.query(id);
         Assert.notNull(device, "未找到设备");
+        if (!isGB28181Protocol(device)) {
+            throw new ControllerException(ErrorCode.ERROR400.getCode(), "非国标设备不支持移动位置订阅");
+        }
         if (device.getSubscribeCycleForMobilePosition() == cycle) {
             return;
         }
@@ -603,6 +674,9 @@ public class DeviceServiceImpl implements IDeviceService {
     public void updateDeviceHeartInfo(Device device) {
         Device deviceInDb = deviceMapper.query(device.getId());
         if (deviceInDb == null) {
+            return;
+        }
+        if (!isGB28181Protocol(deviceInDb)) {
             return;
         }
         if (!Objects.equals(deviceInDb.getHeartBeatCount(), device.getHeartBeatCount()) || !Objects.equals(deviceInDb.getHeartBeatInterval(), device.getHeartBeatInterval())) {

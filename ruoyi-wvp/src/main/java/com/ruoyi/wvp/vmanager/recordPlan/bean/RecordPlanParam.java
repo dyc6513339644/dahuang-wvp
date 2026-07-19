@@ -28,5 +28,5 @@ public class RecordPlanParam {
     /**
      * 录制计划ID, ID为空是删除关联的计划
      */
-    private Integer planId;
+    private Long planId;
 }

@@ -1,7 +1,5 @@
 package com.ruoyi.web.controller.system;
 
-import cn.hutool.http.HttpUtil;
-import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -15,21 +13,12 @@ import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysMenuService;
-import me.zhyd.oauth.config.AuthConfig;
-import me.zhyd.oauth.model.AuthCallback;
-import me.zhyd.oauth.model.AuthResponse;
-import me.zhyd.oauth.model.AuthUser;
-import me.zhyd.oauth.request.AuthGiteeRequest;
-import me.zhyd.oauth.request.AuthRequest;
-import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -58,7 +47,6 @@ public class SysLoginController {
     @Autowired
     private ISysConfigService configService;
 
-
     /**
      * 登录方法
      *
@@ -67,6 +55,12 @@ public class SysLoginController {
      */
     @PostMapping("/login")
     public AjaxResult login(@RequestBody LoginBody loginBody) {
+        if (Boolean.parseBoolean(configService.selectConfigByKey("sys_public_demonstrate")) && !Constants.SUPER_ADMIN.equals(loginBody.getUsername())) {
+            if (!ruoYiConfig.getPublicCode().equals(loginBody.getPublicCode())) {
+                return AjaxResult.error("公众号code错误，请关注ruoyi-wvp公众号获取正确的公众号code");
+            }
+        }
+
         AjaxResult ajax = AjaxResult.success();
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),

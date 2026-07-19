@@ -1,10 +1,14 @@
 package com.ruoyi.system.service.impl;
 
+import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.DictUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysDictDataMapper;
 import com.ruoyi.system.service.ISysDictDataService;
 
@@ -28,7 +32,21 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     @Override
     public List<SysDictData> selectDictDataList(SysDictData dictData)
     {
-        return dictDataMapper.selectDictDataList(dictData);
+        QueryWrapper<SysDictData> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotEmpty(dictData.getDictType()))
+        {
+            wrapper.eq("dict_type", dictData.getDictType());
+        }
+        if (StringUtils.isNotEmpty(dictData.getDictLabel()))
+        {
+            wrapper.like("dict_label", dictData.getDictLabel());
+        }
+        if (StringUtils.isNotEmpty(dictData.getStatus()))
+        {
+            wrapper.eq("status", dictData.getStatus());
+        }
+        wrapper.orderByAsc("dict_sort");
+        return dictDataMapper.selectList(wrapper);
     }
 
     /**
@@ -41,7 +59,12 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     @Override
     public String selectDictLabel(String dictType, String dictValue)
     {
-        return dictDataMapper.selectDictLabel(dictType, dictValue);
+        QueryWrapper<SysDictData> wrapper = new QueryWrapper<>();
+        wrapper.select("dict_label");
+        wrapper.eq("dict_type", dictType);
+        wrapper.eq("dict_value", dictValue);
+        SysDictData data = dictDataMapper.selectOne(wrapper);
+        return data != null ? data.getDictLabel() : "";
     }
 
     /**
@@ -53,7 +76,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     @Override
     public SysDictData selectDictDataById(Long dictCode)
     {
-        return dictDataMapper.selectDictDataById(dictCode);
+        return dictDataMapper.selectById(dictCode);
     }
 
     /**
@@ -67,8 +90,12 @@ public class SysDictDataServiceImpl implements ISysDictDataService
         for (Long dictCode : dictCodes)
         {
             SysDictData data = selectDictDataById(dictCode);
-            dictDataMapper.deleteDictDataById(dictCode);
-            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            dictDataMapper.deleteById(dictCode);
+            QueryWrapper<SysDictData> wrapper = new QueryWrapper<>();
+            wrapper.eq("status", "0");
+            wrapper.eq("dict_type", data.getDictType());
+            wrapper.orderByAsc("dict_sort");
+            List<SysDictData> dictDatas = dictDataMapper.selectList(wrapper);
             DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
     }
@@ -82,10 +109,15 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     @Override
     public int insertDictData(SysDictData data)
     {
-        int row = dictDataMapper.insertDictData(data);
+        data.setCreateTime(new Date());
+        int row = dictDataMapper.insert(data);
         if (row > 0)
         {
-            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            QueryWrapper<SysDictData> wrapper = new QueryWrapper<>();
+            wrapper.eq("status", "0");
+            wrapper.eq("dict_type", data.getDictType());
+            wrapper.orderByAsc("dict_sort");
+            List<SysDictData> dictDatas = dictDataMapper.selectList(wrapper);
             DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
         return row;
@@ -100,10 +132,15 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     @Override
     public int updateDictData(SysDictData data)
     {
-        int row = dictDataMapper.updateDictData(data);
+        data.setUpdateTime(new Date());
+        int row = dictDataMapper.updateById(data);
         if (row > 0)
         {
-            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            QueryWrapper<SysDictData> wrapper = new QueryWrapper<>();
+            wrapper.eq("status", "0");
+            wrapper.eq("dict_type", data.getDictType());
+            wrapper.orderByAsc("dict_sort");
+            List<SysDictData> dictDatas = dictDataMapper.selectList(wrapper);
             DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
         return row;

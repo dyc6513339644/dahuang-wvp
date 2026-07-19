@@ -181,6 +181,11 @@ public interface IDeviceService {
      */
     List<Device> getAll(Device device);
 
+    /**
+     * 查询所有类型设备（含国标、推流、拉流代理）
+     */
+    List<Device> getAllDeviceTypes(Device device);
+
     Device getDevice(Integer gbDeviceDbId);
 
     Device getDeviceByChannelId(Integer channelId);

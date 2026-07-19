@@ -19,7 +19,6 @@ public class ServiceInfo implements ApplicationListener<WebServerInitializedEven
     public void onApplicationEvent(WebServerInitializedEvent event) {
         // 项目启动获取启动的端口号
         ServiceInfo.serverPort = event.getWebServer().getPort();
-        log.info("项目启动获取启动的端口号:  " + ServiceInfo.serverPort);
     }
 
     public void setServerPort(int serverPort) {

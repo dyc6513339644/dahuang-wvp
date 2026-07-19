@@ -300,7 +300,7 @@ public class SIPCommanderForPlatform implements ISIPCommanderForPlatform {
         String deviceId = device == null ? parentPlatform.getDeviceGBId() : device.getDeviceId();
         String deviceName = device == null ? parentPlatform.getName() : device.getName();
         String manufacturer = device == null ? "WVP-28181-PRO" : device.getManufacturer();
-        String model = device == null ? "platform" : device.getModel();
+        String model = device == null ? "platform" : device.getDbModel();
         String firmware = device == null ? gitUtil.getBuildVersion() : device.getFirmware();
         String characterSet = parentPlatform.getCharacterSet();
         StringBuffer deviceInfoXml = new StringBuffer(600);

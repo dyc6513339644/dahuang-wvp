@@ -1,5 +1,9 @@
 package com.ruoyi.wvp.service.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.List;
@@ -8,12 +12,14 @@ import java.util.List;
  * 录制计划
  */
 @Data
+@TableName("wvp_record_plan")
 public class RecordPlan {
 
     /**
      * 计划数据库ID
      */
-    private int id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     /**
      * 计划名称
@@ -23,6 +29,7 @@ public class RecordPlan {
     /**
      * 计划关联通道数量
      */
+    @TableField(exist = false)
     private int channelCount;
 
     /**
@@ -43,5 +50,6 @@ public class RecordPlan {
     /**
      * 计划内容
      */
+    @TableField(exist = false)
     private List<RecordPlanItem> planItemList;
 }

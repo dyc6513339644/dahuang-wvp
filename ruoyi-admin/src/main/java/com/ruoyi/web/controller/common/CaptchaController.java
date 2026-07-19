@@ -7,13 +7,13 @@ import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.code.kaptcha.Producer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.google.code.kaptcha.Producer;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
@@ -32,7 +32,6 @@ import com.ruoyi.system.service.ISysConfigService;
 @RestController
 public class CaptchaController
 {
-
     @Resource(name = "captchaProducer")
     private Producer captchaProducer;
 

@@ -185,7 +185,7 @@ public class Platform implements Serializable {
     /**
      * 平台型号
      */
-    private String model;
+    private String dbModel;
 
     /**
      * 平台安装地址

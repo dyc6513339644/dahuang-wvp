@@ -1,8 +1,11 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.annotation.DataSource;
@@ -12,6 +15,7 @@ import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.DatabaseDialectHolder;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.mapper.SysConfigMapper;
@@ -50,9 +54,7 @@ public class SysConfigServiceImpl implements ISysConfigService
     @DataSource(DataSourceType.MASTER)
     public SysConfig selectConfigById(Long configId)
     {
-        SysConfig config = new SysConfig();
-        config.setConfigId(configId);
-        return configMapper.selectConfig(config);
+        return configMapper.selectById(configId);
     }
 
     /**
@@ -69,9 +71,9 @@ public class SysConfigServiceImpl implements ISysConfigService
         {
             return configValue;
         }
-        SysConfig config = new SysConfig();
-        config.setConfigKey(configKey);
-        SysConfig retConfig = configMapper.selectConfig(config);
+        QueryWrapper<SysConfig> wrapper = new QueryWrapper<>();
+        wrapper.eq("config_key", configKey);
+        SysConfig retConfig = configMapper.selectOne(wrapper);
         if (StringUtils.isNotNull(retConfig))
         {
             redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
@@ -105,7 +107,34 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public List<SysConfig> selectConfigList(SysConfig config)
     {
-        return configMapper.selectConfigList(config);
+        QueryWrapper<SysConfig> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotEmpty(config.getConfigName()))
+        {
+            wrapper.like("config_name", config.getConfigName());
+        }
+        if (StringUtils.isNotEmpty(config.getConfigType()))
+        {
+            wrapper.eq("config_type", config.getConfigType());
+        }
+        if (StringUtils.isNotEmpty(config.getConfigKey()))
+        {
+            wrapper.like("config_key", config.getConfigKey());
+        }
+        // 时间范围查询（字符串比较，兼容 MySQL/SQLite/达梦）
+        if (config.getParams() != null)
+        {
+            String beginTime = (String) config.getParams().get("beginTime");
+            String endTime = (String) config.getParams().get("endTime");
+            if (StringUtils.isNotEmpty(beginTime))
+            {
+                wrapper.ge("create_time", beginTime + " 00:00:00");
+            }
+            if (StringUtils.isNotEmpty(endTime))
+            {
+                wrapper.le("create_time", endTime + " 23:59:59");
+            }
+        }
+        return configMapper.selectList(wrapper);
     }
 
     /**
@@ -117,7 +146,8 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public int insertConfig(SysConfig config)
     {
-        int row = configMapper.insertConfig(config);
+        config.setCreateTime(new Date());
+        int row = configMapper.insert(config);
         if (row > 0)
         {
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -134,13 +164,14 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public int updateConfig(SysConfig config)
     {
-        SysConfig temp = configMapper.selectConfigById(config.getConfigId());
+        SysConfig temp = configMapper.selectById(config.getConfigId());
         if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey()))
         {
             redisCache.deleteObject(getCacheKey(temp.getConfigKey()));
         }
 
-        int row = configMapper.updateConfig(config);
+        config.setUpdateTime(new Date());
+        int row = configMapper.updateById(config);
         if (row > 0)
         {
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -163,7 +194,7 @@ public class SysConfigServiceImpl implements ISysConfigService
             {
                 throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
             }
-            configMapper.deleteConfigById(configId);
+            configMapper.deleteById(configId);
             redisCache.deleteObject(getCacheKey(config.getConfigKey()));
         }
     }
@@ -174,7 +205,7 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public void loadingConfigCache()
     {
-        List<SysConfig> configsList = configMapper.selectConfigList(new SysConfig());
+        List<SysConfig> configsList = configMapper.selectList(new QueryWrapper<>());
         for (SysConfig config : configsList)
         {
             redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
@@ -211,7 +242,10 @@ public class SysConfigServiceImpl implements ISysConfigService
     public boolean checkConfigKeyUnique(SysConfig config)
     {
         Long configId = StringUtils.isNull(config.getConfigId()) ? -1L : config.getConfigId();
-        SysConfig info = configMapper.checkConfigKeyUnique(config.getConfigKey());
+        QueryWrapper<SysConfig> wrapper = new QueryWrapper<>();
+        wrapper.eq("config_key", config.getConfigKey());
+        wrapper.last(DatabaseDialectHolder.limitOne());
+        SysConfig info = configMapper.selectOne(wrapper);
         if (StringUtils.isNotNull(info) && info.getConfigId().longValue() != configId.longValue())
         {
             return UserConstants.NOT_UNIQUE;

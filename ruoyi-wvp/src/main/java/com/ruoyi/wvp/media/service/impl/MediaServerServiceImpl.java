@@ -314,6 +314,9 @@ public class MediaServerServiceImpl implements IMediaServerService {
         if (ObjectUtils.isEmpty(mediaSerItem.getHookIp())) {
             mediaSerItem.setHookIp(mediaSerItem.getIp());
         }
+        if (mediaSerItem.getRecordDay() == 0) {
+            mediaSerItem.setRecordDay(7);
+        }
         mediaServerMapper.update(mediaSerItem);
         MediaServer mediaServerInRedis = getOne(mediaSerItem.getId());
         // 获取完整数据
@@ -413,7 +416,15 @@ public class MediaServerServiceImpl implements IMediaServerService {
             return null;
         }
         String key = VideoManagerConstants.MEDIA_SERVER_PREFIX + userSetting.getServerId();
-        return (MediaServer) redisTemplate.opsForHash().get(key, mediaServerId);
+        MediaServer mediaServer = (MediaServer) redisTemplate.opsForHash().get(key, mediaServerId);
+        // Redis 缓存为空或 httpPort 为 0 时从 DB 兜底并回填缓存
+        if (mediaServer == null || mediaServer.getHttpPort() == 0) {
+            mediaServer = mediaServerMapper.getMediaServerById(mediaServerId);
+            if (mediaServer != null) {
+                redisTemplate.opsForHash().put(key, mediaServer.getId(), mediaServer);
+            }
+        }
+        return mediaServer;
     }
 
 
@@ -464,6 +475,9 @@ public class MediaServerServiceImpl implements IMediaServerService {
             return;
         }
 
+        if (mediaServer.getRecordDay() == 0) {
+            mediaServer.setRecordDay(7);
+        }
         mediaServerMapper.add(mediaServer);
         if (mediaServer.isStatus()) {
             mediaNodeServerService.online(mediaServer);

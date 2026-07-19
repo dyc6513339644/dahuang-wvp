@@ -2,6 +2,8 @@ package com.ruoyi.framework.aspectj;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ruoyi.common.core.domain.WvpBaseEntity;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -164,6 +166,9 @@ public class DataScopeAspect
             if (StringUtils.isNotNull(params) && params instanceof BaseEntity)
             {
                 BaseEntity baseEntity = (BaseEntity) params;
+                baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+            }else if(StringUtils.isNotNull(params) && params instanceof WvpBaseEntity){
+                WvpBaseEntity baseEntity = (WvpBaseEntity) params;
                 baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
             }
         }

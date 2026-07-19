@@ -17,6 +17,7 @@ import com.ruoyi.wvp.streamPush.bean.StreamPush;
 import com.ruoyi.wvp.mapper.StreamPushMapper;
 import com.ruoyi.wvp.streamPush.service.IStreamPushPlayService;
 import com.ruoyi.common.enums.ErrorCode;
+import com.ruoyi.wvp.streamPush.service.IStreamPushService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,9 @@ public class StreamPushPlayServiceImpl implements IStreamPushPlayService {
 
     @Autowired
     private StreamPushMapper streamPushMapper;
+
+    @Autowired
+    private IStreamPushService streamPushService;
 
     @Autowired
     private IMediaServerService mediaServerService;
@@ -52,6 +56,8 @@ public class StreamPushPlayServiceImpl implements IStreamPushPlayService {
 
     @Override
     public void start(Integer id, ErrorCallback<StreamInfo> callback, String platformDeviceId, String platformName ) {
+        try {
+
         StreamPush streamPush = streamPushMapper.queryOne(id);
         Assert.notNull(streamPush, "推流信息未找到");
 
@@ -68,7 +74,7 @@ public class StreamPushPlayServiceImpl implements IStreamPushPlayService {
                     streamPush.getApp(), streamPush.getStream(), mediaInfo, callId));
             if (!streamPush.isPushing()) {
                 streamPush.setPushing(true);
-                streamPushMapper.update(streamPush);
+                streamPushService.updatePushStatus(streamPush, true);
             }
             return;
         }
@@ -107,5 +113,9 @@ public class StreamPushPlayServiceImpl implements IStreamPushPlayService {
                 callback.run(response.getCode(), response.getMsg(), null);
             }
         });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 }

@@ -3,6 +3,10 @@ package com.ruoyi.system.domain;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -11,7 +15,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 岗位表 sys_post
- * 
+ *
  * @author ruoyi
  */
 public class SysPost extends BaseEntity
@@ -20,6 +24,7 @@ public class SysPost extends BaseEntity
 
     /** 岗位序号 */
     @Excel(name = "岗位序号", cellType = ColumnType.NUMERIC)
+    @TableId(value = "post_id", type = IdType.AUTO)
     private Long postId;
 
     /** 岗位编码 */
@@ -39,6 +44,7 @@ public class SysPost extends BaseEntity
     private String status;
 
     /** 用户是否存在此岗位标识 默认不存在 */
+    @TableField(exist = false)
     private boolean flag = false;
 
     public Long getPostId()
@@ -105,7 +111,7 @@ public class SysPost extends BaseEntity
     {
         this.flag = flag;
     }
-    
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)

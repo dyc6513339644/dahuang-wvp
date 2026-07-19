@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysLargeServiceMapper">
+
+    <resultMap type="CountDeviceNum" id="CountDeviceNumResult">
+        <result property="totalGbNum"    column="totalGbNum"    />
+        <result property="totalRtspNum"   column="totalRtspNum"   />
+        <result property="totalOnvifNum"    column="totalOnvifNum"    />
+    </resultMap>
+
+    <resultMap type="CountGbNum" id="CountGbNumResult">
+        <result property="totalNum"    column="totalNum"    />
+        <result property="offlineNum"     column="offlineNum"     />
+        <result property="onlineNum"   column="onlineNum"   />
+    </resultMap>
+
+    <resultMap type="LeftGbDevice" id="LeftGbDeviceResult">
+        <result property="deviceId"    column="device_id"    />
+        <result property="name"    column="name"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="onLine"    column="on_line"    />
+    </resultMap>
+
+    <select id="leftGbDevice" resultMap="LeftGbDeviceResult">
+        SELECT device_id,name,manufacturer,on_line FROM wvp_device WHERE protocol_type = 'GB28181'
+    </select>
+
+    <select id="countDeviceNum" resultMap="CountDeviceNumResult">
+        SELECT
+                (SELECT COUNT(0) FROM wvp_device WHERE protocol_type ='GB28181') AS totalGbNum,
+                (SELECT COUNT(0) FROM wvp_device WHERE protocol_type = 'STREAM_PROXY') AS totalRtspNum,
+                (SELECT COUNT(0) FROM wvp_device WHERE protocol_type = 'ONVIF') AS totalOnvifNum
+    </select>
+
+    <select id="countWvpDevice" resultType="Integer">
+        SELECT COUNT(0) FROM wvp_device WHERE protocol_type = 'GB28181'
+    </select>
+
+    <select id="countRtspDevice" resultType="Integer">
+        SELECT COUNT(0) FROM wvp_device WHERE protocol_type = 'STREAM_PROXY'
+    </select>
+
+    <select id="countOnvifDevice" resultType="Integer">
+        SELECT COUNT(0) FROM wvp_device WHERE protocol_type = 'ONVIF'
+    </select>
+
+    <select id="countGbNum" resultMap="CountGbNumResult">
+        SELECT
+                (SELECT COUNT(0) FROM wvp_device WHERE on_line = 0 AND protocol_type = 'GB28181') AS offlineNum,
+                (SELECT COUNT(0) FROM wvp_device WHERE on_line = 1 AND protocol_type = 'GB28181') AS onlineNum,
+                (SELECT COUNT(0) FROM wvp_device WHERE protocol_type = 'GB28181') AS totalNum
+    </select>
+</mapper>

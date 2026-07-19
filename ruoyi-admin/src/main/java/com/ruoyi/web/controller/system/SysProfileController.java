@@ -26,7 +26,7 @@ import com.ruoyi.system.service.ISysUserService;
 
 /**
  * 个人信息 业务处理
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -88,10 +88,8 @@ public class SysProfileController extends BaseController
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
-    public AjaxResult updatePwd(@RequestBody Map<String, String> params)
+    public AjaxResult updatePwd(String oldPassword, String newPassword)
     {
-        String oldPassword = params.get("oldPassword");
-        String newPassword = params.get("newPassword");
         LoginUser loginUser = getLoginUser();
         String userName = loginUser.getUsername();
         String password = loginUser.getPassword();

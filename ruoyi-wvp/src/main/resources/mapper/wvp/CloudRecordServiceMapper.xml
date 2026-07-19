@@ -41,4 +41,55 @@
         </where>
         order by start_time desc
     </select>
+
+    <select id="queryRecordFilePathList" resultType="string">
+        select file_path
+        from wvp_cloud_record
+        <where>
+            <if test="app != null"> and app = #{app}</if>
+            <if test="stream != null"> and stream = #{stream}</if>
+            <if test="startTimeStamp != null"> and end_time &gt;= #{startTimeStamp}</if>
+            <if test="endTimeStamp != null"> and start_time &lt;= #{endTimeStamp}</if>
+            <if test="callId != null"> and call_id = #{callId}</if>
+            <if test="mediaServerItemList != null">
+                and media_server_id in
+                <foreach collection="mediaServerItemList" item="item" open="(" separator="," close=")">
+                    #{item.id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <update id="updateCollectList">
+        update wvp_cloud_record set collect = #{collect}
+        where file_path in
+        <foreach collection="cloudRecordItemList" item="item" open="(" separator="," close=")">
+            #{item.filePath}
+        </foreach>
+    </update>
+
+    <delete id="deleteByFileList">
+        delete from wvp_cloud_record
+        where media_server_id = #{mediaServerId}
+        and file_path in
+        <foreach collection="filePathList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteList">
+        delete from wvp_cloud_record where id in
+        <foreach collection="cloudRecordItemIdList" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </delete>
+
+    <select id="queryRecordListForDelete" resultType="com.ruoyi.wvp.service.bean.CloudRecordItem">
+        select *
+        from wvp_cloud_record
+        where collect = false
+          and end_time &lt;= #{endTimeStamp}
+          and media_server_id = #{mediaServerId}
+    </select>
+
 </mapper>

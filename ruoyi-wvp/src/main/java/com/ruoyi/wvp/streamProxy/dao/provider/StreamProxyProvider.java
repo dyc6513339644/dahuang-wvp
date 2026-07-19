@@ -6,60 +6,66 @@ import java.util.Map;
 
 public class StreamProxyProvider {
 
-    public String getBaseSelectSql(){
+    /**
+     * 基础查询：从 wvp_device + wvp_device_channel 查询拉流代理
+     */
+    public String getBaseSelectSql() {
         return "SELECT " +
-                " st.*, " +
-                ChannelDataType.STREAM_PROXY.value +  " as data_type, " +
-                " st.id as data_device_id, " +
+                " de.*, " +
+                ChannelDataType.STREAM_PROXY.value + " as data_type, " +
+                " de.id as data_device_id, " +
                 " wdc.*, " +
-                " wdc.id as gb_id" +
-                " FROM wvp_stream_proxy st " +
-                " LEFT join wvp_device_channel wdc " +
-                " on wdc.data_type = 3 and st.id = wdc.data_device_id ";
+                " wdc.id as gb_id " +
+                " FROM wvp_device de " +
+                " LEFT JOIN wvp_device_channel wdc " +
+                " ON wdc.data_type = " + ChannelDataType.STREAM_PROXY.value +
+                " AND de.id = wdc.data_device_id " +
+                " WHERE de.protocol_type = 'STREAM_PROXY' ";
     }
 
-    public String select(Map<String, Object> params ){
-        return getBaseSelectSql() + " WHERE st.id = " + params.get("id");
+    public String select(Map<String, Object> params) {
+        return getBaseSelectSql() + " AND de.id = " + params.get("id");
     }
 
-    public String selectForPushingInMediaServer(Map<String, Object> params ){
-        return getBaseSelectSql() + " WHERE st.pulling=true and st.media_server_id=#{mediaServerId} order by st.create_time desc";
+    public String selectForPushingInMediaServer(Map<String, Object> params) {
+        return getBaseSelectSql() + " AND de.media_server_id = #{mediaServerId} ORDER BY de.create_time DESC";
     }
 
-    public String selectOneByAppAndStream(Map<String, Object> params ){
-        return getBaseSelectSql() + String.format(" WHERE st.app='%s' AND st.stream='%s' order by st.create_time desc",
-                params.get("app"), params.get("stream"));
+    public String selectOneByAppAndStream(Map<String, Object> params) {
+        return getBaseSelectSql() + String.format(
+                " AND de.device_id = '%s' ORDER BY de.create_time DESC",
+                params.get("app"));
     }
 
-    public String selectAll(Map<String, Object> params ){
+    public String selectAll(Map<String, Object> params) {
         StringBuilder sqlBuild = new StringBuilder();
         sqlBuild.append(getBaseSelectSql());
-        sqlBuild.append(" WHERE 1=1 ");
         if (params.get("query") != null) {
             sqlBuild.append(" AND ")
                     .append(" (")
-                    .append(" st.app LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
+                    .append(" de.device_id LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
                     .append(" OR")
-                    .append(" st.stream LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
+                    .append(" de.name LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
                     .append(" OR")
-                    .append(" wdc.gb_device_id LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
+                    .append(" de.src_url LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
                     .append(" OR")
-                    .append(" wdc.gb_name LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
-                    .append(" )")
-            ;
+                    .append(" wdc.device_id LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
+                    .append(" OR")
+                    .append(" wdc.name LIKE ").append("'%").append(params.get("query")).append("%' escape '/'")
+                    .append(" )");
         }
         Object pulling = params.get("pulling");
         if (pulling != null) {
             if ((Boolean) pulling) {
-                sqlBuild.append(" AND st.pulling=1 ");
-            }else {
-                sqlBuild.append(" AND st.pulling=0 ");
+                sqlBuild.append(" AND de.on_line = 1 ");
+            } else {
+                sqlBuild.append(" AND de.on_line = 0 ");
             }
         }
         if (params.get("mediaServerId") != null) {
-            sqlBuild.append(" AND st.media_server_id='").append(params.get("mediaServerId")).append("'");
+            sqlBuild.append(" AND de.media_server_id = '").append(params.get("mediaServerId")).append("'");
         }
-        sqlBuild.append(" order by st.create_time desc");
+        sqlBuild.append(" ORDER BY de.create_time DESC");
         return sqlBuild.toString();
     }
 }

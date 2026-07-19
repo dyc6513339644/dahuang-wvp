@@ -1,5 +1,7 @@
 package com.ruoyi.system.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -8,12 +10,15 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 
  * @author ruoyi
  */
+@TableName("sys_role_menu")
 public class SysRoleMenu
 {
     /** 角色ID */
+    @TableField("role_id")
     private Long roleId;
     
     /** 菜单ID */
+    @TableField("menu_id")
     private Long menuId;
 
     public Long getRoleId()

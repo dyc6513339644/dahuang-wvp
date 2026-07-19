@@ -55,7 +55,7 @@ public class Device extends WvpBaseEntity {
     /**
      * 型号
      */
-    private String model;
+    private String dbModel;
 
     /**
      * 固件版本
@@ -232,4 +232,106 @@ public class Device extends WvpBaseEntity {
      * 地图定位地址
      */
     private String addressMap;
+
+    // ========== ONVIF 专属字段 ==========
+
+    /**
+     * ONVIF用户名
+     */
+    private String userName;
+
+    /**
+     * ONVIF认证方式(1=WSSecurity, 2=Digest)
+     */
+    private String onvifAuthType;
+
+    /**
+     * ONVIF播放类型(1=本地, 2=推流, 3=EasyNTS)
+     */
+    private String playType;
+
+    /**
+     * ONVIF多码流地址(JSON)
+     */
+    private String streamUris;
+
+    /**
+     * EasyNTS播放地址
+     */
+    private String easyNTSUrl;
+
+    /**
+     * ONVIF通道
+     */
+    private String channel;
+
+    /**
+     * ONVIF播放地址
+     */
+    private String url;
+
+    /**
+     * ONVIF推流ID
+     */
+    private String streamId;
+
+    /**
+     * 设备接入协议类型: GB28181(国标), STREAM_PROXY(拉流代理), STREAM_PUSH(推流), ONVIF
+     */
+    private String protocolType;
+
+    /**
+     * 拉流源地址
+     */
+    private String srcUrl;
+
+    /**
+     * 代理类型: default(流媒体直接拉流), ffmpeg(ffmpeg实现拉流)
+     */
+    private String streamType;
+
+    /**
+     * ffmpeg模板KEY
+     */
+    private String ffmpegCmdKey;
+
+    /**
+     * RTSP拉流方式: 0-TCP, 1-UDP, 2-组播
+     */
+    private String rtspType;
+
+    /**
+     * 是否启用音频
+     */
+    private boolean enableAudio;
+
+    /**
+     * 是否启用录像
+     */
+    private boolean enableMp4;
+
+    /**
+     * 无人观看时自动移除
+     */
+    private boolean enableRemoveNoneReader;
+
+    /**
+     * 无人观看时自动停用
+     */
+    private boolean enableDisableNoneReader;
+
+    /**
+     * ZLM返回的streamKey
+     */
+    private String streamKey;
+
+    /**
+     * 是否拉起离线推流
+     */
+    private boolean startOfflinePush;
+
+    /**
+     * 推流时间
+     */
+    private String pushTime;
 }

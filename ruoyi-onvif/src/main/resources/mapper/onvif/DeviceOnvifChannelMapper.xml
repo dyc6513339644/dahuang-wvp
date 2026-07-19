@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.onvif.mapper.DeviceOnvifChannelMapper">
+
+    <resultMap type="DeviceOnvifChannel" id="DeviceOnvifChannelResult">
+        <result property="id"    column="id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="name"    column="name"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="dbModel"    column="db_model"    />
+        <result property="owner"    column="owner"    />
+        <result property="civilCode"    column="civil_code"    />
+        <result property="block"    column="block"    />
+        <result property="address"    column="address"    />
+        <result property="parental"    column="parental"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="safetyWay"    column="safety_way"    />
+        <result property="registerWay"    column="register_way"    />
+        <result property="certNum"    column="cert_num"    />
+        <result property="certifiable"    column="certifiable"    />
+        <result property="errCode"    column="err_code"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="secrecy"    column="secrecy"    />
+        <result property="ipAddress"    column="ip_address"    />
+        <result property="port"    column="port"    />
+        <result property="password"    column="password"    />
+        <result property="status"    column="status"    />
+        <result property="longitude"    column="longitude"    />
+        <result property="latitude"    column="latitude"    />
+        <result property="ptzType"    column="ptz_type"    />
+        <result property="positionType"    column="position_type"    />
+        <result property="roomType"    column="room_type"    />
+        <result property="useType"    column="use_type"    />
+        <result property="supplyLightType"    column="supply_light_type"    />
+        <result property="directionType"    column="direction_type"    />
+        <result property="resolution"    column="resolution"    />
+        <result property="businessGroupId"    column="business_group_id"    />
+        <result property="downloadSpeed"    column="download_speed"    />
+        <result property="svcSpaceSupportMod"    column="svc_space_support_mod"    />
+        <result property="svcTimeSupportMode"    column="svc_time_support_mode"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="subCount"    column="sub_count"    />
+        <result property="streamId"    column="stream_id"    />
+        <result property="hasAudio"    column="has_audio"    />
+        <result property="gpsTime"    column="gps_time"    />
+        <result property="streamIdentification"    column="stream_identification"    />
+        <result property="channelType"    column="channel_type"    />
+        <result property="gbDeviceId"    column="gb_device_id"    />
+        <result property="gbName"    column="gb_name"    />
+        <result property="gbManufacturer"    column="gb_manufacturer"    />
+        <result property="gbModel"    column="gb_model"    />
+        <result property="gbOwner"    column="gb_owner"    />
+        <result property="gbCivilCode"    column="gb_civil_code"    />
+        <result property="gbBlock"    column="gb_block"    />
+        <result property="gbAddress"    column="gb_address"    />
+        <result property="gbParental"    column="gb_parental"    />
+        <result property="gbParentId"    column="gb_parent_id"    />
+        <result property="gbSafetyWay"    column="gb_safety_way"    />
+        <result property="gbRegisterWay"    column="gb_register_way"    />
+        <result property="gbCertNum"    column="gb_cert_num"    />
+        <result property="gbCertifiable"    column="gb_certifiable"    />
+        <result property="gbErrCode"    column="gb_err_code"    />
+        <result property="gbEndTime"    column="gb_end_time"    />
+        <result property="gbSecrecy"    column="gb_secrecy"    />
+        <result property="gbIpAddress"    column="gb_ip_address"    />
+        <result property="gbPort"    column="gb_port"    />
+        <result property="gbPassword"    column="gb_password"    />
+        <result property="gbStatus"    column="gb_status"    />
+        <result property="gbLongitude"    column="gb_longitude"    />
+        <result property="gbLatitude"    column="gb_latitude"    />
+        <result property="gbBusinessGroupId"    column="gb_business_group_id"    />
+        <result property="gbPtzType"    column="gb_ptz_type"    />
+        <result property="gbPositionType"    column="gb_position_type"    />
+        <result property="gbRoomType"    column="gb_room_type"    />
+        <result property="gbUseType"    column="gb_use_type"    />
+        <result property="gbSupplyLightType"    column="gb_supply_light_type"    />
+        <result property="gbDirectionType"    column="gb_direction_type"    />
+        <result property="gbResolution"    column="gb_resolution"    />
+        <result property="gbDownloadSpeed"    column="gb_download_speed"    />
+        <result property="gbSvcSpaceSupportMod"    column="gb_svc_space_support_mod"    />
+        <result property="gbSvcTimeSupportMode"    column="gb_svc_time_support_mode"    />
+        <result property="recordPlanId"    column="record_plan_id"    />
+        <result property="dataType"    column="data_type"    />
+        <result property="dataDeviceId"    column="data_device_id"    />
+        <result property="channelNo"    column="channel_no"    />
+        <result property="srcUrl"    column="src_url"    />
+    </resultMap>
+
+    <sql id="selectDeviceOnvifChannelVo">
+        select id, device_id, name, manufacturer, db_model, owner, civil_code, block, address, parental, parent_id, safety_way, register_way, cert_num, certifiable, err_code, end_time, secrecy, ip_address, port, password, status, longitude, latitude, ptz_type, position_type, room_type, use_type, supply_light_type, direction_type, resolution, business_group_id, download_speed, svc_space_support_mod, svc_time_support_mode, create_time, update_time, sub_count, stream_id, has_audio, gps_time, stream_identification, channel_type, gb_device_id, gb_name, gb_manufacturer, gb_model, gb_owner, gb_civil_code, gb_block, gb_address, gb_parental, gb_parent_id, gb_safety_way, gb_register_way, gb_cert_num, gb_certifiable, gb_err_code, gb_end_time, gb_secrecy, gb_ip_address, gb_port, gb_password, gb_status, gb_longitude, gb_latitude, gb_business_group_id, gb_ptz_type, gb_position_type, gb_room_type, gb_use_type, gb_supply_light_type, gb_direction_type, gb_resolution, gb_download_speed, gb_svc_space_support_mod, gb_svc_time_support_mode, record_plan_id, data_type, data_device_id, channel_no, src_url from wvp_device_channel
+    </sql>
+
+    <select id="selectDeviceOnvifChannelList" parameterType="DeviceOnvifChannel" resultMap="DeviceOnvifChannelResult">
+        <include refid="selectDeviceOnvifChannelVo"/>
+        <where>
+            <if test="deviceId != null  and deviceId != ''"> and device_id = #{deviceId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="manufacturer != null  and manufacturer != ''"> and manufacturer = #{manufacturer}</if>
+            <if test="dbModel != null  and dbModel != ''"> and db_model = #{dbModel}</if>
+            <if test="owner != null  and owner != ''"> and owner = #{owner}</if>
+            <if test="civilCode != null  and civilCode != ''"> and civil_code = #{civilCode}</if>
+            <if test="block != null  and block != ''"> and block = #{block}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="parental != null "> and parental = #{parental}</if>
+            <if test="parentId != null  and parentId != ''"> and parent_id = #{parentId}</if>
+            <if test="safetyWay != null "> and safety_way = #{safetyWay}</if>
+            <if test="registerWay != null "> and register_way = #{registerWay}</if>
+            <if test="certNum != null  and certNum != ''"> and cert_num = #{certNum}</if>
+            <if test="certifiable != null "> and certifiable = #{certifiable}</if>
+            <if test="errCode != null "> and err_code = #{errCode}</if>
+            <if test="endTime != null  and endTime != ''"> and end_time = #{endTime}</if>
+            <if test="secrecy != null "> and secrecy = #{secrecy}</if>
+            <if test="ipAddress != null  and ipAddress != ''"> and ip_address = #{ipAddress}</if>
+            <if test="port != null "> and port = #{port}</if>
+            <if test="password != null  and password != ''"> and password = #{password}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="longitude != null "> and longitude = #{longitude}</if>
+            <if test="latitude != null "> and latitude = #{latitude}</if>
+            <if test="ptzType != null "> and ptz_type = #{ptzType}</if>
+            <if test="positionType != null "> and position_type = #{positionType}</if>
+            <if test="roomType != null "> and room_type = #{roomType}</if>
+            <if test="useType != null "> and use_type = #{useType}</if>
+            <if test="supplyLightType != null "> and supply_light_type = #{supplyLightType}</if>
+            <if test="directionType != null "> and direction_type = #{directionType}</if>
+            <if test="resolution != null  and resolution != ''"> and resolution = #{resolution}</if>
+            <if test="businessGroupId != null  and businessGroupId != ''"> and business_group_id = #{businessGroupId}</if>
+            <if test="downloadSpeed != null  and downloadSpeed != ''"> and download_speed = #{downloadSpeed}</if>
+            <if test="svcSpaceSupportMod != null "> and svc_space_support_mod = #{svcSpaceSupportMod}</if>
+            <if test="svcTimeSupportMode != null "> and svc_time_support_mode = #{svcTimeSupportMode}</if>
+            <if test="subCount != null "> and sub_count = #{subCount}</if>
+            <if test="streamId != null  and streamId != ''"> and stream_id = #{streamId}</if>
+            <if test="hasAudio != null "> and has_audio = #{hasAudio}</if>
+            <if test="gpsTime != null  and gpsTime != ''"> and gps_time = #{gpsTime}</if>
+            <if test="streamIdentification != null  and streamIdentification != ''"> and stream_identification = #{streamIdentification}</if>
+            <if test="channelType != null "> and channel_type = #{channelType}</if>
+            <if test="gbDeviceId != null  and gbDeviceId != ''"> and gb_device_id = #{gbDeviceId}</if>
+            <if test="gbName != null  and gbName != ''"> and gb_name like concat('%', #{gbName}, '%')</if>
+            <if test="gbManufacturer != null  and gbManufacturer != ''"> and gb_manufacturer = #{gbManufacturer}</if>
+            <if test="gbModel != null  and gbModel != ''"> and gb_model = #{gbModel}</if>
+            <if test="gbOwner != null  and gbOwner != ''"> and gb_owner = #{gbOwner}</if>
+            <if test="gbCivilCode != null  and gbCivilCode != ''"> and gb_civil_code = #{gbCivilCode}</if>
+            <if test="gbBlock != null  and gbBlock != ''"> and gb_block = #{gbBlock}</if>
+            <if test="gbAddress != null  and gbAddress != ''"> and gb_address = #{gbAddress}</if>
+            <if test="gbParental != null "> and gb_parental = #{gbParental}</if>
+            <if test="gbParentId != null  and gbParentId != ''"> and gb_parent_id = #{gbParentId}</if>
+            <if test="gbSafetyWay != null "> and gb_safety_way = #{gbSafetyWay}</if>
+            <if test="gbRegisterWay != null "> and gb_register_way = #{gbRegisterWay}</if>
+            <if test="gbCertNum != null  and gbCertNum != ''"> and gb_cert_num = #{gbCertNum}</if>
+            <if test="gbCertifiable != null "> and gb_certifiable = #{gbCertifiable}</if>
+            <if test="gbErrCode != null "> and gb_err_code = #{gbErrCode}</if>
+            <if test="gbEndTime != null  and gbEndTime != ''"> and gb_end_time = #{gbEndTime}</if>
+            <if test="gbSecrecy != null "> and gb_secrecy = #{gbSecrecy}</if>
+            <if test="gbIpAddress != null  and gbIpAddress != ''"> and gb_ip_address = #{gbIpAddress}</if>
+            <if test="gbPort != null "> and gb_port = #{gbPort}</if>
+            <if test="gbPassword != null  and gbPassword != ''"> and gb_password = #{gbPassword}</if>
+            <if test="gbStatus != null  and gbStatus != ''"> and gb_status = #{gbStatus}</if>
+            <if test="gbLongitude != null "> and gb_longitude = #{gbLongitude}</if>
+            <if test="gbLatitude != null "> and gb_latitude = #{gbLatitude}</if>
+            <if test="gbBusinessGroupId != null  and gbBusinessGroupId != ''"> and gb_business_group_id = #{gbBusinessGroupId}</if>
+            <if test="gbPtzType != null "> and gb_ptz_type = #{gbPtzType}</if>
+            <if test="gbPositionType != null "> and gb_position_type = #{gbPositionType}</if>
+            <if test="gbRoomType != null "> and gb_room_type = #{gbRoomType}</if>
+            <if test="gbUseType != null "> and gb_use_type = #{gbUseType}</if>
+            <if test="gbSupplyLightType != null "> and gb_supply_light_type = #{gbSupplyLightType}</if>
+            <if test="gbDirectionType != null "> and gb_direction_type = #{gbDirectionType}</if>
+            <if test="gbResolution != null  and gbResolution != ''"> and gb_resolution = #{gbResolution}</if>
+            <if test="gbDownloadSpeed != null  and gbDownloadSpeed != ''"> and gb_download_speed = #{gbDownloadSpeed}</if>
+            <if test="gbSvcSpaceSupportMod != null "> and gb_svc_space_support_mod = #{gbSvcSpaceSupportMod}</if>
+            <if test="gbSvcTimeSupportMode != null "> and gb_svc_time_support_mode = #{gbSvcTimeSupportMode}</if>
+            <if test="recordPlanId != null "> and record_plan_id = #{recordPlanId}</if>
+            <if test="dataType != null "> and data_type = #{dataType}</if>
+            <if test="dataDeviceId != null "> and data_device_id = #{dataDeviceId}</if>
+            <if test="channelNo != null  and channelNo != ''"> and channel_no = #{channelNo}</if>
+            <if test="srcUrl != null  and srcUrl != ''"> and src_url = #{srcUrl}</if>
+        </where>
+    </select>
+
+
+    <select id="selectDeviceChannelList" parameterType="DeviceChannelReqVo" resultMap="DeviceOnvifChannelResult">
+        <include refid="selectDeviceOnvifChannelVo"/>
+        <where>
+            <if test='key != null and key != ""'>
+                AND (name LIKE CONCAT('%', #{key}, '%') OR device_id LIKE CONCAT('%', #{key}, '%'))
+            </if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="parentId != null  and parentId != ''"> and parent_id = #{parentId}</if>
+            <if test="dataType != null "> and data_type = #{dataType}</if>
+            <if test="dataDeviceId != null "> and data_device_id = #{dataDeviceId}</if>
+            <if test="filterGps != null and filterGps == true">
+                and longitude is not null and latitude is not null and longitude != 0 and latitude != 0
+            </if>
+        </where>
+    </select>
+
+
+    <delete id="deleteDeviceOnvifChannelByDataDeviceId" parameterType="Long">
+        delete from wvp_device_channel where data_device_id = #{dataDeviceId}
+    </delete>
+
+    <!-- 探测任务：按 dataDeviceId 批量更新通道状态 -->
+    <update id="updateStatusByDataDeviceId">
+        UPDATE wvp_device_channel SET status = #{status}
+        WHERE data_device_id = #{dataDeviceId}
+    </update>
+</mapper>

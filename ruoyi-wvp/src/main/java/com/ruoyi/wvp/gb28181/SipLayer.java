@@ -44,6 +44,9 @@ public class SipLayer implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
+		// 延迟加载SIP数据库配置（带10秒超时保护，超时不阻塞主线程）
+		sipConfig.ensureLoaded();
+
 		try {
 			if (ObjectUtils.isEmpty(sipConfig.getIp())) {
 				try {
