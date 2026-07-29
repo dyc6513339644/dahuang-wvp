@@ -159,6 +159,13 @@ public interface IDeviceOnvifService
      */
     public List<DeviceOnvif> selectAllDeviceList(DeviceReqVo deviceReqVo);
 
+    /**
+     * 查询所有设备列表（含分配设备过滤）
+     * @param deviceReqVo 查询条件
+     * @param deviceIds   用户分配的设备ID列表，null或空表示不过滤
+     */
+    public List<DeviceOnvif> selectAllDeviceListFiltered(DeviceReqVo deviceReqVo, List<String> deviceIds);
+
 
 
 }

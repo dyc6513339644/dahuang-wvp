@@ -2,7 +2,6 @@ package com.ruoyi.wvp.gb28181.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.dynamic.datasource.annotation.DS;
-import javax.annotation.PostConstruct;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.wvp.common.CommonCallback;
 import com.ruoyi.wvp.common.VideoManagerConstants;
@@ -33,7 +32,6 @@ import com.ruoyi.common.enums.ErrorCode;
 import com.ruoyi.wvp.vmanager.bean.ResourceBaseInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -95,16 +93,6 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Autowired
     private AudioBroadcastManager audioBroadcastManager;
-
-    @Value("${spring.datasource.driver-class-name:}")
-    private String driverClassName;
-
-    private String dbType;
-
-    @PostConstruct
-    public void init() {
-        dbType = DatabaseDialectHolder.resolveDbType(driverClassName);
-    }
 
     private Device getDeviceByDeviceIdFromDb(String deviceId) {
         return deviceMapper.getDeviceByDeviceId(deviceId);
@@ -561,14 +549,14 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     @DataScope(deptAlias = "d")
     public List<Device> getAll(Device device) {
-        device.getParams().put("dbType", dbType);
+        device.getParams().put("dbType", DatabaseDialectHolder.getDbType());
         return deviceMapper.getDeviceList(ChannelDataType.GB28181.value, device);
     }
 
     @Override
     @DataScope(deptAlias = "d")
     public List<Device> getAllDeviceTypes(Device device) {
-        device.getParams().put("dbType", dbType);
+        device.getParams().put("dbType", DatabaseDialectHolder.getDbType());
         return deviceMapper.getAllDeviceList(device);
     }
 

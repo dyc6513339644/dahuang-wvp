@@ -26,6 +26,10 @@ public interface UserChannelMapper {
     @Select("SELECT COUNT(0) FROM sys_user_channel WHERE user_id = #{userId}")
     int countByUserId(@Param("userId") Long userId);
 
+    /** 查询用户分配的设备ID列表（去重，过滤空值） */
+    @Select("SELECT DISTINCT device_id FROM sys_user_channel WHERE user_id = #{userId} AND device_id IS NOT NULL AND device_id != ''")
+    List<String> selectDistinctDeviceIdsByUserId(@Param("userId") Long userId);
+
     /** 查询用户有权限的设备列表 */
     @Select("SELECT de.*, " +
             "(SELECT COUNT(0) FROM wvp_device_channel dc WHERE dc.data_device_id = de.id) AS channel_count " +

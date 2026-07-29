@@ -2,13 +2,11 @@ package com.ruoyi.system.service.impl;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ruoyi.system.domain.SysPost;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
@@ -39,15 +37,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Autowired
     private SysRoleMapper roleMapper;
 
-    @Value("${spring.datasource.driver-class-name:}")
-    private String driverClassName;
-
-    private String dbType;
-
-    @PostConstruct
-    public void init() {
-        dbType = DatabaseDialectHolder.resolveDbType(driverClassName);
-    }
+    /** 使用 DatabaseDialectHolder 静态方法判断，无需额外字段 */
 
     /**
      * 查询部门管理数据
@@ -76,9 +66,20 @@ public class SysDeptServiceImpl implements ISysDeptService {
         wrapper.eq("del_flag", "0");
 
         // 数据权限
+        // DataScopeAspect 生成的 dataScope 格式为 " AND (d.dept_id IN (...))"，
+        // 这是为 XML Mapper ${params.dataScope} 直接拼接设计的。
+        // MyBatis-Plus QueryWrapper.apply() 会自动在条件间加 AND，
+        // 需去除前导 AND 和无效别名 "d."。
         Map<String, Object> params = dept.getParams();
-        if (params != null && params.get("dataScope") != null&&StringUtils.isNotEmpty(params.get("dataScope").toString())) {
-            wrapper.apply(params.get("dataScope").toString());
+        if (params != null && params.get("dataScope") != null && StringUtils.isNotEmpty(params.get("dataScope").toString())) {
+            String dataScopeStr = params.get("dataScope").toString();
+            // 1) 去除 DataScopeAspect 添加的前导 " AND "，避免与 QueryWrapper 自动 AND 重复
+            if (dataScopeStr.startsWith(" AND ")) {
+                dataScopeStr = dataScopeStr.substring(5);
+            }
+            // 2) 去除 "d." 别名前缀（QueryWrapper 生成的 FROM sys_dept 没有别名）
+            dataScopeStr = dataScopeStr.replace("d.", "");
+            wrapper.apply(dataScopeStr);
         }
         wrapper.orderByAsc("order_num","parent_id");
 
@@ -173,10 +174,10 @@ public class SysDeptServiceImpl implements ISysDeptService {
         wrapper.eq("status", 0);
         wrapper.eq("del_flag", "0");
         //根据数据库类型判断
-        if("dm".equals(dbType)) {
-            wrapper.apply("INSTR(',' || ancestors || ',', ',' || {0} || ',') > 0", deptId);
-        }else {
+        if(DatabaseDialectHolder.isMySQL()) {
             wrapper.apply("find_in_set({0}, ancestors)", deptId);
+        }else {
+            wrapper.apply("INSTR(',' || ancestors || ',', ',' || {0} || ',') > 0", deptId);
         }
         return deptMapper.selectCount(wrapper);
     }
@@ -315,10 +316,10 @@ public class SysDeptServiceImpl implements ISysDeptService {
 
         QueryWrapper<SysDept> wrapper = new QueryWrapper<>();
         //根据数据库类型判断
-        if("dm".equals(dbType)) {
-            wrapper.apply("INSTR(',' || ancestors || ',', ',' || {0} || ',') > 0", deptId);
-        }else {
+        if(DatabaseDialectHolder.isMySQL()) {
             wrapper.apply("find_in_set({0}, ancestors)", deptId);
+        }else {
+            wrapper.apply("INSTR(',' || ancestors || ',', ',' || {0} || ',') > 0", deptId);
         }
         List<SysDept> children=deptMapper.selectList(wrapper);
         // List<SysDept> children = deptMapper.selectChildrenDeptById(deptId);

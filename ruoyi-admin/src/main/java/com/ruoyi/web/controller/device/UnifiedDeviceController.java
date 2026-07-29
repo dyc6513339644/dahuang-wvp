@@ -18,6 +18,7 @@ import com.ruoyi.wvp.gb28181.service.IDeviceService;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
 import com.ruoyi.wvp.gb28181.task.ISubscribeTask;
 import com.ruoyi.wvp.mapper.DeviceMapper;
+import com.ruoyi.wvp.service.IUserChannelService;
 import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.common.StreamInfo;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,36 +75,92 @@ public class UnifiedDeviceController extends BaseController {
     @Autowired
     private IMediaServerService mediaServerService;
 
+    @Autowired
+    private IUserChannelService userChannelService;
 
-    //查询所有设备
+
+    // ==================== 用户通道过滤辅助方法 ====================
+
+    /**
+     * 判断当前用户是否需要按分配通道过滤
+     * @return true=需要过滤，false=不过滤（无分配通道则返回全部）
+     */
+    private boolean shouldFilterByUserChannel() {
+        Long userId = getUserId();
+        boolean needFilter = userChannelService.hasUserChannels(userId);
+        log.debug("[UnifiedDevice] userId={}, needFilter={}", userId, needFilter);
+        return needFilter;
+    }
+
+    /**
+     * 获取当前用户分配的设备ID列表
+     */
+    private List<String> getUserAssignedDeviceIds() {
+        return userChannelService.getDistinctDeviceIdsByUserId(getUserId());
+    }
+
+    // ==================== 设备查询 ====================
+
+    //查询所有设备（含分配通道过滤：无分配通道则返回全部，有则只返回分配的设备）
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listAllDevice")
     public AjaxResult listAllDevice(DeviceReqVo deviceReqVo) {
+        if (shouldFilterByUserChannel()) {
+            List<String> deviceIds = getUserAssignedDeviceIds();
+            if (deviceIds.isEmpty()) {
+                return success(Collections.emptyList());
+            }
+            return success(deviceOnvifService.selectAllDeviceListFiltered(deviceReqVo, deviceIds));
+        }
         return success(deviceOnvifService.selectAllDeviceList(deviceReqVo));
     }
 
-    //查下设备带分页
+    //查下设备带分页（含分配通道过滤）
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listDevicePage")
     public TableDataInfo listDevicePage(DeviceReqVo deviceReqVo){
         startPage();
-        List<DeviceOnvif> list = deviceOnvifService.selectAllDeviceList(deviceReqVo);
+        List<DeviceOnvif> list;
+        if (shouldFilterByUserChannel()) {
+            List<String> deviceIds = getUserAssignedDeviceIds();
+            list = deviceIds.isEmpty() ? Collections.emptyList()
+                    : deviceOnvifService.selectAllDeviceListFiltered(deviceReqVo, deviceIds);
+        } else {
+            list = deviceOnvifService.selectAllDeviceList(deviceReqVo);
+        }
         return getDataTable(list);
     }
 
-    //根据设备查下通道
+    // ==================== 通道查询 ====================
+
+    //根据设备查下通道（含分配通道过滤）
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listDeviceChannel")
     public AjaxResult listDeviceChannel(DeviceChannelReqVo deviceChannelReqVo){
+        if (shouldFilterByUserChannel()) {
+            List<String> deviceIds = getUserAssignedDeviceIds();
+            if (deviceIds.isEmpty()) {
+                return success(Collections.emptyList());
+            }
+            return success(deviceOnvifChannelService.selectDeviceChannelListFiltered(deviceChannelReqVo, deviceIds));
+        }
         return success(deviceOnvifChannelService.selectDeviceChannelList(deviceChannelReqVo));
     }
 
 
+    //通道带分页（含分配通道过滤）
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listDeviceChannelPage")
     public TableDataInfo listDeviceChannelPage(DeviceChannelReqVo deviceChannelReqVo){
         startPage();
-        List<DeviceOnvifChannel> list =deviceOnvifChannelService.selectDeviceChannelList(deviceChannelReqVo);
+        List<DeviceOnvifChannel> list;
+        if (shouldFilterByUserChannel()) {
+            List<String> deviceIds = getUserAssignedDeviceIds();
+            list = deviceIds.isEmpty() ? Collections.emptyList()
+                    : deviceOnvifChannelService.selectDeviceChannelListFiltered(deviceChannelReqVo, deviceIds);
+        } else {
+            list = deviceOnvifChannelService.selectDeviceChannelList(deviceChannelReqVo);
+        }
         return getDataTable(list);
     }
 

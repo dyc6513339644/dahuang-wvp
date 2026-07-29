@@ -5,12 +5,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -73,16 +71,6 @@ public class SysUserServiceImpl implements ISysUserService
     @Autowired
     protected Validator validator;
 
-    @Value("${spring.datasource.driver-class-name:}")
-    private String driverClassName;
-
-    private String dbType;
-
-    @PostConstruct
-    public void init() {
-        dbType = DatabaseDialectHolder.resolveDbType(driverClassName);
-    }
-
     /**
      * 根据条件分页查询用户列表
      *
@@ -93,7 +81,7 @@ public class SysUserServiceImpl implements ISysUserService
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user)
     {
-        user.getParams().put("dbType", dbType);
+        user.getParams().put("dbType", DatabaseDialectHolder.getDbType());
         return userMapper.selectUserList(user);
     }
 

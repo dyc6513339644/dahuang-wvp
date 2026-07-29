@@ -34,4 +34,14 @@ public interface DeviceOnvifChannelMapper extends BaseMapper<DeviceOnvifChannel>
      * 查询设备通道列表（含设备信息）
      */
     List<DeviceOnvifChannel> selectDeviceChannelList(DeviceChannelReqVo deviceChannelReqVo);
+
+    /**
+     * 查询设备通道列表（含设备信息 + 分配设备过滤）
+     * 通过 sys_user_channel.device_id → wvp_device.device_id → wvp_device.id → wvp_device_channel.data_device_id 过滤
+     *
+     * @param deviceChannelReqVo 查询条件
+     * @param deviceIds          用户分配的设备ID列表（sys_user_channel.device_id），null或空表示不过滤
+     */
+    List<DeviceOnvifChannel> selectDeviceChannelListFiltered(@Param("reqVo") DeviceChannelReqVo deviceChannelReqVo,
+                                                              @Param("deviceIds") List<String> deviceIds);
 }

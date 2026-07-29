@@ -51,9 +51,6 @@ spring:
   # 数据源配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driverClassName: com.mysql.cj.jdbc.Driver
-    # 达梦
-    #driverClassName: dm.jdbc.driver.DmDriver
     druid:
       # 主库数据源
       master:
