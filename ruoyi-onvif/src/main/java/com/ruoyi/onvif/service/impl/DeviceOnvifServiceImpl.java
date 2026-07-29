@@ -179,4 +179,9 @@ public class DeviceOnvifServiceImpl implements IDeviceOnvifService
     public void irisSetByChannelId(Long channelId, float irisValue) {
         log.warn(NOT_SUPPORTED_MSG);
     }
+
+    @Override
+    public List<DeviceOnvif> selectAllDeviceListFiltered(DeviceReqVo deviceReqVo, List<String> deviceIds) {
+        return deviceOnvifMapper.selectAllDeviceListFiltered(deviceReqVo, deviceIds);
+    }
 }

@@ -139,6 +139,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ORDER BY de.create_time DESC
     </select>
 
+    <select id="selectAllDeviceListFiltered" resultMap="DeviceOnvifResult">
+        SELECT de.*,
+        (SELECT COUNT(0) FROM wvp_device_channel dc WHERE dc.data_device_id = de.id) AS channel_count
+        FROM wvp_device de
+        <where>
+            <if test="reqVo.protocolType != null  and reqVo.protocolType != ''"> and protocol_type = #{reqVo.protocolType}</if>
+            <if test='reqVo.key != null and reqVo.key != ""'>
+                AND (de.name LIKE CONCAT('%', #{reqVo.key}, '%') OR de.device_id LIKE CONCAT('%', #{reqVo.key}, '%'))
+            </if>
+            <if test='reqVo.status != null'>
+                AND de.on_line = #{reqVo.status}
+            </if>
+            <if test="reqVo.manufacturer != null  and reqVo.manufacturer != ''"> and manufacturer = #{reqVo.manufacturer}</if>
+            <if test="deviceIds != null and deviceIds.size() > 0">
+                AND de.device_id IN
+                <foreach collection="deviceIds" item="deviceId" open="(" separator="," close=")">
+                    #{deviceId}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY de.create_time DESC
+    </select>
+
     <select id="selectDeviceOnvifListHasChannelCount" parameterType="DeviceOnvif" resultMap="DeviceOnvifResult">
         SELECT de.*,
         (SELECT COUNT(0) FROM wvp_device_channel dc WHERE dc.data_device_id = de.id) AS channel_count

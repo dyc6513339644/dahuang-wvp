@@ -6,7 +6,6 @@ import com.ruoyi.common.utils.DatabaseDialectHolder;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -20,9 +19,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 public class MybatisPlusConfig
 {
-    @Value("${spring.datasource.driver-class-name:}")
-    private String driverClassName;
-
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor()
     {
@@ -37,13 +33,12 @@ public class MybatisPlusConfig
     }
 
     /**
-     * 分页插件，从 driver-class-name 自动推断数据库类型
+     * 分页插件，自动从 DatabaseDialectHolder 获取数据库类型
      */
     public PaginationInnerInterceptor paginationInnerInterceptor()
     {
         PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
-        String dbType = DatabaseDialectHolder.resolveDbType(driverClassName);
-        paginationInnerInterceptor.setDbType(DbType.getDbType(dbType));
+        paginationInnerInterceptor.setDbType(DbType.getDbType(DatabaseDialectHolder.getDbType()));
         // 设置最大单页限制数量，默认 500 条，-1 不受限制
         paginationInnerInterceptor.setMaxLimit(-1L);
         return paginationInnerInterceptor;

@@ -91,4 +91,11 @@ public interface IDeviceOnvifChannelService
      * @return
      */
     public List<DeviceOnvifChannel> selectDeviceChannelList(DeviceChannelReqVo deviceChannelReqVo);
+
+    /**
+     * 查询设备通道列表（含分配设备过滤）
+     * @param deviceChannelReqVo 查询条件
+     * @param deviceIds          用户分配的设备ID列表，null或空表示不过滤
+     */
+    public List<DeviceOnvifChannel> selectDeviceChannelListFiltered(DeviceChannelReqVo deviceChannelReqVo, List<String> deviceIds);
 }

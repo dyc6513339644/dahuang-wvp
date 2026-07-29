@@ -195,6 +195,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
+    <select id="selectDeviceChannelListFiltered" resultMap="DeviceOnvifChannelResult">
+        <include refid="selectDeviceOnvifChannelVo"/>
+        <where>
+            <if test='reqVo.key != null and reqVo.key != ""'>
+                AND (name LIKE CONCAT('%', #{reqVo.key}, '%') OR device_id LIKE CONCAT('%', #{reqVo.key}, '%'))
+            </if>
+            <if test="reqVo.status != null  and reqVo.status != ''"> and status = #{reqVo.status}</if>
+            <if test="reqVo.parentId != null  and reqVo.parentId != ''"> and parent_id = #{reqVo.parentId}</if>
+            <if test="reqVo.dataType != null "> and data_type = #{reqVo.dataType}</if>
+            <if test="reqVo.dataDeviceId != null "> and data_device_id = #{reqVo.dataDeviceId}</if>
+            <if test="reqVo.filterGps != null and reqVo.filterGps == true">
+                and longitude is not null and latitude is not null and longitude != 0 and latitude != 0
+            </if>
+            <if test="deviceIds != null and deviceIds.size() > 0">
+                AND EXISTS (
+                    SELECT 1 FROM wvp_device d
+                    WHERE d.id = wvp_device_channel.data_device_id
+                    AND d.device_id IN
+                    <foreach collection="deviceIds" item="deviceId" open="(" separator="," close=")">
+                        #{deviceId}
+                    </foreach>
+                )
+            </if>
+        </where>
+    </select>
+
 
     <delete id="deleteDeviceOnvifChannelByDataDeviceId" parameterType="Long">
         delete from wvp_device_channel where data_device_id = #{dataDeviceId}
