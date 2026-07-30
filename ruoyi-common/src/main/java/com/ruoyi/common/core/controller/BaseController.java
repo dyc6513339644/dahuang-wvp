@@ -1,12 +1,9 @@
 package com.ruoyi.common.core.controller;
 
 import java.beans.PropertyEditorSupport;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.exception.DemoModeException;
 import com.ruoyi.common.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +18,6 @@ import com.ruoyi.common.core.page.PageDomain;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.page.TableSupport;
 import com.ruoyi.common.utils.sql.SqlUtil;
-import org.springframework.web.bind.annotation.ModelAttribute;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * web层通用数据处理
@@ -50,39 +43,6 @@ public class BaseController
                 setValue(DateUtils.parseDate(text));
             }
         });
-    }
-
-    @ModelAttribute
-    public void init(HttpServletRequest httpServletRequest, HttpServletResponse response) throws IOException {
-        try {
-            if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
-                this.verificationRequest(httpServletRequest, response);
-            }
-        } catch (Exception e) {
-            this.verificationRequest(httpServletRequest, response);
-        }
-    }
-
-    /**
-     * 校验请求
-     */
-    private void verificationRequest(HttpServletRequest httpServletRequest, HttpServletResponse response) {
-        String url = ServletUtils.getRequest().getRequestURI();
-        // 需要拦截的url
-        if (StringUtils.isNotEmpty(url) && (url.indexOf("/genCode") >= 0 || url.indexOf("/export") >= 0)) {
-            throw new DemoModeException();
-        }
-
-        // 需要放开的url
-        if (StringUtils.isNotEmpty(url) && (url.contains("/demo") || url.contains("/tool/gen"))) {
-            return;
-        }
-
-        // 增删改 请求
-        if ("DELETE".equals(httpServletRequest.getMethod()) || "POST".equals(httpServletRequest.getMethod())
-                || "PUT".equals(httpServletRequest.getMethod())) {
-            throw new DemoModeException();
-        }
     }
 
     /**

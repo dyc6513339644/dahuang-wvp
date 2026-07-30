@@ -85,7 +85,7 @@ public class SysBaseConfigController extends BaseController {
      * @param port 端口号
      * @return {available: true/false}
      */
-    @PreAuthorize("@ss.hasPermi('system:baseconfig:query')")
+
     @GetMapping("/checkPort")
     public AjaxResult checkPort(@RequestParam int port) {
         try (
