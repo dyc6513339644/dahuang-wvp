@@ -15,8 +15,14 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
 
 * 平台使用手册
   https://my.feishu.cn/wiki/VAAgwKRMkiMJ2dkBIWDcu7HKneb?from=from_copylink
-## 最近更新（2026-07-19）
-* 支撑达梦数据库
+## 最近更新
+
+（2026-07-31）
+* 支持Postgres数据库
+* 优化设备查询过滤通道权限
+
+（2026-07-19）
+* 支持达梦数据库
 * 支撑内置sqlite数据库，做到无数据库使用
 * 国标设备推拉流 统一一张表
 * 增加AK/SK 认证，给业务系统调用接口
