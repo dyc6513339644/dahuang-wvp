@@ -48,8 +48,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="countGbNum" resultMap="CountGbNumResult">
         SELECT
-                (SELECT COUNT(0) FROM wvp_device WHERE on_line = 0 AND protocol_type = 'GB28181') AS offlineNum,
-                (SELECT COUNT(0) FROM wvp_device WHERE on_line = 1 AND protocol_type = 'GB28181') AS onlineNum,
+                (SELECT COUNT(0) FROM wvp_device WHERE CASE WHEN on_line THEN 1 ELSE 0 END = 0 AND protocol_type = 'GB28181') AS offlineNum,
+                (SELECT COUNT(0) FROM wvp_device WHERE CASE WHEN on_line THEN 1 ELSE 0 END = 1 AND protocol_type = 'GB28181') AS onlineNum,
                 (SELECT COUNT(0) FROM wvp_device WHERE protocol_type = 'GB28181') AS totalNum
     </select>
 </mapper>

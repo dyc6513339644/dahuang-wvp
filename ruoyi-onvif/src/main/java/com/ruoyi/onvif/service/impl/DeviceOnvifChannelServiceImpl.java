@@ -1,16 +1,18 @@
 package com.ruoyi.onvif.service.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.onvif.domain.DeviceOnvifChannel;
 import com.ruoyi.onvif.domain.vo.DeviceChannelReqVo;
 import com.ruoyi.onvif.mapper.DeviceOnvifChannelMapper;
 import com.ruoyi.onvif.service.IDeviceOnvifChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 /**

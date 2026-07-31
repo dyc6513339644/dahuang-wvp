@@ -184,8 +184,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         FROM wvp_device de WHERE de.protocol_type = 'ONVIF'
         AND (
           (de.keepalive_time IS NULL OR de.keepalive_time = '')
-          OR (de.on_line = 1 AND de.keepalive_time &lt;= #{heartbeatThreshold})
-          OR (de.on_line = 0 AND de.keepalive_time &lt;= #{offlineThreshold})
+          OR (CASE WHEN de.on_line THEN 1 ELSE 0 END = 1 AND de.keepalive_time &lt;= #{heartbeatThreshold})
+          OR (CASE WHEN de.on_line THEN 1 ELSE 0 END = 0 AND de.keepalive_time &lt;= #{offlineThreshold})
         )
         ORDER BY de.create_time DESC
     </select>

@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class DeviceReqVo {
     private String key;
-    private String status;
+    private Boolean status;
     private String manufacturer;
     private String protocolType;
 }

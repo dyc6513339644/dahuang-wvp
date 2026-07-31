@@ -90,7 +90,7 @@ public class DeviceOnvif extends BaseEntity
 
     /** 移动设备位置信息上报时间间隔,单位:秒,默认值5 */
     @Excel(name = "移动设备位置信息上报时间间隔,单位:秒,默认值5")
-    private Boolean  mobilePositionSubmissionInterval;
+    private Integer  mobilePositionSubmissionInterval;
 
     /** 报警订阅周期，0为不订阅 */
     @Excel(name = "报警订阅周期，0为不订阅")
@@ -186,19 +186,19 @@ public class DeviceOnvif extends BaseEntity
 
     /** 是否启用音频 */
     @Excel(name = "是否启用音频")
-    private Integer enableAudio;
+    private Boolean enableAudio;
 
     /** 是否启用录像 */
     @Excel(name = "是否启用录像")
-    private Integer enableMp4;
+    private Boolean enableMp4;
 
     /** 无人观看时自动移除 */
     @Excel(name = "无人观看时自动移除")
-    private Integer enableRemoveNoneReader;
+    private Boolean enableRemoveNoneReader;
 
     /** 无人观看时自动停用 */
     @Excel(name = "无人观看时自动停用")
-    private Integer enableDisableNoneReader;
+    private Boolean enableDisableNoneReader;
 
     /** ZLM返回的streamKey */
     @Excel(name = "ZLM返回的streamKey")
@@ -206,11 +206,11 @@ public class DeviceOnvif extends BaseEntity
 
     /** 是否拉起离线推流 */
     @Excel(name = "是否拉起离线推流")
-    private Integer startOfflinePush;
+    private Boolean startOfflinePush;
 
     /** 推流状态 */
     @Excel(name = "推流状态")
-    private Integer pushing;
+    private Boolean pushing;
 
     /** 推流时间 */
     @Excel(name = "推流时间")
@@ -364,11 +364,11 @@ public class DeviceOnvif extends BaseEntity
         this.subscribeCycleForMobilePosition = subscribeCycleForMobilePosition;
     }
 
-    public Boolean getMobilePositionSubmissionInterval() {
+    public Integer getMobilePositionSubmissionInterval() {
         return mobilePositionSubmissionInterval;
     }
 
-    public void setMobilePositionSubmissionInterval(Boolean mobilePositionSubmissionInterval) {
+    public void setMobilePositionSubmissionInterval(Integer mobilePositionSubmissionInterval) {
         this.mobilePositionSubmissionInterval = mobilePositionSubmissionInterval;
     }
 
@@ -556,35 +556,35 @@ public class DeviceOnvif extends BaseEntity
         this.rtspType = rtspType;
     }
 
-    public Integer getEnableAudio() {
+    public Boolean getEnableAudio() {
         return enableAudio;
     }
 
-    public void setEnableAudio(Integer enableAudio) {
+    public void setEnableAudio(Boolean enableAudio) {
         this.enableAudio = enableAudio;
     }
 
-    public Integer getEnableMp4() {
+    public Boolean getEnableMp4() {
         return enableMp4;
     }
 
-    public void setEnableMp4(Integer enableMp4) {
+    public void setEnableMp4(Boolean enableMp4) {
         this.enableMp4 = enableMp4;
     }
 
-    public Integer getEnableRemoveNoneReader() {
+    public Boolean getEnableRemoveNoneReader() {
         return enableRemoveNoneReader;
     }
 
-    public void setEnableRemoveNoneReader(Integer enableRemoveNoneReader) {
+    public void setEnableRemoveNoneReader(Boolean enableRemoveNoneReader) {
         this.enableRemoveNoneReader = enableRemoveNoneReader;
     }
 
-    public Integer getEnableDisableNoneReader() {
+    public Boolean getEnableDisableNoneReader() {
         return enableDisableNoneReader;
     }
 
-    public void setEnableDisableNoneReader(Integer enableDisableNoneReader) {
+    public void setEnableDisableNoneReader(Boolean enableDisableNoneReader) {
         this.enableDisableNoneReader = enableDisableNoneReader;
     }
 
@@ -596,19 +596,19 @@ public class DeviceOnvif extends BaseEntity
         this.streamKey = streamKey;
     }
 
-    public Integer getStartOfflinePush() {
+    public Boolean getStartOfflinePush() {
         return startOfflinePush;
     }
 
-    public void setStartOfflinePush(Integer startOfflinePush) {
+    public void setStartOfflinePush(Boolean startOfflinePush) {
         this.startOfflinePush = startOfflinePush;
     }
 
-    public Integer getPushing() {
+    public Boolean getPushing() {
         return pushing;
     }
 
-    public void setPushing(Integer pushing) {
+    public void setPushing(Boolean pushing) {
         this.pushing = pushing;
     }
 
