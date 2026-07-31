@@ -54,13 +54,17 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://127.0.0.1:3306/dahuang-wvp?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowMultiQueries=true
+        url: jdbc:mysql://127.0.0.1:3306/dahuang-wvp-pro?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowMultiQueries=true
         username: root
         password: root123456
         # 达梦
         #url: jdbc:dm://127.0.0.1:5236/dahuang-wvp-pro?COMPATIBLE_MODE=4
         #username: SYSDBA
         #password:<PASSWORD>
+        # Postgres配置
+        #url: jdbc:postgresql://localhost:5432/dahuang-wvp-pro?stringtype=unspecified
+        #username: postgres
+        #password: <PASSWORD>
       # 从库数据源
       slave:
         enabled: false
