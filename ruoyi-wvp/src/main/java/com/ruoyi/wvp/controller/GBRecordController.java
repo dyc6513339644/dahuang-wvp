@@ -3,6 +3,7 @@ package com.ruoyi.wvp.controller;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.common.exception.SsrcTransactionNotFoundException;
@@ -15,6 +16,7 @@ import com.ruoyi.wvp.gb28181.transmit.callback.DeferredResultHolder;
 import com.ruoyi.wvp.gb28181.transmit.callback.RequestMessage;
 import com.ruoyi.wvp.gb28181.transmit.cmd.impl.SIPCommander;
 import com.ruoyi.wvp.media.bean.RecordInfo;
+import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.wvp.service.bean.InviteErrorCode;
 import com.ruoyi.wvp.utils.DateUtil;
 import com.ruoyi.common.enums.ErrorCode;
@@ -60,6 +62,9 @@ public class GBRecordController extends BaseController {
 
 	@Autowired
 	private UserSetting userSetting;
+
+	@Autowired
+	private StreamUrlHelper streamUrlHelper;
 
 	/**
 	 * 录像信息查询
@@ -169,8 +174,19 @@ public class GBRecordController extends BaseController {
 
 				if (data != null) {
 					StreamInfo streamInfo = (StreamInfo)data;
+					streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, streamInfo.getMediaServer());
 					if (userSetting.getUseSourceIpAsStreamIp()) {
-						streamInfo.channgeStreamIp(request.getLocalAddr());
+						MediaServer ms = streamInfo.getMediaServer();
+						if (ms == null || !ms.isNginxProxyEnabled()) {
+							String host;
+							try {
+								java.net.URL url = new java.net.URL(request.getRequestURL().toString());
+								host = url.getHost();
+							} catch (java.net.MalformedURLException e) {
+								host = request.getLocalAddr();
+							}
+							streamInfo.channgeStreamIp(host);
+						}
 					}
 					wvpResult.setData(new StreamContent(streamInfo));
 				}

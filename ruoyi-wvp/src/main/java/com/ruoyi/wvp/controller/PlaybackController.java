@@ -6,7 +6,9 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.wvp.common.InviteInfo;
 import com.ruoyi.wvp.common.InviteSessionType;
 import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.conf.UserSetting;
+import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.Device;
 import com.ruoyi.wvp.gb28181.bean.DeviceChannel;
@@ -70,6 +72,9 @@ public class PlaybackController extends BaseController {
 	@Autowired
 	private IDeviceChannelService channelService;
 
+	@Autowired
+	private StreamUrlHelper streamUrlHelper;
+
 	/**
 	 * 开始回放
 	 *
@@ -118,16 +123,20 @@ public class PlaybackController extends BaseController {
 
 						if (data != null) {
 							StreamInfo streamInfo = (StreamInfo)data;
+							streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, streamInfo.getMediaServer());
 							if (userSetting.getUseSourceIpAsStreamIp()) {
-								streamInfo=streamInfo.clone();//深拷贝
-								String host;
-								try {
-									URL url=new URL(request.getRequestURL().toString());
-									host=url.getHost();
-								} catch (MalformedURLException e) {
-									host=request.getLocalAddr();
+								MediaServer ms = streamInfo.getMediaServer();
+								if (ms == null || !ms.isNginxProxyEnabled()) {
+									streamInfo=streamInfo.clone();//深拷贝
+									String host;
+									try {
+										URL url=new URL(request.getRequestURL().toString());
+										host=url.getHost();
+									} catch (MalformedURLException e) {
+										host=request.getLocalAddr();
+									}
+									streamInfo.channgeStreamIp(host);
 								}
-								streamInfo.channgeStreamIp(host);
 							}
 							wvpResult.setData(new StreamContent(streamInfo));
 						}

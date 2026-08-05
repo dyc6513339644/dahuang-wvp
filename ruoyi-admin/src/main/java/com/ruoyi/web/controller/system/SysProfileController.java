@@ -19,6 +19,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.sign.RsaUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.framework.web.service.TokenService;
@@ -90,6 +91,16 @@ public class SysProfileController extends BaseController
     @PutMapping("/updatePwd")
     public AjaxResult updatePwd(String oldPassword, String newPassword)
     {
+        // RSA 私钥解密
+        try
+        {
+            oldPassword = RsaUtils.decryptByPrivateKey(oldPassword);
+            newPassword = RsaUtils.decryptByPrivateKey(newPassword);
+        }
+        catch (Exception e)
+        {
+            return error("密码解析失败，请刷新页面后重试");
+        }
         LoginUser loginUser = getLoginUser();
         String userName = loginUser.getUsername();
         String password = loginUser.getPassword();

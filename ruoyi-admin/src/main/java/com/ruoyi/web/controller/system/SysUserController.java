@@ -27,6 +27,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.sign.RsaUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysPostService;
@@ -127,7 +128,15 @@ public class SysUserController extends BaseController {
             return error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setCreateBy(getUsername());
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        // RSA 私钥解密后 BCrypt 加密
+        try
+        {
+            user.setPassword(SecurityUtils.encryptPassword(RsaUtils.decryptByPrivateKey(user.getPassword())));
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error("密码解析失败，请刷新页面后重试");
+        }
         return toAjax(userService.insertUser(user));
     }
 
@@ -175,7 +184,15 @@ public class SysUserController extends BaseController {
     public AjaxResult resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        // RSA 私钥解密
+        try
+        {
+            user.setPassword(SecurityUtils.encryptPassword(RsaUtils.decryptByPrivateKey(user.getPassword())));
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error("密码解析失败，请刷新页面后重试");
+        }
         user.setUpdateBy(getUsername());
         return toAjax(userService.resetPwd(user));
     }

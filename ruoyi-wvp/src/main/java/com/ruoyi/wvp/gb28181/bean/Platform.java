@@ -93,6 +93,12 @@ public class Platform implements Serializable {
     private String characterSet;
 
     /**
+     * GB/T 28181 协议版本
+     * 1=GB28181-2016, 2=GB28181-2022
+     */
+    private Integer protocolVersion = 1;
+
+    /**
      * 允许云台控制
      */
     private boolean ptz;

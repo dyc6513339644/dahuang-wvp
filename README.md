@@ -17,6 +17,12 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016视频
   https://my.feishu.cn/wiki/VAAgwKRMkiMJ2dkBIWDcu7HKneb?from=from_copylink
 ## 最近更新
 
+
+v2.0.0 （2026-08-15）
+1.全面兼容GB28181-2022啦
+2.安全性全面提提升 登录密码，修改密码，重置密码相关接口全部进行加密
+3.增加初始密码修改，增加过期密码修改功能 
+
 （2026-07-31）
 * 支持Postgres数据库
 * 优化设备查询过滤通道权限

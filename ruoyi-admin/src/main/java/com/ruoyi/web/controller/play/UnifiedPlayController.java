@@ -11,6 +11,7 @@ import com.ruoyi.onvif.service.IDeviceOnvifService;
 import com.ruoyi.onvif.utils.OnvifUtils;
 import com.ruoyi.wvp.common.InviteSessionType;
 import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.common.enums.ChannelDataType;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
@@ -111,6 +112,9 @@ public class UnifiedPlayController extends BaseController {
 
     @Autowired
     private UserSetting userSetting;
+
+    @Autowired
+    private StreamUrlHelper streamUrlHelper;
 
     // ==================== 协议识别辅助 ====================
 
@@ -354,7 +358,8 @@ public class UnifiedPlayController extends BaseController {
             wvpResult.setCode(ErrorCode.SUCCESS.getCode());
             wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
             if (streamInfo != null) {
-                if (userSetting.getUseSourceIpAsStreamIp()) {
+                streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, mediaServerItem);
+                if (userSetting.getUseSourceIpAsStreamIp() && (mediaServerItem == null || !mediaServerItem.isNginxProxyEnabled())) {
                     streamInfo = streamInfo.clone();
                     String host = resolveRequestHost(request);
                     streamInfo.channgeStreamIp(host);
@@ -380,10 +385,16 @@ public class UnifiedPlayController extends BaseController {
         WVPResult<StreamContent> wvpResult = new WVPResult<>();
         wvpResult.setCode(ErrorCode.SUCCESS.getCode());
         wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
-        if (streamInfo != null && userSetting.getUseSourceIpAsStreamIp()) {
-            streamInfo = streamInfo.clone();
-            String host = resolveRequestHost(request);
-            streamInfo.channgeStreamIp(host);
+        if (streamInfo != null) {
+            streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, streamInfo.getMediaServer());
+            if (userSetting.getUseSourceIpAsStreamIp()) {
+                MediaServer ms = streamInfo.getMediaServer();
+                if (ms == null || !ms.isNginxProxyEnabled()) {
+                    streamInfo = streamInfo.clone();
+                    String host = resolveRequestHost(request);
+                    streamInfo.channgeStreamIp(host);
+                }
+            }
         }
         wvpResult.setData(new StreamContent(streamInfo));
         return wvpResult;

@@ -6,6 +6,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
 import com.ruoyi.wvp.gb28181.controller.bean.ChannelToGroupByGbDeviceParam;
@@ -57,6 +58,9 @@ public class CommonChannelController extends BaseController {
 
     @Autowired
     private UserSetting userSetting;
+
+    @Autowired
+    private StreamUrlHelper streamUrlHelper;
 
     /**
      * 获取通道信息
@@ -331,16 +335,20 @@ public class CommonChannelController extends BaseController {
             if (code == InviteErrorCode.SUCCESS.getCode()) {
                 WVPResult<StreamContent> wvpResult = WVPResult.success();
                 if (streamInfo != null) {
+                    streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, streamInfo.getMediaServer());
                     if (userSetting.getUseSourceIpAsStreamIp()) {
-                        streamInfo = streamInfo.clone();//深拷贝
-                        String host;
-                        try {
-                            URL url = new URL(request.getRequestURL().toString());
-                            host = url.getHost();
-                        } catch (MalformedURLException e) {
-                            host = request.getLocalAddr();
+                        com.ruoyi.wvp.media.bean.MediaServer ms = streamInfo.getMediaServer();
+                        if (ms == null || !ms.isNginxProxyEnabled()) {
+                            streamInfo = streamInfo.clone();//深拷贝
+                            String host;
+                            try {
+                                URL url = new URL(request.getRequestURL().toString());
+                                host = url.getHost();
+                            } catch (MalformedURLException e) {
+                                host = request.getLocalAddr();
+                            }
+                            streamInfo.channgeStreamIp(host);
                         }
-                        streamInfo.channgeStreamIp(host);
                     }
                     if (!ObjectUtils.isEmpty(streamInfo.getMediaServer().getTranscodeSuffix())
                             && !"null".equalsIgnoreCase(streamInfo.getMediaServer().getTranscodeSuffix())) {

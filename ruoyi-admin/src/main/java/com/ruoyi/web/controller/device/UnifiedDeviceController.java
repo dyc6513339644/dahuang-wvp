@@ -119,13 +119,17 @@ public class UnifiedDeviceController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listDevicePage")
     public TableDataInfo listDevicePage(DeviceReqVo deviceReqVo){
-        startPage();
         List<DeviceOnvif> list;
         if (shouldFilterByUserChannel()) {
             List<String> deviceIds = getUserAssignedDeviceIds();
-            list = deviceIds.isEmpty() ? Collections.emptyList()
-                    : deviceOnvifService.selectAllDeviceListFiltered(deviceReqVo, deviceIds);
+            if (deviceIds.isEmpty()) {
+                list = Collections.emptyList();
+            } else {
+                startPage();
+                list = deviceOnvifService.selectAllDeviceListFiltered(deviceReqVo, deviceIds);
+            }
         } else {
+            startPage();
             list = deviceOnvifService.selectAllDeviceList(deviceReqVo);
         }
         return getDataTable(list);
@@ -152,13 +156,17 @@ public class UnifiedDeviceController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listDeviceChannelPage")
     public TableDataInfo listDeviceChannelPage(DeviceChannelReqVo deviceChannelReqVo){
-        startPage();
         List<DeviceOnvifChannel> list;
         if (shouldFilterByUserChannel()) {
             List<String> deviceIds = getUserAssignedDeviceIds();
-            list = deviceIds.isEmpty() ? Collections.emptyList()
-                    : deviceOnvifChannelService.selectDeviceChannelListFiltered(deviceChannelReqVo, deviceIds);
+            if (deviceIds.isEmpty()) {
+                list = Collections.emptyList();
+            } else {
+                startPage();
+                list = deviceOnvifChannelService.selectDeviceChannelListFiltered(deviceChannelReqVo, deviceIds);
+            }
         } else {
+            startPage();
             list = deviceOnvifChannelService.selectDeviceChannelList(deviceChannelReqVo);
         }
         return getDataTable(list);

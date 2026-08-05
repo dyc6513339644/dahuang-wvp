@@ -13,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import javax.sip.InvalidArgumentException;
 import javax.sip.PeerUnavailableException;
 import javax.sip.SipFactory;
@@ -102,7 +106,8 @@ public class SIPRequestHeaderPlarformProvider {
 				authorizationHeader.setUsername(username);
 			}
 			authorizationHeader.setURI(requestURI);
-			authorizationHeader.setAlgorithm("MD5");
+			String alg = (parentPlatform.getProtocolVersion() != null && parentPlatform.getProtocolVersion() == 2) ? "SHA-256" : "MD5";
+			authorizationHeader.setAlgorithm(alg);
 			registerRequest.addHeader(authorizationHeader);
 			return  registerRequest;
 		}
@@ -126,33 +131,42 @@ public class SIPRequestHeaderPlarformProvider {
 				// TODO
 			}
 		}
-		String HA1 = DigestUtils.md5DigestAsHex((parentPlatform.getDeviceGBId() + ":" + realm + ":" + parentPlatform.getPassword()).getBytes());
-		String HA2=DigestUtils.md5DigestAsHex((Request.REGISTER + ":" + requestURI.toString()).getBytes());
+			boolean is2022 = parentPlatform.getProtocolVersion() != null && parentPlatform.getProtocolVersion() == 2;
+			String digestAlg = is2022 ? "SHA-256" : "MD5";
 
-		StringBuffer reStr = new StringBuffer(200);
-		reStr.append(HA1);
-		reStr.append(":");
-		reStr.append(nonce);
-		reStr.append(":");
-		if (qop != null) {
-			reStr.append(nc);
-			reStr.append(":");
-			reStr.append(cNonce);
-			reStr.append(":");
-			reStr.append(qop);
-			reStr.append(":");
-		}
-		reStr.append(HA2);
+			String HA1 = is2022
+				? sha256Digest((parentPlatform.getDeviceGBId() + ":" + realm + ":" + parentPlatform.getPassword()).getBytes())
+				: DigestUtils.md5DigestAsHex((parentPlatform.getDeviceGBId() + ":" + realm + ":" + parentPlatform.getPassword()).getBytes());
+			String HA2 = is2022
+				? sha256Digest((Request.REGISTER + ":" + requestURI.toString()).getBytes())
+				: DigestUtils.md5DigestAsHex((Request.REGISTER + ":" + requestURI.toString()).getBytes());
 
-		String RESPONSE = DigestUtils.md5DigestAsHex(reStr.toString().getBytes());
+			StringBuffer reStr = new StringBuffer(200);
+			reStr.append(HA1);
+			reStr.append(":");
+			reStr.append(nonce);
+			reStr.append(":");
+			if (qop != null) {
+				reStr.append(nc);
+				reStr.append(":");
+				reStr.append(cNonce);
+				reStr.append(":");
+				reStr.append(qop);
+				reStr.append(":");
+			}
+			reStr.append(HA2);
 
-		AuthorizationHeader authorizationHeader = SipFactory.getInstance().createHeaderFactory().createAuthorizationHeader(scheme);
-		authorizationHeader.setUsername(parentPlatform.getDeviceGBId());
-		authorizationHeader.setRealm(realm);
-		authorizationHeader.setNonce(nonce);
-		authorizationHeader.setURI(requestURI);
-		authorizationHeader.setResponse(RESPONSE);
-		authorizationHeader.setAlgorithm("MD5");
+			String RESPONSE = is2022
+				? sha256Digest(reStr.toString().getBytes())
+				: DigestUtils.md5DigestAsHex(reStr.toString().getBytes());
+
+			AuthorizationHeader authorizationHeader = SipFactory.getInstance().createHeaderFactory().createAuthorizationHeader(scheme);
+			authorizationHeader.setUsername(parentPlatform.getDeviceGBId());
+			authorizationHeader.setRealm(realm);
+			authorizationHeader.setNonce(nonce);
+			authorizationHeader.setURI(requestURI);
+			authorizationHeader.setResponse(RESPONSE);
+			authorizationHeader.setAlgorithm(digestAlg);
 		if (qop != null) {
 			authorizationHeader.setQop(qop);
 			authorizationHeader.setCNonce(cNonce);
@@ -388,4 +402,18 @@ public class SIPRequestHeaderPlarformProvider {
 
 		return request;
 	}
+
+    private static String sha256Digest(byte[] input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(input);
+            StringBuilder sb = new StringBuilder(64);
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not available", e);
+        }
+    }
 }

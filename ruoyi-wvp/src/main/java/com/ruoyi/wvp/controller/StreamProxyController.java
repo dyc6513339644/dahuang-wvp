@@ -2,6 +2,7 @@ package com.ruoyi.wvp.controller;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -61,6 +62,9 @@ public class StreamProxyController extends BaseController {
 
     @Autowired
     private UserSetting userSetting;
+
+    @Autowired
+    private StreamUrlHelper streamUrlHelper;
 
     /**
      * 分页查询拉流代理列表（直接查 wvp_device，protocol_type='STREAM_PROXY'）
@@ -148,16 +152,20 @@ public class StreamProxyController extends BaseController {
                 wvpResult.setCode(ErrorCode.SUCCESS.getCode());
                 wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
                 if (streamInfo != null) {
+                    streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, streamInfo.getMediaServer());
                     if (userSetting.getUseSourceIpAsStreamIp()) {
-                        streamInfo = streamInfo.clone();
-                        String host;
-                        try {
-                            URL url = new URL(request.getRequestURL().toString());
-                            host = url.getHost();
-                        } catch (MalformedURLException e) {
-                            host = request.getLocalAddr();
+                        MediaServer ms = streamInfo.getMediaServer();
+                        if (ms == null || !ms.isNginxProxyEnabled()) {
+                            streamInfo = streamInfo.clone();
+                            String host;
+                            try {
+                                URL url = new URL(request.getRequestURL().toString());
+                                host = url.getHost();
+                            } catch (MalformedURLException e) {
+                                host = request.getLocalAddr();
+                            }
+                            streamInfo.channgeStreamIp(host);
                         }
-                        streamInfo.channgeStreamIp(host);
                     }
                     wvpResult.setData(new StreamContent(streamInfo));
                 } else {

@@ -41,7 +41,10 @@ public interface MediaServerMapper {
             "create_time,"+
             "update_time,"+
             "transcode_suffix,"+
-            "hook_alive_interval"+
+            "hook_alive_interval,"+
+            "nginx_proxy_enabled,"+
+            "nginx_http_port,"+
+            "nginx_https_port"+
             ") VALUES " +
             "(" +
             "#{id}, " +
@@ -73,7 +76,10 @@ public interface MediaServerMapper {
             "#{createTime}, " +
             "#{updateTime}, " +
             "#{transcodeSuffix}, " +
-            "#{hookAliveInterval})")
+            "#{hookAliveInterval}," +
+            "#{nginxProxyEnabled}," +
+            "#{nginxHttpPort}," +
+            "#{nginxHttpsPort})")
     int add(MediaServer mediaServerItem);
 
     @Update(value = {" <script>" +
@@ -105,6 +111,11 @@ public interface MediaServerMapper {
             "<if test=\"recordPath != null\">, record_path=#{recordPath}</if>" +
             "<if test=\"transcodeSuffix != null\">, transcode_suffix=#{transcodeSuffix}</if>" +
             "<if test=\"type != null\">, type=#{type}</if>" +
+            "<if test=\"transcodeSuffix != null\">, transcode_suffix=#{transcodeSuffix}</if>" +
+            "<if test=\"hookAliveInterval != null\">, hook_alive_interval=#{hookAliveInterval}</if>" +
+            "<if test=\"nginxProxyEnabled != null\">, nginx_proxy_enabled=#{nginxProxyEnabled}</if>" +
+            "<if test=\"nginxHttpPort != null\">, nginx_http_port=#{nginxHttpPort}</if>" +
+            "<if test=\"nginxHttpsPort != null\">, nginx_https_port=#{nginxHttpsPort}</if>" +
             "WHERE id=#{id}"+
             " </script>"})
     int update(MediaServer mediaServerItem);
@@ -137,6 +148,9 @@ public interface MediaServerMapper {
             "<if test=\"type != null\">, type=#{type}</if>" +
             "<if test=\"transcodeSuffix != null\">, transcode_suffix=#{transcodeSuffix}</if>" +
             "<if test=\"hookAliveInterval != null\">, hook_alive_interval=#{hookAliveInterval}</if>" +
+            "<if test=\"nginxProxyEnabled != null\">, nginx_proxy_enabled=#{nginxProxyEnabled}</if>" +
+            "<if test=\"nginxHttpPort != null\">, nginx_http_port=#{nginxHttpPort}</if>" +
+            "<if test=\"nginxHttpsPort != null\">, nginx_https_port=#{nginxHttpsPort}</if>" +
             "WHERE ip=#{ip} and http_port=#{httpPort}"+
             " </script>"})
     int updateByHostAndPort(MediaServer mediaServerItem);

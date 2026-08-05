@@ -169,6 +169,21 @@ public class MediaServer {
      */
     private String transcodeSuffix;
 
+    /**
+     * nginx统一代理开关
+     */
+    private boolean nginxProxyEnabled;
+
+    /**
+     * nginx代理对外HTTP端口
+     */
+    private Integer nginxHttpPort;
+
+    /**
+     * nginx代理对外HTTPS端口
+     */
+    private Integer nginxHttpsPort;
+
     public MediaServer() {
     }
 
@@ -453,5 +468,29 @@ public class MediaServer {
 
     public void setTranscodeSuffix(String transcodeSuffix) {
         this.transcodeSuffix = transcodeSuffix;
+    }
+
+    public boolean isNginxProxyEnabled() {
+        return nginxProxyEnabled;
+    }
+
+    public void setNginxProxyEnabled(boolean nginxProxyEnabled) {
+        this.nginxProxyEnabled = nginxProxyEnabled;
+    }
+
+    public Integer getNginxHttpPort() {
+        return nginxHttpPort;
+    }
+
+    public void setNginxHttpPort(Integer nginxHttpPort) {
+        this.nginxHttpPort = nginxHttpPort;
+    }
+
+    public Integer getNginxHttpsPort() {
+        return nginxHttpsPort;
+    }
+
+    public void setNginxHttpsPort(Integer nginxHttpsPort) {
+        this.nginxHttpsPort = nginxHttpsPort;
     }
 }

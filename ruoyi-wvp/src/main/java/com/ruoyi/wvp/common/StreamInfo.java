@@ -447,6 +447,41 @@ public class StreamInfo implements Serializable, Cloneable{
         }
     }
 
+    /**
+     * nginx统一代理：替换host为域名，替换http/https类端口为nginx代理端口
+     * @param domain     对外域名
+     * @param httpPort   对外HTTP端口（flv/ws_flv/hls/ts/fmp4/rtc 使用）
+     * @param httpsPort  对外HTTPS端口（https_flv/wss_flv/https_hls/wss_ts/https_fmp4/rtcs 使用）
+     */
+    public void changeStreamUrlForNginx(String domain, Integer httpPort, Integer httpsPort) {
+        if (httpPort != null) {
+            if (this.flv != null)     { this.flv.setHost(domain);     this.flv.setPort(httpPort); }
+            if (this.ws_flv != null)  { this.ws_flv.setHost(domain);  this.ws_flv.setPort(httpPort); }
+            if (this.hls != null)     { this.hls.setHost(domain);     this.hls.setPort(httpPort); }
+            if (this.ws_hls != null)  { this.ws_hls.setHost(domain);  this.ws_hls.setPort(httpPort); }
+            if (this.ts != null)      { this.ts.setHost(domain);      this.ts.setPort(httpPort); }
+            if (this.ws_ts != null)   { this.ws_ts.setHost(domain);   this.ws_ts.setPort(httpPort); }
+            if (this.fmp4 != null)    { this.fmp4.setHost(domain);    this.fmp4.setPort(httpPort); }
+            if (this.ws_fmp4 != null) { this.ws_fmp4.setHost(domain); this.ws_fmp4.setPort(httpPort); }
+            if (this.rtc != null)     { this.rtc.setHost(domain);     this.rtc.setPort(httpPort); }
+            // http 协议非加密地址也改 host（nginx 统一入口下可能需要回退用）
+            if (this.rtsp != null)    { this.rtsp.setHost(domain); }
+            if (this.rtmp != null)    { this.rtmp.setHost(domain); }
+        }
+        if (httpsPort != null) {
+            if (this.https_flv != null)    { this.https_flv.setHost(domain);    this.https_flv.setPort(httpsPort); }
+            if (this.wss_flv != null)      { this.wss_flv.setHost(domain);      this.wss_flv.setPort(httpsPort); }
+            if (this.https_hls != null)    { this.https_hls.setHost(domain);    this.https_hls.setPort(httpsPort); }
+            if (this.wss_hls != null)      { this.wss_hls.setHost(domain);      this.wss_hls.setPort(httpsPort); }
+            if (this.wss_ts != null)       { this.wss_ts.setHost(domain);       this.wss_ts.setPort(httpsPort); }
+            if (this.https_fmp4 != null)   { this.https_fmp4.setHost(domain);   this.https_fmp4.setPort(httpsPort); }
+            if (this.wss_fmp4 != null)     { this.wss_fmp4.setHost(domain);     this.wss_fmp4.setPort(httpsPort); }
+            if (this.rtcs != null)         { this.rtcs.setHost(domain);         this.rtcs.setPort(httpsPort); }
+            if (this.rtsps != null)        { this.rtsps.setHost(domain); }
+            if (this.rtmps != null)        { this.rtmps.setHost(domain); }
+        }
+    }
+
 
     public static class TransactionInfo{
         public String callId;

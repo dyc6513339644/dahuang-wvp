@@ -49,8 +49,11 @@ import java.util.Random;
 public class DigestServerAuthenticationHelper  {
 
     private MessageDigest messageDigest;
+    private String algorithm;
 
-    public static final String DEFAULT_ALGORITHM = "MD5";
+    public static final String ALGORITHM_MD5 = "MD5";
+    public static final String ALGORITHM_SHA256 = "SHA-256";
+    public static final String DEFAULT_ALGORITHM = ALGORITHM_MD5;
     public static final String DEFAULT_SCHEME = "Digest";
 
     /** to hex converter */
@@ -58,12 +61,21 @@ public class DigestServerAuthenticationHelper  {
             '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
     /**
-     * Default constructor.
-     * @throws NoSuchAlgorithmException
+     * Default constructor (MD5 for backward compatibility).
      */
     public DigestServerAuthenticationHelper()
             throws NoSuchAlgorithmException {
-        messageDigest = MessageDigest.getInstance(DEFAULT_ALGORITHM);
+        this(DEFAULT_ALGORITHM);
+    }
+
+    /**
+     * Constructor with specified algorithm (MD5 or SHA-256).
+     * GB28181-2016 uses MD5, GB28181-2022 uses SHA-256.
+     */
+    public DigestServerAuthenticationHelper(String algorithm)
+            throws NoSuchAlgorithmException {
+        this.algorithm = algorithm;
+        messageDigest = MessageDigest.getInstance(algorithm);
     }
 
     public static String toHexString(byte b[]) {
@@ -98,7 +110,7 @@ public class DigestServerAuthenticationHelper  {
             proxyAuthenticate.setParameter("realm", realm);
             proxyAuthenticate.setParameter("qop", "auth");
             proxyAuthenticate.setParameter("nonce", generateNonce());
-            proxyAuthenticate.setParameter("algorithm", DEFAULT_ALGORITHM);
+            proxyAuthenticate.setParameter("algorithm", algorithm);
 
             response.setHeader(proxyAuthenticate);
         } catch (Exception ex) {

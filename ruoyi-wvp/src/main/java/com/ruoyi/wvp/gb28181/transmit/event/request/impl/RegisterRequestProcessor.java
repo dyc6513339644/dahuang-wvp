@@ -30,6 +30,7 @@ import javax.sip.SipException;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -122,19 +123,25 @@ public class RegisterRequestProcessor extends SIPRequestProcessorParent implemen
                 }
                 return;
             }
+            // 检测设备支持的GB28181协议版本
+            int detectedVersion = detectProtocolVersion(request);
+            log.info(title + " 设备：{}, 检测到协议版本: GB28181-{}", deviceId, detectedVersion == 2 ? "2022" : "2016");
+
             String password = (device != null && !ObjectUtils.isEmpty(device.getPassword())) ? device.getPassword() : sipConfig.getPassword();
             AuthorizationHeader authHead = (AuthorizationHeader) request.getHeader(AuthorizationHeader.NAME);
             if (authHead == null && !ObjectUtils.isEmpty(password)) {
                 log.info(title + " 设备：{}, 回复401: {}", deviceId, requestAddress);
                 response = getMessageFactory().createResponse(Response.UNAUTHORIZED, request);
-                new DigestServerAuthenticationHelper().generateChallenge(getHeaderFactory(), response, sipConfig.getDomain());
+                String authAlg = detectedVersion == 2 ? DigestServerAuthenticationHelper.ALGORITHM_SHA256 : DigestServerAuthenticationHelper.ALGORITHM_MD5;
+                new DigestServerAuthenticationHelper(authAlg).generateChallenge(getHeaderFactory(), response, sipConfig.getDomain());
                 sipSender.transmitRequest(request.getLocalAddress().getHostAddress(), response);
                 return;
             }
 
-            // 校验密码是否正确
+            // 校验密码是否正确（根据协议版本选择算法）
+            String authAlg = detectedVersion == 2 ? DigestServerAuthenticationHelper.ALGORITHM_SHA256 : DigestServerAuthenticationHelper.ALGORITHM_MD5;
             passwordCorrect = ObjectUtils.isEmpty(password) ||
-                    new DigestServerAuthenticationHelper().doAuthenticatePlainTextPassword(request, password);
+                    new DigestServerAuthenticationHelper(authAlg).doAuthenticatePlainTextPassword(request, password);
 
             if (!passwordCorrect) {
                 // 注册失败
@@ -167,21 +174,25 @@ public class RegisterRequestProcessor extends SIPRequestProcessorParent implemen
             if (device == null) {
                 device = new Device();
                 device.setStreamMode("TCP-PASSIVE");
-                device.setCharset("GB2312");
+                // GB28181-2022标准强制GB18030字符集，2016版默认GB2312
+                device.setCharset(detectedVersion == 2 ? "GB18030" : "GB2312");
                 device.setGeoCoordSys("WGS84");
                 device.setMediaServerId("auto");
                 device.setDeviceId(deviceId);
                 device.setOnLine(false);
+                device.setProtocolVersion(detectedVersion);
             } else {
                 if (ObjectUtils.isEmpty(device.getStreamMode())) {
                     device.setStreamMode("TCP-PASSIVE");
                 }
                 if (ObjectUtils.isEmpty(device.getCharset())) {
-                    device.setCharset("GB2312");
+                    device.setCharset(detectedVersion == 2 ? "GB18030" : "GB2312");
                 }
                 if (ObjectUtils.isEmpty(device.getGeoCoordSys())) {
                     device.setGeoCoordSys("WGS84");
                 }
+                // 已注册设备更新协议版本（检测到的版本优先）
+                device.setProtocolVersion(detectedVersion);
             }
 
             device.setIp(remoteAddressInfo.getIp());
@@ -216,6 +227,48 @@ public class RegisterRequestProcessor extends SIPRequestProcessorParent implemen
         } catch (SipException | NoSuchAlgorithmException | ParseException e) {
             log.error("未处理的异常 ", e);
         }
+    }
+
+    /**
+     * 检测设备支持的 GB28181 协议版本
+     * 检测途径（按优先级）:
+     * 1. X-GB-Ver 自定义SIP头（参考 wvp 兼容实现，3.0=2022版，2.0=2016版）
+     * 2. User-Agent 头中的版本标识
+     * 3. Contact 头中的扩展参数
+     * 4. 默认 2016（兼容未知设备）
+     */
+    private int detectProtocolVersion(SIPRequest request) {
+        // 1. X-GB-Ver 头（2022版设备显式声明）
+        javax.sip.header.Header verHeader = request.getHeader("X-GB-Ver");
+        if (verHeader != null) {
+            String verValue = verHeader.toString().trim();
+            int idx = verValue.indexOf(':');
+            if (idx >= 0) {
+                String ver = verValue.substring(idx + 1).trim();
+                if ("3.0".equals(ver) || "2022".equals(ver)) {
+                    log.info("检测到 X-GB-Ver 头: {}, 判定为GB28181-2022设备", ver);
+                    return 2;
+                }
+            }
+        }
+
+        // 2. User-Agent 头
+        UserAgentHeader userAgentHeader = (UserAgentHeader) request.getHeader(UserAgentHeader.NAME);
+        if (userAgentHeader != null) {
+            String ua = userAgentHeader.toString().toLowerCase();
+            if (ua.contains("gb28181-2022") || ua.contains("gb/t 28181-2022") || ua.contains("gb28181 2022")) {
+                return 2;
+            }
+        }
+
+        // 3. Contact 头中的扩展参数
+        ContactHeader contactHeader = (ContactHeader) request.getHeader(ContactHeader.NAME);
+        if (contactHeader != null && contactHeader.toString().contains("version=2")) {
+            return 2;
+        }
+
+        // 4. 默认 2016
+        return 1;
     }
 
     private Response getRegisterOkResponse(Request request) throws ParseException {

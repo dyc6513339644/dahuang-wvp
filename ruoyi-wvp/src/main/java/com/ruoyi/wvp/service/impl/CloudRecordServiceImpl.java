@@ -5,6 +5,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ruoyi.common.exception.ControllerException;
+import com.ruoyi.system.config.SslConfig;
+import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.gb28181.service.ICloudRecordService;
 import com.ruoyi.wvp.mapper.CloudRecordServiceMapper;
 import com.ruoyi.wvp.media.bean.MediaServer;
@@ -49,6 +51,12 @@ public class CloudRecordServiceImpl implements ICloudRecordService {
 
     @Autowired
     private AssistRESTfulUtils assistRESTfulUtils;
+
+    @Autowired
+    private StreamUrlHelper streamUrlHelper;
+
+    @Autowired
+    private SslConfig sslConfig;
 
     @Override
     public List<CloudRecordItem> getList(int pageNum, int pageSize, String query, String app, String stream, String startTime, String endTime, List<MediaServer> mediaServerItems, String callId) {
@@ -243,7 +251,9 @@ public class CloudRecordServiceImpl implements ICloudRecordService {
         }
         String filePath = recordItem.getFilePath();
         MediaServer mediaServerItem = mediaServerService.getOne(recordItem.getMediaServerId());
-        return CloudRecordUtils.getDownloadFilePath(mediaServerItem, filePath);
+        DownloadFileInfo info = CloudRecordUtils.getDownloadFilePath(mediaServerItem, filePath);
+        CloudRecordUtils.fillNginxDomainPaths(info, mediaServerItem, filePath, sslConfig.getAccessDomain());
+        return info;
     }
 
     @Override

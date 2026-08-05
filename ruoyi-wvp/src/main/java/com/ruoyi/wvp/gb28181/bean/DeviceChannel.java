@@ -229,6 +229,21 @@ public class DeviceChannel extends CommonGBChannel {
     private Integer svcTimeSupportMode;
 
     /**
+     * 国标-2022: 智能分析能力编码
+     * 取值: 空/0-不支持; 1-人脸检测; 2-人脸识别; 3-车辆检测; 4-车辆识别;
+     * 5-人体检测; 6-行为分析; 7-物品检测; 8-人群密度; 9-目标跟踪
+     * 可为组合，如 "1,3,5" 表示支持人脸检测+车辆检测+人体检测
+     */
+    @MessageElementForCatalog("Info.SmartAnalysisCode")
+    private String smartAnalysisCode;
+
+    /**
+     * 国标-2022: 增强云台能力
+     */
+    @MessageElementForCatalog("Info.EnhancedPtzCap")
+    private Integer enhancedPtzCap;
+
+    /**
      * 国标-云台类型描述字符串
      */
     private String ptzTypeText;

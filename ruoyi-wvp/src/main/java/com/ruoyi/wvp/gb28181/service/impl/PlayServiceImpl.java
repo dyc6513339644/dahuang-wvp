@@ -9,7 +9,9 @@ import com.ruoyi.wvp.common.InviteInfo;
 import com.ruoyi.wvp.common.InviteSessionStatus;
 import com.ruoyi.wvp.common.InviteSessionType;
 import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.common.VideoManagerConstants;
+import com.ruoyi.system.config.SslConfig;
 import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
@@ -101,6 +103,12 @@ public class PlayServiceImpl implements IPlayService {
 
     @Autowired
     private UserSetting userSetting;
+
+    @Autowired
+    private StreamUrlHelper streamUrlHelper;
+
+    @Autowired
+    private SslConfig sslConfig;
 
     @Autowired
     private IDeviceChannelService deviceChannelService;
@@ -1055,6 +1063,7 @@ public class PlayServiceImpl implements IPlayService {
                             RecordInfo recordInfo = hookData.getRecordInfo();
                             String filePath = recordInfo.getFilePath();
                             DownloadFileInfo downloadFileInfo = CloudRecordUtils.getDownloadFilePath(mediaServerItem, filePath);
+                            CloudRecordUtils.fillNginxDomainPaths(downloadFileInfo, mediaServerItem, filePath, sslConfig.getAccessDomain());
                             InviteInfo inviteInfoForNew = inviteStreamService.getInviteInfo(inviteInfo.getType()
                                     , inviteInfo.getChannelId(), inviteInfo.getStream());
                             if (inviteInfoForNew != null && inviteInfoForNew.getStreamInfo() != null) {
@@ -1102,6 +1111,7 @@ public class PlayServiceImpl implements IPlayService {
                 }
                 log.warn("[获取下载进度] 发现下载已经结束，直接从数据库获取到文件 {}/{}-{}", device.getDeviceId(), channel.getDeviceId(), stream);
                 DownloadFileInfo downloadFileInfo = CloudRecordUtils.getDownloadFilePath(mediaServer, filePath);
+                CloudRecordUtils.fillNginxDomainPaths(downloadFileInfo, mediaServer, filePath, sslConfig.getAccessDomain());
                 StreamInfo streamInfo = new StreamInfo();
                 streamInfo.setDownLoadFilePath(downloadFileInfo);
                 streamInfo.setApp(app);
@@ -1235,7 +1245,9 @@ public class PlayServiceImpl implements IPlayService {
         AudioBroadcastResult audioBroadcastResult = new AudioBroadcastResult();
         audioBroadcastResult.setApp(app);
         audioBroadcastResult.setStream(stream);
-        audioBroadcastResult.setStreamInfo(new StreamContent(mediaServerService.getStreamInfoByAppAndStream(mediaServerItem, app, stream, null, null, null, false)));
+        StreamInfo streamInfo = mediaServerService.getStreamInfoByAppAndStream(mediaServerItem, app, stream, null, null, null, false);
+        streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, mediaServerItem);
+        audioBroadcastResult.setStreamInfo(new StreamContent(streamInfo));
         audioBroadcastResult.setCodec("G.711");
         return audioBroadcastResult;
     }

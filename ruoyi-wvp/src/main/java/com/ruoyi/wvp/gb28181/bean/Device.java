@@ -159,6 +159,13 @@ public class Device extends WvpBaseEntity {
     private String charset;
 
     /**
+     * GB/T 28181 协议版本
+     * 1=GB28181-2016, 2=GB28181-2022
+     * 默认 1（兼容未知设备）
+     */
+    private Integer protocolVersion = 1;
+
+    /**
      * 目录订阅周期，0为不订阅
      */
     private int subscribeCycleForCatalog;

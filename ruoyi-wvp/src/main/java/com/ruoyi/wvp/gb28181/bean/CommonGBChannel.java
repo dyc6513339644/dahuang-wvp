@@ -213,6 +213,16 @@ public class CommonGBChannel {
     private Integer gbSvcTimeSupportMode;
 
     /**
+     * 国标-2022: 智能分析能力编码
+     */
+    private String gbSmartAnalysisCode;
+
+    /**
+     * 国标-2022: 增强云台能力
+     */
+    private Integer gbEnhancedPtzCap;
+
+    /**
      * 二进制保存的录制计划, 每一位表示每个小时的前半个小时
      */
     private Long recordPLan;
@@ -438,6 +448,12 @@ public class CommonGBChannel {
                 }
                 if (this.getGbSvcTimeSupportMode() != null) {
                     content.append("  <SVCTimeSupportMode>" + this.getGbSvcTimeSupportMode() + "</SVCTimeSupportMode>\n");
+                }
+                if (this.getGbSmartAnalysisCode() != null && !this.getGbSmartAnalysisCode().isEmpty()) {
+                    content.append("  <SmartAnalysisCode>" + this.getGbSmartAnalysisCode() + "</SmartAnalysisCode>\n");
+                }
+                if (this.getGbEnhancedPtzCap() != null) {
+                    content.append("  <EnhancedPtzCap>" + this.getGbEnhancedPtzCap() + "</EnhancedPtzCap>\n");
                 }
                 content.append("</Info>\n");
             }

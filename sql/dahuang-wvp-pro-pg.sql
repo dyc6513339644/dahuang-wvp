@@ -1870,6 +1870,7 @@ CACHE 1
   "del_flag" char(1) COLLATE "pg_catalog"."default" DEFAULT '0'::bpchar,
   "login_ip" text COLLATE "pg_catalog"."default" DEFAULT ''::text,
   "login_date" timestamp(6),
+  "pwd_update_date" timestamp(6),
   "push_key" text COLLATE "pg_catalog"."default",
   "create_by" text COLLATE "pg_catalog"."default" DEFAULT ''::text,
   "create_time" timestamp(6),
@@ -1892,6 +1893,7 @@ COMMENT ON COLUMN "public"."sys_user"."status" IS '帐号状态（0正常 1停�
 COMMENT ON COLUMN "public"."sys_user"."del_flag" IS '删除标志（0代表存在 2代表删除）';
 COMMENT ON COLUMN "public"."sys_user"."login_ip" IS '最后登录IP';
 COMMENT ON COLUMN "public"."sys_user"."login_date" IS '最后登录时间';
+COMMENT ON COLUMN "public"."sys_user"."pwd_update_date" IS '密码最后更新时间';
 COMMENT ON COLUMN "public"."sys_user"."create_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_user"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_user"."update_by" IS '更新者';
@@ -2472,7 +2474,10 @@ CREATE TABLE "public"."wvp_media_server" (
   "hook_alive_interval" int4,
   "record_path" text COLLATE "pg_catalog"."default",
   "record_day" int4 DEFAULT 7,
-  "transcode_suffix" text COLLATE "pg_catalog"."default"
+  "transcode_suffix" text COLLATE "pg_catalog"."default",
+  "nginx_proxy_enabled" bool DEFAULT false,
+  "nginx_http_port" int4,
+  "nginx_https_port" int4
 )
 ;
 

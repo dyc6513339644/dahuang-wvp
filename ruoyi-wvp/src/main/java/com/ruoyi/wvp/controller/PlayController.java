@@ -6,6 +6,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.wvp.common.InviteSessionType;
 import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.Device;
@@ -93,6 +94,9 @@ public class PlayController extends BaseController {
     @Autowired
     private IGbChannelService gbChannelService;
 
+    @Autowired
+    private StreamUrlHelper streamUrlHelper;
+
     /**
      * 播放视频
      *
@@ -159,7 +163,8 @@ public class PlayController extends BaseController {
                 wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
 
                 if (streamInfo != null) {
-                    if (userSetting.getUseSourceIpAsStreamIp()) {
+                    streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, newMediaServerItem);
+                    if (userSetting.getUseSourceIpAsStreamIp() && !newMediaServerItem.isNginxProxyEnabled()) {
                         streamInfo = streamInfo.clone();//深拷贝
                         String host;
                         try {
@@ -208,16 +213,20 @@ public class PlayController extends BaseController {
                 wvpResult.setCode(ErrorCode.SUCCESS.getCode());
                 wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
                 if (streamInfo != null) {
+                    streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, streamInfo.getMediaServer());
                     if (userSetting.getUseSourceIpAsStreamIp()) {
-                        streamInfo = streamInfo.clone();
-                        String host;
-                        try {
-                            URL url = new URL(request.getRequestURL().toString());
-                            host = url.getHost();
-                        } catch (MalformedURLException e) {
-                            host = request.getLocalAddr();
+                        MediaServer ms = streamInfo.getMediaServer();
+                        if (ms == null || !ms.isNginxProxyEnabled()) {
+                            streamInfo = streamInfo.clone();
+                            String host;
+                            try {
+                                URL url = new URL(request.getRequestURL().toString());
+                                host = url.getHost();
+                            } catch (MalformedURLException e) {
+                                host = request.getLocalAddr();
+                            }
+                            streamInfo.channgeStreamIp(host);
                         }
-                        streamInfo.channgeStreamIp(host);
                     }
                     wvpResult.setData(new StreamContent(streamInfo));
                 } else {
@@ -253,16 +262,20 @@ public class PlayController extends BaseController {
                 wvpResult.setCode(ErrorCode.SUCCESS.getCode());
                 wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
                 if (streamInfo != null) {
+                    streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, streamInfo.getMediaServer());
                     if (userSetting.getUseSourceIpAsStreamIp()) {
-                        streamInfo = streamInfo.clone();
-                        String host;
-                        try {
-                            URL url = new URL(request.getRequestURL().toString());
-                            host = url.getHost();
-                        } catch (MalformedURLException e) {
-                            host = request.getLocalAddr();
+                        MediaServer ms = streamInfo.getMediaServer();
+                        if (ms == null || !ms.isNginxProxyEnabled()) {
+                            streamInfo = streamInfo.clone();
+                            String host;
+                            try {
+                                URL url = new URL(request.getRequestURL().toString());
+                                host = url.getHost();
+                            } catch (MalformedURLException e) {
+                                host = request.getLocalAddr();
+                            }
+                            streamInfo.channgeStreamIp(host);
                         }
-                        streamInfo.channgeStreamIp(host);
                     }
                     wvpResult.setData(new StreamContent(streamInfo));
                 } else {
@@ -334,7 +347,8 @@ public class PlayController extends BaseController {
         WVPResult<StreamContent> wvpResult = new WVPResult<>();
         wvpResult.setCode(ErrorCode.SUCCESS.getCode());
         wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
-        if (userSetting.getUseSourceIpAsStreamIp()) {
+        streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, mediaServer);
+        if (userSetting.getUseSourceIpAsStreamIp() && !mediaServer.isNginxProxyEnabled()) {
             streamInfo = streamInfo.clone();
             String host;
             try {

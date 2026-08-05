@@ -387,6 +387,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public int resetPwd(SysUser user)
     {
+        user.setPwdUpdateDate(new Date());
         user.setUpdateTime(new Date());
         return userMapper.updateById(user);
     }
@@ -403,6 +404,7 @@ public class SysUserServiceImpl implements ISysUserService
     {
         UpdateWrapper<SysUser> wrapper = new UpdateWrapper<>();
         wrapper.set("password", password);
+        wrapper.set("pwd_update_date", new Date());
         wrapper.eq("user_name", userName);
         return userMapper.update(null, wrapper);
     }
