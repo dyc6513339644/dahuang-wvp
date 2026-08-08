@@ -8,6 +8,7 @@
 ## 平台介绍
 
 dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016，兼容2022视频平台，保留版权的情况下可以用于商业项目。重点对前端UI进行升级优化
+* 最新更新已GITEE为准
 * 演示地址
   https://wvp.zgdahuan.com/
    账号：admin
@@ -17,6 +18,15 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016，兼
   https://my.feishu.cn/wiki/VAAgwKRMkiMJ2dkBIWDcu7HKneb?from=from_copylink
 ## 最近更新
 
+
+
+v2.0.1 （2026-08-08）
+* 修复国标设备编辑时，订阅配置变更时自动触发SIP订阅同步
+* 新增地图配置与Logo配置的增删改查接口及缓存刷新机制
+* 移动位置消费改为"先读后删"模式，确保DB写入失败不丢数据
+* 统一使用MD5算法进行GB28181设备注册认证
+* 移除大屏统计接口的匿名访问注解
+* 其他已知小BUG
 
 v2.0.0 （2026-08-05）
 * 1.全面兼容GB28181-2022
