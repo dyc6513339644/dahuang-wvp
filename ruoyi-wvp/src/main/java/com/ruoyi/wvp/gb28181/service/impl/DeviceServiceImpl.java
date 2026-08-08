@@ -18,6 +18,7 @@ import com.ruoyi.wvp.gb28181.session.SipInviteSessionManager;
 import com.ruoyi.wvp.gb28181.task.ISubscribeTask;
 import com.ruoyi.wvp.gb28181.task.impl.CatalogSubscribeTask;
 import com.ruoyi.wvp.gb28181.task.impl.MobilePositionSubscribeTask;
+import com.ruoyi.wvp.gb28181.task.impl.AlarmSubscribeTask;
 import com.ruoyi.wvp.gb28181.transmit.cmd.ISIPCommander;
 import com.ruoyi.wvp.gb28181.transmit.event.request.impl.message.response.cmd.CatalogResponseMessageHandler;
 import com.ruoyi.wvp.mapper.DeviceChannelMapper;
@@ -170,6 +171,9 @@ public class DeviceServiceImpl implements IDeviceService {
                 if (device.getSubscribeCycleForMobilePosition() > 0) {
                     addMobilePositionSubscribe(device);
                 }
+                if (device.getSubscribeCycleForAlarm() > 0) {
+                    addAlarmSubscribe(device);
+                }
                 if (userSetting.getDeviceStatusNotify()) {
                     // 发送redis消息
                     redisCatchStorage.sendDeviceOrChannelStatus(device.getDeviceId(), null, true);
@@ -231,6 +235,7 @@ public class DeviceServiceImpl implements IDeviceService {
         // 移除订阅
         removeCatalogSubscribe(device, null);
         removeMobilePositionSubscribe(device, null);
+        removeAlarmSubscribe(device, null);
 
         List<AudioBroadcastCatch> audioBroadcastCatches = audioBroadcastManager.getByDeviceId(deviceId);
         if (!audioBroadcastCatches.isEmpty()) {
@@ -329,7 +334,7 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Override
     public boolean removeMobilePositionSubscribe(Device device, CommonCallback<Boolean> callback) {
-        if (device == null || device.getSubscribeCycleForCatalog() < 0) {
+        if (device == null || device.getSubscribeCycleForMobilePosition() < 0) {
             if (callback != null) {
                 callback.run(false);
             }
@@ -399,6 +404,97 @@ public class DeviceServiceImpl implements IDeviceService {
             String errorMsg = String.format("同步通道失败，信令发送失败： %s", e.getMessage());
             catalogResponseMessageHandler.setChannelSyncEnd(device.getDeviceId(), sn, errorMsg);
         }
+    }
+
+    /**
+     * 开启/关闭报警订阅
+     *
+     * @param id    设备ID
+     * @param cycle 订阅周期，0为取消订阅
+     */
+    @Override
+    public void subscribeAlarm(int id, int cycle) {
+        Device device = deviceMapper.query(id);
+        Assert.notNull(device, "未找到设备");
+        if (!isGB28181Protocol(device)) {
+            throw new ControllerException(ErrorCode.ERROR400.getCode(), "非国标设备不支持报警订阅");
+        }
+        if (device.getSubscribeCycleForAlarm() == cycle) {
+            return;
+        }
+
+        if (device.getSubscribeCycleForAlarm() > 0) {
+            // 订阅周期不同，则先取消
+            removeAlarmSubscribe(device, result -> {
+                device.setSubscribeCycleForAlarm(cycle);
+                if (cycle > 0) {
+                    addAlarmSubscribe(device);
+                }
+                deviceMapper.updateSubscribeAlarm(device);
+                redisCatchStorage.updateDevice(device);
+            });
+        } else {
+            // 开启订阅
+            device.setSubscribeCycleForAlarm(cycle);
+            addAlarmSubscribe(device);
+            deviceMapper.updateSubscribeAlarm(device);
+            redisCatchStorage.updateDevice(device);
+        }
+    }
+
+    @Override
+    public boolean addAlarmSubscribe(Device device) {
+        if (device == null || device.getSubscribeCycleForAlarm() < 0) {
+            return false;
+        }
+        if (!isGB28181Protocol(device)) {
+            log.info("[添加报警订阅] 非国标设备，跳过: {}", device.getDeviceId());
+            return false;
+        }
+        log.info("[添加报警订阅] 设备{}", device.getDeviceId());
+        AlarmSubscribeTask alarmSubscribeTask = new AlarmSubscribeTask(device, sipCommander, dynamicTask);
+        int cycle = Math.max(device.getSubscribeCycleForAlarm(), 30);
+        dynamicTask.startCron(device.getDeviceId() + "alarm", alarmSubscribeTask, (cycle - 1) * 1000);
+        alarmSubscribeTask.run();
+        return true;
+    }
+
+    @Override
+    public boolean removeAlarmSubscribe(Device device, CommonCallback<Boolean> callback) {
+        if (device == null || device.getSubscribeCycleForAlarm() < 0) {
+            if (callback != null) {
+                callback.run(false);
+            }
+            return false;
+        }
+        if (!isGB28181Protocol(device)) {
+            log.info("[移除报警订阅] 非国标设备，跳过: {}", device.getDeviceId());
+            if (callback != null) {
+                callback.run(false);
+            }
+            return false;
+        }
+        log.info("[移除报警订阅]: {}", device.getDeviceId());
+        String taskKey = device.getDeviceId() + "alarm";
+        if (device.isOnLine()) {
+            Runnable runnable = dynamicTask.get(taskKey);
+            if (runnable instanceof ISubscribeTask) {
+                ISubscribeTask subscribeTask = (ISubscribeTask) runnable;
+                subscribeTask.stop(callback);
+            } else {
+                log.info("[移除报警订阅]失败，未找到订阅任务 : {}", device.getDeviceId());
+                if (callback != null) {
+                    callback.run(false);
+                }
+            }
+        } else {
+            log.info("[移除报警订阅]失败，设备已经离线 : {}", device.getDeviceId());
+            if (callback != null) {
+                callback.run(false);
+            }
+        }
+        dynamicTask.stop(taskKey);
+        return true;
     }
 
     @Override

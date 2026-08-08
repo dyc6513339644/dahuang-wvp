@@ -29,7 +29,7 @@ public class SysLargeController extends BaseController {
      *
      * @return
      */
-    @Anonymous
+
     @GetMapping("/countDeviceNum")
     public AjaxResult countDeviceNum(){
         return success(sysLargeService.countDeviceNum());
@@ -40,7 +40,7 @@ public class SysLargeController extends BaseController {
      *
      * @return
      */
-    @Anonymous
+
     @GetMapping("/countGbNum")
     public AjaxResult countGbNum() {
         return success(sysLargeService.countGbNum());
@@ -51,7 +51,7 @@ public class SysLargeController extends BaseController {
      *
      * @return
      */
-    @Anonymous
+
     @GetMapping("/leftGbDevice")
     public AjaxResult leftGbDevice() {
         return success(sysLargeService.leftGbDevice());

@@ -20,7 +20,7 @@ public class UserSetting {
     /**
      * 是否保存位置的历史记录(轨迹)
      */
-    private Boolean savePositionHistory = Boolean.FALSE;
+    private Boolean savePositionHistory = Boolean.TRUE;
 
     /**
      * 是否开始自动点播: 请求流为未拉起的流时,自动开启点播, 需要rtp.enable=true

@@ -271,6 +271,13 @@ public interface DeviceMapper {
     void updateSubscribeCatalog(Device device);
 
     /**
+     * 更新报警订阅
+     *
+     * @param device
+     */
+    void updateSubscribeAlarm(Device device);
+
+    /**
      * 修改设备信息
      *
      * @param device

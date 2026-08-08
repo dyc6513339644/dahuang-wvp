@@ -27,6 +27,14 @@ public interface ISysConfigService
     public String selectConfigByKey(String configKey);
 
     /**
+     * 根据键名查询完整参数配置对象
+     * 
+     * @param configKey 参数键名
+     * @return 参数配置对象（含configId），不存在返回null
+     */
+    public SysConfig selectConfigObjByKey(String configKey);
+
+    /**
      * 获取验证码开关
      * 
      * @return true开启，false关闭

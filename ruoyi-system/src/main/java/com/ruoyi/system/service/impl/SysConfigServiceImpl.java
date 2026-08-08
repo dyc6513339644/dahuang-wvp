@@ -83,6 +83,20 @@ public class SysConfigServiceImpl implements ISysConfigService
     }
 
     /**
+     * 根据键名查询完整参数配置对象（含configId）
+     * 
+     * @param configKey 参数key
+     * @return 参数配置对象，不存在返回null
+     */
+    @Override
+    public SysConfig selectConfigObjByKey(String configKey)
+    {
+        QueryWrapper<SysConfig> wrapper = new QueryWrapper<>();
+        wrapper.eq("config_key", configKey);
+        return configMapper.selectOne(wrapper);
+    }
+
+    /**
      * 获取验证码开关
      * 
      * @return true开启，false关闭

@@ -17,7 +17,6 @@ import com.ruoyi.wvp.gb28181.service.IGbChannelService;
 import com.ruoyi.wvp.gb28181.service.IDeviceService;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
 import com.ruoyi.wvp.gb28181.task.ISubscribeTask;
-import com.ruoyi.wvp.mapper.DeviceMapper;
 import com.ruoyi.wvp.service.IUserChannelService;
 import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
@@ -248,6 +247,7 @@ public class UnifiedDeviceController extends BaseController {
 
     /**
      * 统一设备更新 — 支持所有协议类型
+     * 当修改国标设备的订阅配置时，自动触发 SIP 订阅的开启/关闭
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:edit')")
     @PostMapping("/update")
@@ -255,13 +255,28 @@ public class UnifiedDeviceController extends BaseController {
         if (device.getId() == null) {
             return error("设备ID不能为空");
         }
+
+        // 保存更新前的国标设备状态，用于比对订阅变更
+        Device oldGbDevice = null;
+        Long deviceId = device.getId();
+        Device dbDevice = deviceService.getDevice(deviceId.intValue());
+        if (dbDevice != null && "GB28181".equals(dbDevice.getProtocolType())) {
+            oldGbDevice = deviceService.getDevice(deviceId.intValue());
+        }
+
         deviceOnvifService.updateDeviceOnvif(device);
 
         // 根据 DB 中实际协议类型分发特殊处理
-        Device dbDevice = deviceService.getDevice(device.getId().intValue());
         if (dbDevice != null) {
             if ("GB28181".equals(dbDevice.getProtocolType())) {
-                redisCatchStorage.updateDevice(dbDevice);
+                // 重新读取更新后的设备信息同步到 Redis
+                Device updatedDevice = deviceService.getDevice(deviceId.intValue());
+                redisCatchStorage.updateDevice(updatedDevice);
+
+                // 同步订阅状态变更：对比更新前后的 subscribeCycle 值
+                if (oldGbDevice != null) {
+                    syncSubscriptionChanges(device, oldGbDevice, deviceId);
+                }
             }
             if ("STREAM_PUSH".equals(dbDevice.getProtocolType()) && device.getName() != null) {
                 StreamPush sp = new StreamPush();
@@ -271,6 +286,47 @@ public class UnifiedDeviceController extends BaseController {
             }
         }
         return success();
+    }
+
+    /**
+     * 对比更新前后的订阅配置，变化时触发实际的 SIP 订阅开关
+     */
+    private void syncSubscriptionChanges(DeviceOnvif newDevice, Device oldGbDevice, Long deviceId) {
+        Boolean newCatalogCycle = newDevice.getSubscribeCycleForCatalog();
+        Boolean newAlarmCycle = newDevice.getSubscribeCycleForAlarm();
+        Boolean newMobilePosCycle = newDevice.getSubscribeCycleForMobilePosition();
+        Integer newMobilePosInterval = newDevice.getMobilePositionSubmissionInterval();
+
+        // 目录订阅：Boolean(true=开启, false=关闭)
+        if (newCatalogCycle != null) {
+            int cycle = newCatalogCycle ? 1 : 0;
+            if (cycle != oldGbDevice.getSubscribeCycleForCatalog()) {
+                log.info("[统一更新] 目录订阅变更: deviceId={}, {} -> {}", deviceId,
+                        oldGbDevice.getSubscribeCycleForCatalog(), cycle);
+                deviceService.subscribeCatalog(deviceId.intValue(), cycle);
+            }
+        }
+
+        // 移动位置订阅
+        if (newMobilePosCycle != null) {
+            int cycle = newMobilePosCycle ? 1 : 0;
+            if (cycle != oldGbDevice.getSubscribeCycleForMobilePosition()) {
+                int interval = newMobilePosInterval != null ? newMobilePosInterval : oldGbDevice.getMobilePositionSubmissionInterval();
+                log.info("[统一更新] 移动位置订阅变更: deviceId={}, {} -> {}", deviceId,
+                        oldGbDevice.getSubscribeCycleForMobilePosition(), cycle);
+                deviceService.subscribeMobilePosition(deviceId.intValue(), cycle, interval);
+            }
+        }
+
+        // 报警订阅
+        if (newAlarmCycle != null) {
+            int cycle = newAlarmCycle ? 1 : 0;
+            if (cycle != oldGbDevice.getSubscribeCycleForAlarm()) {
+                log.info("[统一更新] 报警订阅变更: deviceId={}, {} -> {}", deviceId,
+                        oldGbDevice.getSubscribeCycleForAlarm(), cycle);
+                deviceService.subscribeAlarm(deviceId.intValue(), cycle);
+            }
+        }
     }
 
 

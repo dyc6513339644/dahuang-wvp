@@ -132,16 +132,17 @@ public class RegisterRequestProcessor extends SIPRequestProcessorParent implemen
             if (authHead == null && !ObjectUtils.isEmpty(password)) {
                 log.info(title + " 设备：{}, 回复401: {}", deviceId, requestAddress);
                 response = getMessageFactory().createResponse(Response.UNAUTHORIZED, request);
-                String authAlg = detectedVersion == 2 ? DigestServerAuthenticationHelper.ALGORITHM_SHA256 : DigestServerAuthenticationHelper.ALGORITHM_MD5;
-                new DigestServerAuthenticationHelper(authAlg).generateChallenge(getHeaderFactory(), response, sipConfig.getDomain());
+                // 统一使用MD5（兼容GB28181-2022设备，大部分设备厂商仍未实现SHA-256）
+                new DigestServerAuthenticationHelper(DigestServerAuthenticationHelper.ALGORITHM_MD5)
+                        .generateChallenge(getHeaderFactory(), response, sipConfig.getDomain());
                 sipSender.transmitRequest(request.getLocalAddress().getHostAddress(), response);
                 return;
             }
 
-            // 校验密码是否正确（根据协议版本选择算法）
-            String authAlg = detectedVersion == 2 ? DigestServerAuthenticationHelper.ALGORITHM_SHA256 : DigestServerAuthenticationHelper.ALGORITHM_MD5;
+            // 校验密码是否正确（统一使用MD5，兼容GB28181-2022设备）
             passwordCorrect = ObjectUtils.isEmpty(password) ||
-                    new DigestServerAuthenticationHelper(authAlg).doAuthenticatePlainTextPassword(request, password);
+                    new DigestServerAuthenticationHelper(DigestServerAuthenticationHelper.ALGORITHM_MD5)
+                            .doAuthenticatePlainTextPassword(request, password);
 
             if (!passwordCorrect) {
                 // 注册失败

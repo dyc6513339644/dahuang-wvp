@@ -103,6 +103,12 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateSubscribeAlarm">
+        UPDATE wvp_device
+        SET subscribe_cycle_for_alarm = #{subscribeCycleForAlarm}
+        WHERE id = #{id}
+    </update>
+
     <select id="getOnlineDevices" resultMap="DeviceResult">
         SELECT de.id,
                de.dept_id,

@@ -21,6 +21,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.RequestEvent;
+import java.util.List;
 import javax.sip.SipException;
 import javax.sip.message.Response;
 import java.text.ParseException;
@@ -78,8 +79,19 @@ public class MobilePositionNotifyMessageHandler extends SIPRequestProcessorParen
                         String channelId = getText(rootElementAfterCharset, "DeviceID");
                         DeviceChannel deviceChannel = deviceChannelService.getOne(device.getDeviceId(), channelId);
                         if (deviceChannel == null) {
-                            log.warn("[解析报警消息] 未找到通道：{}/{}", device.getDeviceId(), channelId);
-                            continue;
+                            if (channelId.equals(device.getDeviceId())) {
+                                // DeviceID等于设备ID，取设备下首个通道
+                                List<DeviceChannel> channels = deviceChannelService.queryChaneListByDeviceId(device.getDeviceId());
+                                if (channels != null && !channels.isEmpty()) {
+                                    deviceChannel = channels.get(0);
+                                } else {
+                                    log.warn("[移动位置通知] 设备下无通道 {}", device.getDeviceId());
+                                    continue;
+                                }
+                            } else {
+                                log.warn("[移动位置通知] 未找到通道：{}/{}", device.getDeviceId(), channelId);
+                                continue;
+                            }
                         }
 
                         MobilePosition mobilePosition = new MobilePosition();

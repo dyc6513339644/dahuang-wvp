@@ -107,7 +107,17 @@ public class NotifyRequestForMobilePositionProcessor extends SIPRequestProcessor
 							deviceChannel = deviceChannelService.getOne(device.getDeviceId(), channelId);
 							if (deviceChannel != null) {
 								mobilePosition.setChannelId(deviceChannel.getId());
-							}else {
+							} else if (channelId.equals(device.getDeviceId())) {
+								// DeviceID等于设备ID，设备汇报自身位置而非特定通道，取设备下首个通道
+								List<DeviceChannel> channels = deviceChannelService.queryChaneListByDeviceId(device.getDeviceId());
+								if (channels != null && !channels.isEmpty()) {
+									deviceChannel = channels.get(0);
+									mobilePosition.setChannelId(deviceChannel.getId());
+								} else {
+									log.error("[notify-移动位置] 设备下无通道 {}", device.getDeviceId());
+									break readDocument;
+								}
+							} else {
 								log.error("[notify-移动位置] 未找到通道 {}/{}", device.getDeviceId(), channelId);
 								break readDocument;
 							}

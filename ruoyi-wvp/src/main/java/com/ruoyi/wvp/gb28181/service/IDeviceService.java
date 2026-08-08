@@ -209,5 +209,30 @@ public interface IDeviceService {
      */
     void subscribeMobilePosition(int id, int cycle, int interval);
 
+    /**
+     * 开启/关闭报警订阅
+     *
+     * @param id    设备ID
+     * @param cycle 订阅周期，0为取消订阅
+     */
+    void subscribeAlarm(int id, int cycle);
+
+    /**
+     * 添加报警订阅
+     *
+     * @param device 设备信息
+     * @return 布尔
+     */
+    boolean addAlarmSubscribe(Device device);
+
+    /**
+     * 移除报警订阅
+     *
+     * @param device   设备信息
+     * @param callback 回调
+     * @return 布尔
+     */
+    boolean removeAlarmSubscribe(Device device, CommonCallback<Boolean> callback);
+
     void updateDeviceHeartInfo(Device device);
 }

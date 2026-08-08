@@ -448,7 +448,7 @@ public interface DeviceChannelMapper {
             "<if test='item.id == 0'>WHERE data_type = #{item.dataType} and data_device_id=#{item.dataDeviceId} AND device_id=#{item.deviceId}</if>" +
             "</foreach>" +
             "</script>"})
-    void batchUpdatePosition(List<DeviceChannel> channelList);
+    void batchUpdatePosition(@Param("channelList") List<DeviceChannel> channelList);
 
     @SelectProvider(type = DeviceChannelProvider.class, method = "getOne")
     DeviceChannel getOne(@Param("id") int id);

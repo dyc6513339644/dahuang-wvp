@@ -14,6 +14,7 @@ import com.ruoyi.wvp.utils.DateUtil;
 import com.ruoyi.common.enums.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,7 @@ public class AlarmController {
      * @param time 结束时间(这个时间之前的报警会被删除)
      * @return
      */
+    @PreAuthorize("@ss.hasPermi('wvp:alarm:remove')")
     @DeleteMapping("/delete")
     public Integer delete(
             @RequestParam(required = false) Integer id,
@@ -135,6 +137,7 @@ public class AlarmController {
      * @param endTime 结束时间
      * @return
      */
+    @PreAuthorize("@ss.hasPermi('wvp:alarm:list')")
     @GetMapping("/all")
     public PageInfo<DeviceAlarm> getAll(
             @RequestParam int page,
