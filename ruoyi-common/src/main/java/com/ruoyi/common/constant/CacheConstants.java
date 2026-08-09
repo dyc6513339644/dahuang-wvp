@@ -51,4 +51,9 @@ public class CacheConstants
      * goview工作台数据 redis key
      */
     public static final String SYS_GOVIEW_WORK_LIST = "sys_goview_work_list:";
+
+    /**
+     * SIP 设备黑名单 redis key
+     */
+    public static final String SIP_BLACK_KEY = "wvp_sip_black:";
 }

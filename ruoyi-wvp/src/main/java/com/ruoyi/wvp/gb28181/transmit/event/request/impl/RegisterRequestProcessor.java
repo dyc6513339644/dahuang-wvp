@@ -13,6 +13,7 @@ import com.ruoyi.wvp.gb28181.transmit.SIPSender;
 import com.ruoyi.wvp.gb28181.transmit.event.request.ISIPRequestProcessor;
 import com.ruoyi.wvp.gb28181.transmit.event.request.SIPRequestProcessorParent;
 import com.ruoyi.wvp.gb28181.utils.SipUtils;
+import com.ruoyi.wvp.service.ISipBlackService;
 import com.ruoyi.wvp.utils.DateUtil;
 import gov.nist.javax.sip.address.AddressImpl;
 import gov.nist.javax.sip.address.SipUri;
@@ -63,6 +64,9 @@ public class RegisterRequestProcessor extends SIPRequestProcessorParent implemen
     @Autowired
     private UserSetting userSetting;
 
+    @Autowired
+    private ISipBlackService sipBlackService;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         // 添加消息处理的订阅
@@ -91,13 +95,25 @@ public class RegisterRequestProcessor extends SIPRequestProcessorParent implemen
             SipUri uri = (SipUri) address.getURI();
             String deviceId = uri.getUser();
 
-            Device device = deviceService.getDeviceByDeviceId(deviceId);
-
             RemoteAddressInfo remoteAddressInfo = SipUtils.getRemoteAddressFromRequest(request,
                     userSetting.getSipUseSourceIpAsRemoteAddress());
             String requestAddress = remoteAddressInfo.getIp() + ":" + remoteAddressInfo.getPort();
             String title = registerFlag ? "[注册请求]" : "[注销请求]";
             log.info(title + "设备：{}, 开始处理: {}", deviceId, requestAddress);
+
+            // 黑名单检查：设备ID匹配 + IP/端口（若条目中填写了则需要一致）
+            if (registerFlag && sipBlackService.isBlacklisted(deviceId,
+                    remoteAddressInfo.getIp(), remoteAddressInfo.getPort())) {
+                log.warn("{} 设备：{} (IP:{}, 端口:{}) 命中黑名单，拒绝接入",
+                        title, deviceId, remoteAddressInfo.getIp(), remoteAddressInfo.getPort());
+                response = getMessageFactory().createResponse(Response.FORBIDDEN, request);
+                response.setReasonPhrase("Device Blacklisted");
+                sipSender.transmitRequest(request.getLocalAddress().getHostAddress(), response);
+                return;
+            }
+
+            Device device = deviceService.getDeviceByDeviceId(deviceId);
+
             if (device != null &&
                     device.getSipTransactionInfo() != null &&
                     request.getCallIdHeader().getCallId().equals(device.getSipTransactionInfo().getCallId())) {

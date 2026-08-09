@@ -45,6 +45,7 @@ public class CacheController
         caches.add(new SysCache(CacheConstants.PWD_ERR_CNT_KEY, "密码错误次数"));
         caches.add(new SysCache(CacheConstants.SYS_WORK_LIST, "工作台数据"));
         caches.add(new SysCache(CacheConstants.SYS_GOVIEW_WORK_LIST, "goview工作台数据"));
+        caches.add(new SysCache(CacheConstants.SIP_BLACK_KEY, "SIP黑名单"));
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
