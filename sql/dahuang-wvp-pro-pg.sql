@@ -3,419 +3,22 @@
 
  Source Server         : 本地pg
  Source Server Type    : PostgreSQL
- Source Server Version : 150018 (150018)
+ Source Server Version : 150002 (150002)
  Source Host           : localhost:5432
- Source Catalog        : dahuang-wvp-pro
+ Source Catalog        : dahuang-wvp
  Source Schema         : public
 
  Target Server Type    : PostgreSQL
- Target Server Version : 150018 (150018)
+ Target Server Version : 150002 (150002)
  File Encoding         : 65001
 
- Date: 31/07/2026 11:28:35
+ Date: 15/08/2026 19:44:04
 */
-
-
--- ----------------------------
--- Sequence structure for gen_table_column_column_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."gen_table_column_column_id_seq";
-CREATE SEQUENCE "public"."gen_table_column_column_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for gen_table_table_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."gen_table_table_id_seq";
-CREATE SEQUENCE "public"."gen_table_table_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_base_config_config_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_base_config_config_id_seq";
-CREATE SEQUENCE "public"."sys_base_config_config_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 2147483647
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_config_config_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_config_config_id_seq";
-CREATE SEQUENCE "public"."sys_config_config_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 2147483647
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_dept_dept_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_dept_dept_id_seq";
-CREATE SEQUENCE "public"."sys_dept_dept_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_dict_data_dict_code_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_dict_data_dict_code_seq";
-CREATE SEQUENCE "public"."sys_dict_data_dict_code_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_dict_type_dict_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_dict_type_dict_id_seq";
-CREATE SEQUENCE "public"."sys_dict_type_dict_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_job_job_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_job_job_id_seq";
-CREATE SEQUENCE "public"."sys_job_job_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_job_log_job_log_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_job_log_job_log_id_seq";
-CREATE SEQUENCE "public"."sys_job_log_job_log_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_logininfor_info_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_logininfor_info_id_seq";
-CREATE SEQUENCE "public"."sys_logininfor_info_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_menu_menu_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_menu_menu_id_seq";
-CREATE SEQUENCE "public"."sys_menu_menu_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_notice_notice_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_notice_notice_id_seq";
-CREATE SEQUENCE "public"."sys_notice_notice_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 2147483647
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_oper_log_oper_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_oper_log_oper_id_seq";
-CREATE SEQUENCE "public"."sys_oper_log_oper_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_post_post_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_post_post_id_seq";
-CREATE SEQUENCE "public"."sys_post_post_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_role_role_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_role_role_id_seq";
-CREATE SEQUENCE "public"."sys_role_role_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_user_user_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_user_user_id_seq";
-CREATE SEQUENCE "public"."sys_user_user_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_cloud_record_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_cloud_record_id_seq";
-CREATE SEQUENCE "public"."wvp_cloud_record_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_common_group_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_common_group_id_seq";
-CREATE SEQUENCE "public"."wvp_common_group_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_common_region_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_common_region_id_seq";
-CREATE SEQUENCE "public"."wvp_common_region_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_device_alarm_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_device_alarm_id_seq";
-CREATE SEQUENCE "public"."wvp_device_alarm_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_device_channel_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_device_channel_id_seq";
-CREATE SEQUENCE "public"."wvp_device_channel_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_device_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_device_id_seq";
-CREATE SEQUENCE "public"."wvp_device_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_device_mobile_position_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_device_mobile_position_id_seq";
-CREATE SEQUENCE "public"."wvp_device_mobile_position_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_favorites_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_favorites_id_seq";
-CREATE SEQUENCE "public"."wvp_favorites_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_mark_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_mark_id_seq";
-CREATE SEQUENCE "public"."wvp_mark_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_platform_channel_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_platform_channel_id_seq";
-CREATE SEQUENCE "public"."wvp_platform_channel_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_platform_group_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_platform_group_id_seq";
-CREATE SEQUENCE "public"."wvp_platform_group_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_platform_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_platform_id_seq";
-CREATE SEQUENCE "public"."wvp_platform_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_platform_region_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_platform_region_id_seq";
-CREATE SEQUENCE "public"."wvp_platform_region_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_record_plan_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_record_plan_id_seq";
-CREATE SEQUENCE "public"."wvp_record_plan_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_record_plan_item_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_record_plan_item_id_seq";
-CREATE SEQUENCE "public"."wvp_record_plan_item_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_resources_tree_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_resources_tree_id_seq";
-CREATE SEQUENCE "public"."wvp_resources_tree_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_sip_config_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_sip_config_id_seq";
-CREATE SEQUENCE "public"."wvp_sip_config_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_stream_proxy_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_stream_proxy_id_seq";
-CREATE SEQUENCE "public"."wvp_stream_proxy_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_stream_push_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_stream_push_id_seq";
-CREATE SEQUENCE "public"."wvp_stream_push_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for wvp_user_api_key_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."wvp_user_api_key_id_seq";
-CREATE SEQUENCE "public"."wvp_user_api_key_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 9223372036854775807
-START 1
-CACHE 1;
 
 -- ----------------------------
 -- Table structure for gen_table
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."gen_table";
+DROP TABLE IF EXISTS "public"."gen_table" CASCADE;
 CREATE TABLE "public"."gen_table" (
   "table_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -475,7 +78,7 @@ COMMENT ON COLUMN "public"."gen_table"."remark" IS '备注';
 -- ----------------------------
 -- Table structure for gen_table_column
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."gen_table_column";
+DROP TABLE IF EXISTS "public"."gen_table_column" CASCADE;
 CREATE TABLE "public"."gen_table_column" (
   "column_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -537,7 +140,7 @@ COMMENT ON COLUMN "public"."gen_table_column"."update_time" IS '更新时间';
 -- ----------------------------
 -- Table structure for qrtz_blob_triggers
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_blob_triggers";
+DROP TABLE IF EXISTS "public"."qrtz_blob_triggers" CASCADE;
 CREATE TABLE "public"."qrtz_blob_triggers" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "trigger_name" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -557,7 +160,7 @@ COMMENT ON COLUMN "public"."qrtz_blob_triggers"."blob_data" IS '存放持久化T
 -- ----------------------------
 -- Table structure for qrtz_calendars
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_calendars";
+DROP TABLE IF EXISTS "public"."qrtz_calendars" CASCADE;
 CREATE TABLE "public"."qrtz_calendars" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "calendar_name" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -575,7 +178,7 @@ COMMENT ON COLUMN "public"."qrtz_calendars"."calendar" IS '存放持久化calend
 -- ----------------------------
 -- Table structure for qrtz_cron_triggers
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_cron_triggers";
+DROP TABLE IF EXISTS "public"."qrtz_cron_triggers" CASCADE;
 CREATE TABLE "public"."qrtz_cron_triggers" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "trigger_name" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -597,7 +200,7 @@ COMMENT ON COLUMN "public"."qrtz_cron_triggers"."time_zone_id" IS '时区';
 -- ----------------------------
 -- Table structure for qrtz_fired_triggers
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_fired_triggers";
+DROP TABLE IF EXISTS "public"."qrtz_fired_triggers" CASCADE;
 CREATE TABLE "public"."qrtz_fired_triggers" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "entry_id" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -635,7 +238,7 @@ COMMENT ON COLUMN "public"."qrtz_fired_triggers"."requests_recovery" IS '是否�
 -- ----------------------------
 -- Table structure for qrtz_job_details
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_job_details";
+DROP TABLE IF EXISTS "public"."qrtz_job_details" CASCADE;
 CREATE TABLE "public"."qrtz_job_details" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "job_name" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -667,7 +270,7 @@ COMMENT ON COLUMN "public"."qrtz_job_details"."job_data" IS '存放持久化job�
 -- ----------------------------
 -- Table structure for qrtz_locks
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_locks";
+DROP TABLE IF EXISTS "public"."qrtz_locks" CASCADE;
 CREATE TABLE "public"."qrtz_locks" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "lock_name" text COLLATE "pg_catalog"."default" NOT NULL
@@ -683,7 +286,7 @@ COMMENT ON COLUMN "public"."qrtz_locks"."lock_name" IS '悲观锁名称';
 -- ----------------------------
 -- Table structure for qrtz_paused_trigger_grps
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_paused_trigger_grps";
+DROP TABLE IF EXISTS "public"."qrtz_paused_trigger_grps" CASCADE;
 CREATE TABLE "public"."qrtz_paused_trigger_grps" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "trigger_group" text COLLATE "pg_catalog"."default" NOT NULL
@@ -699,7 +302,7 @@ COMMENT ON COLUMN "public"."qrtz_paused_trigger_grps"."trigger_group" IS 'qrtz_t
 -- ----------------------------
 -- Table structure for qrtz_scheduler_state
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_scheduler_state";
+DROP TABLE IF EXISTS "public"."qrtz_scheduler_state" CASCADE;
 CREATE TABLE "public"."qrtz_scheduler_state" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "instance_name" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -719,7 +322,7 @@ COMMENT ON COLUMN "public"."qrtz_scheduler_state"."checkin_interval" IS '检查�
 -- ----------------------------
 -- Table structure for qrtz_simple_triggers
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_simple_triggers";
+DROP TABLE IF EXISTS "public"."qrtz_simple_triggers" CASCADE;
 CREATE TABLE "public"."qrtz_simple_triggers" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "trigger_name" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -743,7 +346,7 @@ COMMENT ON COLUMN "public"."qrtz_simple_triggers"."times_triggered" IS '已经�
 -- ----------------------------
 -- Table structure for qrtz_simprop_triggers
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_simprop_triggers";
+DROP TABLE IF EXISTS "public"."qrtz_simprop_triggers" CASCADE;
 CREATE TABLE "public"."qrtz_simprop_triggers" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "trigger_name" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -783,7 +386,7 @@ COMMENT ON COLUMN "public"."qrtz_simprop_triggers"."bool_prop_2" IS 'Boolean类�
 -- ----------------------------
 -- Table structure for qrtz_triggers
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."qrtz_triggers";
+DROP TABLE IF EXISTS "public"."qrtz_triggers" CASCADE;
 CREATE TABLE "public"."qrtz_triggers" (
   "sched_name" text COLLATE "pg_catalog"."default" NOT NULL,
   "trigger_name" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -827,7 +430,7 @@ COMMENT ON COLUMN "public"."qrtz_triggers"."job_data" IS '存放持久化job对�
 -- ----------------------------
 -- Table structure for sys_base_config
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_base_config";
+DROP TABLE IF EXISTS "public"."sys_base_config" CASCADE;
 CREATE TABLE "public"."sys_base_config" (
   "config_id" int4 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -870,7 +473,7 @@ INSERT INTO "public"."sys_base_config" VALUES (1, '0', 'classpath:httpsKey.p12',
 -- ----------------------------
 -- Table structure for sys_config
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_config";
+DROP TABLE IF EXISTS "public"."sys_config" CASCADE;
 CREATE TABLE "public"."sys_config" (
   "config_id" int4 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -910,16 +513,25 @@ INSERT INTO "public"."sys_config" VALUES (3, '主框架页-侧边栏主题', 'sy
 INSERT INTO "public"."sys_config" VALUES (4, '账号自助-验证码开关', 'sys.account.captchaEnabled', 'true', 'Y', 'admin', '2025-04-03 09:03:39', 'admin', '2026-07-21 15:09:29', '是否开启验证码功能（true开启，false关闭）');
 INSERT INTO "public"."sys_config" VALUES (5, '账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '是否开启注册用户功能（true开启，false关闭）');
 INSERT INTO "public"."sys_config" VALUES (6, '用户登录-黑名单列表', 'sys.login.blackIPList', '', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '设置登录IP黑名单限制，多个匹配项以;分隔，支持匹配（*通配、网段）');
-INSERT INTO "public"."sys_config" VALUES (19, '高德地图KEY ', 'gaode_map_key', '88f28edf21df134b8b4c45ae6b87761a', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-06-07 15:39:26', NULL);
-INSERT INTO "public"."sys_config" VALUES (20, '高德地图安全秘钥', 'gaode_map_security_code', '082ed5b08a0c94f565964ce946e260dd', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-06-07 15:43:56', NULL);
-INSERT INTO "public"."sys_config" VALUES (21, '高德地图中心点坐标', 'gaode_map_center', '40.09,116.24', 'Y', 'admin', '2026-06-05 22:25:38', 'admin', '2026-06-07 15:51:26', NULL);
 INSERT INTO "public"."sys_config" VALUES (22, '网站名称', 'plat_name', '大荒安防', 'Y', 'admin', '2026-06-22 17:37:07', '', NULL, NULL);
 INSERT INTO "public"."sys_config" VALUES (23, '演示信息开关', 'sys.demo.enabled', 'true', 'Y', 'admin', '2026-07-16 18:05:33', 'admin', '2026-07-16 18:26:50', NULL);
+INSERT INTO "public"."sys_config" VALUES (24, '后台登录页Logo', 'site_logo_login', '', 'Y', 'admin', '2026-08-15 19:20:04', '', '2026-08-15 19:20:04', NULL);
+INSERT INTO "public"."sys_config" VALUES (25, '后台小Logo', 'site_logo_square', '', 'Y', 'admin', '2026-08-15 19:20:04', '', '2026-08-15 19:20:04', NULL);
+INSERT INTO "public"."sys_config" VALUES (26, '后台大Logo', 'site_logo_lefttop', '', 'Y', 'admin', '2026-08-15 19:20:04', '', '2026-08-15 19:20:04', NULL);
+INSERT INTO "public"."sys_config" VALUES (27, '移动端登录Logo', 'mobile_login_logo', '', 'Y', 'admin', '2026-08-15 19:20:04', '', '2026-08-15 19:20:04', NULL);
+INSERT INTO "public"."sys_config" VALUES (28, '系统ICO图标', 'site_favicon', '', 'Y', 'admin', '2026-08-15 19:20:04', '', '2026-08-15 19:20:04', NULL);
+INSERT INTO "public"."sys_config" VALUES (29, '地图类型', 'map_type', 'tianditu', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', NULL);
+INSERT INTO "public"."sys_config" VALUES (19, '高德地图KEY ', 'gaode_map_key', '1111111111111', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-08-15 19:22:05', NULL);
+INSERT INTO "public"."sys_config" VALUES (20, '高德地图安全秘钥', 'gaode_map_security_code', '222222222', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-08-15 19:22:05', NULL);
+INSERT INTO "public"."sys_config" VALUES (21, '高德地图中心点坐标', 'gaode_map_center', '40.09,116.24', 'Y', 'admin', '2026-06-05 22:25:38', 'admin', '2026-08-15 19:22:05', NULL);
+INSERT INTO "public"."sys_config" VALUES (30, '天地图KEY', 'tianditu_map_key', '1111111111', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', NULL);
+INSERT INTO "public"."sys_config" VALUES (31, '天地图安全秘钥', 'tianditu_map_security_code', '11111111111111', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', NULL);
+INSERT INTO "public"."sys_config" VALUES (32, '天地图中心点坐标', 'tianditu_map_center', '40.09,116.24', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', NULL);
 
 -- ----------------------------
 -- Table structure for sys_dept
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_dept";
+DROP TABLE IF EXISTS "public"."sys_dept" CASCADE;
 CREATE TABLE "public"."sys_dept" (
   "dept_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -962,23 +574,13 @@ COMMENT ON COLUMN "public"."sys_dept"."update_time" IS '更新时间';
 -- ----------------------------
 -- Records of sys_dept
 -- ----------------------------
-INSERT INTO "public"."sys_dept" VALUES (100, 0, '0', 'ry-wvp', 0, 'ry-wvp', '15888888888', 'ry-wvp@qq.com', '0', '0', 'admin', '2025-04-03 09:03:39', 'admin', '2025-04-18 10:55:40', NULL);
-INSERT INTO "public"."sys_dept" VALUES (101, 100, '0,100', '广州总公司', 1, 'ry-wvp', '15888888888', 'ry-wvp@qq.com', '0', '0', 'admin', '2025-04-03 09:03:39', 'admin', '2025-04-18 10:56:23', NULL);
-INSERT INTO "public"."sys_dept" VALUES (102, 100, '0,100', '长沙分公司', 2, '若依', '15888888888', 'ry@qq.com', '0', '2', 'admin', '2025-04-03 09:03:39', '', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (103, 101, '0,100,101', '研发部门', 1, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', '2025-04-03 09:03:39', '', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (104, 101, '0,100,101', '市场部门', 2, '若依', '15888888888', 'ry@qq.com', '0', '2', 'admin', '2025-04-03 09:03:39', '', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (105, 101, '0,100,101', '测试部门2', 3, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', '2025-04-03 09:03:39', 'admin', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (106, 101, '0,100,101', '财务部门', 4, '若依', '15888888888', 'ry@qq.com', '0', '2', 'admin', '2025-04-03 09:03:39', '', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (107, 101, '0,100,101', '运维部门', 5, '若依', '15888888888', 'ry@qq.com', '0', '2', 'admin', '2025-04-03 09:03:39', '', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (108, 102, '0,100,102', '市场部门', 1, '若依', '15888888888', 'ry@qq.com', '0', '2', 'admin', '2025-04-03 09:03:39', '', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (109, 102, '0,100,102', '财务部门', 2, '若依', '15888888888', 'ry@qq.com', '0', '2', 'admin', '2025-04-03 09:03:39', '', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (110, 101, '0,100,101', '测试部门3', 4, NULL, NULL, NULL, '0', '0', 'admin', NULL, '', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (111, 110, '0,100,101,110', '额的大所3', 5, '111111', '', '', '0', '0', 'admin', '2026-07-15 18:54:54', 'admin', '2026-07-15 18:55:05', NULL);
+INSERT INTO "public"."sys_dept" VALUES (100, 0, '0', '监控平台', 0, 'ry-wvp', '15888888888', 'ry-wvp@qq.com', '0', '0', 'admin', '2025-04-03 09:03:39', 'admin', '2025-04-18 10:55:40', NULL);
+
 
 -- ----------------------------
 -- Table structure for sys_dict_data
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_dict_data";
+DROP TABLE IF EXISTS "public"."sys_dict_data" CASCADE;
 CREATE TABLE "public"."sys_dict_data" (
   "dict_code" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1074,7 +676,7 @@ INSERT INTO "public"."sys_dict_data" VALUES (61, 4, 'SDK播放', '4', 'play_type
 -- ----------------------------
 -- Table structure for sys_dict_type
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_dict_type";
+DROP TABLE IF EXISTS "public"."sys_dict_type" CASCADE;
 CREATE TABLE "public"."sys_dict_type" (
   "dict_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1128,7 +730,7 @@ INSERT INTO "public"."sys_dict_type" VALUES (20, '通道是否加密', 'yingshi_
 -- ----------------------------
 -- Table structure for sys_job
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_job";
+DROP TABLE IF EXISTS "public"."sys_job" CASCADE;
 CREATE TABLE "public"."sys_job" (
   "job_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1172,7 +774,7 @@ COMMENT ON COLUMN "public"."sys_job"."remark" IS '备注信息';
 -- ----------------------------
 -- Table structure for sys_job_log
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_job_log";
+DROP TABLE IF EXISTS "public"."sys_job_log" CASCADE;
 CREATE TABLE "public"."sys_job_log" (
   "job_log_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1206,7 +808,7 @@ COMMENT ON COLUMN "public"."sys_job_log"."create_time" IS '创建时间';
 -- ----------------------------
 -- Table structure for sys_logininfor
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_logininfor";
+DROP TABLE IF EXISTS "public"."sys_logininfor" CASCADE;
 CREATE TABLE "public"."sys_logininfor" (
   "info_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1239,10 +841,11 @@ COMMENT ON COLUMN "public"."sys_logininfor"."login_time" IS '访问时间';
 -- Records of sys_logininfor
 -- ----------------------------
 
+
 -- ----------------------------
 -- Table structure for sys_menu
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_menu";
+DROP TABLE IF EXISTS "public"."sys_menu" CASCADE;
 CREATE TABLE "public"."sys_menu" (
   "menu_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1432,7 +1035,7 @@ INSERT INTO "public"."sys_menu" VALUES (2162, '录像管理', 0, 5, 'record', NU
 -- ----------------------------
 -- Table structure for sys_notice
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_notice";
+DROP TABLE IF EXISTS "public"."sys_notice" CASCADE;
 CREATE TABLE "public"."sys_notice" (
   "notice_id" int4 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1470,7 +1073,7 @@ COMMENT ON COLUMN "public"."sys_notice"."remark" IS '备注';
 -- ----------------------------
 -- Table structure for sys_oper_log
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_oper_log";
+DROP TABLE IF EXISTS "public"."sys_oper_log" CASCADE;
 CREATE TABLE "public"."sys_oper_log" (
   "oper_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1522,7 +1125,7 @@ COMMENT ON COLUMN "public"."sys_oper_log"."cost_time" IS '消耗时间';
 -- ----------------------------
 -- Table structure for sys_post
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_post";
+DROP TABLE IF EXISTS "public"."sys_post" CASCADE;
 CREATE TABLE "public"."sys_post" (
   "post_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1560,13 +1163,12 @@ INSERT INTO "public"."sys_post" VALUES (1, 'ceo', '董事长', 1, '0', 'admin', 
 INSERT INTO "public"."sys_post" VALUES (2, 'se', '项目经理', 2, '0', 'admin', '2025-04-03 09:03:39', '', NULL, '');
 INSERT INTO "public"."sys_post" VALUES (3, 'hr', '人力资源', 3, '0', 'admin', '2025-04-03 09:03:39', '', NULL, '');
 INSERT INTO "public"."sys_post" VALUES (4, 'user', '普通员工', 4, '0', 'admin', '2025-04-03 09:03:39', '', NULL, '');
-INSERT INTO "public"."sys_post" VALUES (5, 'test3', 'test3', 0, '0', 'admin', NULL, 'admin', '2026-07-19 09:35:17', NULL);
-INSERT INTO "public"."sys_post" VALUES (6, 'test2', 'test2', 0, '0', 'admin', '2026-07-19 09:35:05', '', '2026-07-19 09:35:05', NULL);
+
 
 -- ----------------------------
 -- Table structure for sys_role
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_role";
+DROP TABLE IF EXISTS "public"."sys_role" CASCADE;
 CREATE TABLE "public"."sys_role" (
   "role_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1610,13 +1212,12 @@ COMMENT ON COLUMN "public"."sys_role"."remark" IS '备注';
 -- ----------------------------
 INSERT INTO "public"."sys_role" VALUES (1, '超级管理员', 'admin', 1, '1', 't', 't', '0', '0', 'admin', '2025-04-03 09:03:39', '', NULL, '超级管理员');
 INSERT INTO "public"."sys_role" VALUES (2, '普通角色', 'common', 2, '2', 't', 't', '0', '0', 'admin', '2025-04-03 09:03:39', 'admin', '2025-09-19 16:35:21', '普通角色');
-INSERT INTO "public"."sys_role" VALUES (4, '测试', '111111', 0, '1', 't', 't', '0', '2', 'admin', '2026-07-30 19:58:10', '', '2026-07-30 19:58:10', NULL);
-INSERT INTO "public"."sys_role" VALUES (3, '管理员', 'admin_wvp', 0, '1', 't', 't', '0', '0', 'admin', '2026-06-23 16:52:04', 'admin', '2026-07-30 19:59:17', NULL);
+INSERT INTO "public"."sys_role" VALUES (3, '管理员', 'admin_wvp', 0, '1', 't', 't', '0', '0', 'admin', '2026-06-23 16:52:04', '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_role_dept
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_role_dept";
+DROP TABLE IF EXISTS "public"."sys_role_dept" CASCADE;
 CREATE TABLE "public"."sys_role_dept" (
   "role_id" int8 NOT NULL,
   "dept_id" int8 NOT NULL
@@ -1635,7 +1236,7 @@ INSERT INTO "public"."sys_role_dept" VALUES (2, 105);
 -- ----------------------------
 -- Table structure for sys_role_menu
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_role_menu";
+DROP TABLE IF EXISTS "public"."sys_role_menu" CASCADE;
 CREATE TABLE "public"."sys_role_menu" (
   "role_id" int8 NOT NULL,
   "menu_id" int8 NOT NULL
@@ -1731,12 +1332,16 @@ INSERT INTO "public"."sys_role_menu" VALUES (2, 1057);
 INSERT INTO "public"."sys_role_menu" VALUES (2, 1058);
 INSERT INTO "public"."sys_role_menu" VALUES (2, 1059);
 INSERT INTO "public"."sys_role_menu" VALUES (2, 1060);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2013);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2161);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2015);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2000);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2003);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2004);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2006);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2007);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2008);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2012);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2013);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2014);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2015);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2016);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2017);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2018);
@@ -1755,100 +1360,43 @@ INSERT INTO "public"."sys_role_menu" VALUES (3, 2031);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2032);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2033);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2034);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2008);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2041);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2042);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2044);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2043);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2045);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2007);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2035);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2036);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2037);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2038);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2039);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2040);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2004);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2049);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2059);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2051);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2052);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2054);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2014);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2041);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2042);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2043);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2044);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2045);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2046);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2047);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2048);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2049);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2051);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2052);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2053);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2054);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2055);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2057);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2058);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2162);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2012);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2059);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2060);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2061);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2062);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2063);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2064);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2065);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2006);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2035);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2036);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2000);
 INSERT INTO "public"."sys_role_menu" VALUES (3, 2079);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 109);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1046);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1047);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1048);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 113);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 114);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 501);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1042);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1043);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1044);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1045);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 500);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1039);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1040);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 2089);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 100);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1000);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1001);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1002);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1003);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1004);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1005);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1006);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 101);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1007);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1008);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1009);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1010);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1011);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 103);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1016);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1017);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1018);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1019);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 104);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1020);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1021);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1022);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1023);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1024);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 106);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1030);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1031);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1032);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1033);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1034);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 107);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1035);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1036);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1037);
-INSERT INTO "public"."sys_role_menu" VALUES (3, 1038);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2161);
+INSERT INTO "public"."sys_role_menu" VALUES (3, 2162);
 
 -- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_user";
+DROP TABLE IF EXISTS "public"."sys_user" CASCADE;
 CREATE TABLE "public"."sys_user" (
   "user_id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -1870,13 +1418,13 @@ CACHE 1
   "del_flag" char(1) COLLATE "pg_catalog"."default" DEFAULT '0'::bpchar,
   "login_ip" text COLLATE "pg_catalog"."default" DEFAULT ''::text,
   "login_date" timestamp(6),
-  "pwd_update_date" timestamp(6),
   "push_key" text COLLATE "pg_catalog"."default",
   "create_by" text COLLATE "pg_catalog"."default" DEFAULT ''::text,
   "create_time" timestamp(6),
   "update_by" text COLLATE "pg_catalog"."default" DEFAULT ''::text,
   "update_time" timestamp(6),
-  "remark" text COLLATE "pg_catalog"."default"
+  "remark" text COLLATE "pg_catalog"."default",
+  "pwd_update_date" timestamp(6)
 )
 ;
 COMMENT ON COLUMN "public"."sys_user"."user_id" IS '用户ID';
@@ -1893,27 +1441,23 @@ COMMENT ON COLUMN "public"."sys_user"."status" IS '帐号状态（0正常 1停�
 COMMENT ON COLUMN "public"."sys_user"."del_flag" IS '删除标志（0代表存在 2代表删除）';
 COMMENT ON COLUMN "public"."sys_user"."login_ip" IS '最后登录IP';
 COMMENT ON COLUMN "public"."sys_user"."login_date" IS '最后登录时间';
-COMMENT ON COLUMN "public"."sys_user"."pwd_update_date" IS '密码最后更新时间';
 COMMENT ON COLUMN "public"."sys_user"."create_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_user"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_user"."update_by" IS '更新者';
 COMMENT ON COLUMN "public"."sys_user"."update_time" IS '更新时间';
 COMMENT ON COLUMN "public"."sys_user"."remark" IS '备注';
+COMMENT ON COLUMN "public"."sys_user"."pwd_update_date" IS '密码最后更新时间';
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO "public"."sys_user" VALUES (2, 105, 'ry', '若依', '00', 'ry@qq.com', '15666666666', '1', '', '$2a$10$GK9SWq4ExewvcK8d4ImVDO6To51q/zJXU//7avhUxR6jgjeteU97C', '0', '0', '127.0.0.1', '2026-07-29 19:13:10', NULL, 'admin', '2025-04-03 09:03:39', 'admin', '2026-07-29 19:13:10', '测试员');
-INSERT INTO "public"."sys_user" VALUES (3, 103, 'ry-wvp', 'ry-wvp', '00', '', '', '2', '', '$2a$10$33PyYoiccR46JxRFMf68eO/AMoAfgeHy0LXaqPkzIcKiAAN9RqjRK', '0', '0', '127.0.0.1', '2025-04-18 11:20:20', NULL, 'admin', '2025-04-18 10:57:08', 'admin', '2025-06-18 00:55:07', NULL);
-INSERT INTO "public"."sys_user" VALUES (4, 100, 'admin_wvp', '管理员', '00', '', '18011111111', '0', '', '$2a$10$E46LV8OFOMFQDZ54X3mI2.FhDkmZ9xOQ4mdoByisRBP5fL8p2y5JC', '0', '0', '127.0.0.1', '2026-06-23 17:38:39', NULL, 'admin', '2026-06-23 16:52:55', '', '2026-06-23 17:38:39', NULL);
-INSERT INTO "public"."sys_user" VALUES (5, NULL, 'test', 'test', '00', '', '', '0', '', '$2a$10$RSWxVpk9bHZKiFtNKhEaO.sWOlGPM6Oyz./ZJqY0QKm10eH7zCNBa', '0', '0', '', NULL, NULL, 'admin', '2026-07-19 10:20:54', '', '2026-07-19 10:20:54', NULL);
-INSERT INTO "public"."sys_user" VALUES (1, 103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '/profile/avatar/2025/06/17/透明底logo_20250617143004A001.png', '$2a$10$7hGDAACyoyJF9SFe5WHJg.3aqcJaSpQAY.7ar4tpuoPIf1su7zBne', '0', '0', '127.0.0.1', '2026-07-30 19:10:56', '3e80d1762a324d5b0ff636e0bd16f1e3', 'admin', '2025-04-03 09:03:39', '', '2026-07-30 19:10:56', '管理员');
-INSERT INTO "public"."sys_user" VALUES (6, NULL, 'ttt', '测试', '00', '', '', '0', '', '$2a$10$KX1a1N1bgeILNEwP3rcCHOP6BgDGAB7uIWNWQ.1mItjmY0XjeYC.i', '0', '0', '', NULL, NULL, 'admin', '2026-07-30 19:57:56', '', '2026-07-30 19:57:56', NULL);
+INSERT INTO "public"."sys_user" VALUES (4, 100, 'admin_wvp', '管理员', '00', '', '18011111111', '0', '', '$2a$10$4diPR2c4pALoq.N2.F65NeiaPmkh.ZGE2dNyHntFk6F/sU6iFzKRS', '0', '0', '127.0.0.1', '2026-08-15 18:11:18', NULL, 'admin', '2026-06-23 16:52:55', 'admin', '2026-08-15 18:11:18', NULL, '2026-08-15 18:10:59');
+INSERT INTO "public"."sys_user" VALUES (1, 100, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '/profile/avatar/2025/06/17/透明底logo_20250617143004A001.png', '$2a$10$7hGDAACyoyJF9SFe5WHJg.3aqcJaSpQAY.7ar4tpuoPIf1su7zBne', '0', '0', '127.0.0.1', '2026-08-15 18:50:47', '3e80d1762a324d5b0ff636e0bd16f1e3', 'admin', '2025-04-03 09:03:39', '', '2026-08-15 18:50:47', '管理员', NULL);
 
 -- ----------------------------
 -- Table structure for sys_user_channel
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_user_channel";
+DROP TABLE IF EXISTS "public"."sys_user_channel" CASCADE;
 CREATE TABLE "public"."sys_user_channel" (
   "user_id" int8 NOT NULL,
   "channel_id" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -1924,16 +1468,12 @@ CREATE TABLE "public"."sys_user_channel" (
 -- ----------------------------
 -- Records of sys_user_channel
 -- ----------------------------
-INSERT INTO "public"."sys_user_channel" VALUES (2, '34020000002000000996', '34020000002000000996');
-INSERT INTO "public"."sys_user_channel" VALUES (2, '34020000002000000997', '34020000002000000997');
-INSERT INTO "public"."sys_user_channel" VALUES (2, '34020000002000000999', '34020000002000000999');
-INSERT INTO "public"."sys_user_channel" VALUES (2, '34020000002000000998', '34020000002000000998');
-INSERT INTO "public"."sys_user_channel" VALUES (2, '34020000002000001000', '34020000002000001000');
+
 
 -- ----------------------------
 -- Table structure for sys_user_post
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_user_post";
+DROP TABLE IF EXISTS "public"."sys_user_post" CASCADE;
 CREATE TABLE "public"."sys_user_post" (
   "user_id" int8 NOT NULL,
   "post_id" int8 NOT NULL
@@ -1946,13 +1486,11 @@ COMMENT ON COLUMN "public"."sys_user_post"."post_id" IS '岗位ID';
 -- Records of sys_user_post
 -- ----------------------------
 INSERT INTO "public"."sys_user_post" VALUES (1, 1);
-INSERT INTO "public"."sys_user_post" VALUES (2, 2);
-INSERT INTO "public"."sys_user_post" VALUES (3, 4);
 
 -- ----------------------------
 -- Table structure for sys_user_role
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_user_role";
+DROP TABLE IF EXISTS "public"."sys_user_role" CASCADE;
 CREATE TABLE "public"."sys_user_role" (
   "user_id" int8 NOT NULL,
   "role_id" int8 NOT NULL
@@ -1965,14 +1503,12 @@ COMMENT ON COLUMN "public"."sys_user_role"."role_id" IS '角色ID';
 -- Records of sys_user_role
 -- ----------------------------
 INSERT INTO "public"."sys_user_role" VALUES (1, 1);
-INSERT INTO "public"."sys_user_role" VALUES (2, 3);
-INSERT INTO "public"."sys_user_role" VALUES (3, 2);
 INSERT INTO "public"."sys_user_role" VALUES (4, 3);
 
 -- ----------------------------
 -- Table structure for wvp_cloud_record
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_cloud_record";
+DROP TABLE IF EXISTS "public"."wvp_cloud_record" CASCADE;
 CREATE TABLE "public"."wvp_cloud_record" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2003,7 +1539,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_common_group
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_common_group";
+DROP TABLE IF EXISTS "public"."wvp_common_group" CASCADE;
 CREATE TABLE "public"."wvp_common_group" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2027,10 +1563,11 @@ CACHE 1
 -- Records of wvp_common_group
 -- ----------------------------
 
+
 -- ----------------------------
 -- Table structure for wvp_common_region
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_common_region";
+DROP TABLE IF EXISTS "public"."wvp_common_region" CASCADE;
 CREATE TABLE "public"."wvp_common_region" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2052,10 +1589,11 @@ CACHE 1
 -- Records of wvp_common_region
 -- ----------------------------
 
+
 -- ----------------------------
 -- Table structure for wvp_device
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_device";
+DROP TABLE IF EXISTS "public"."wvp_device" CASCADE;
 CREATE TABLE "public"."wvp_device" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2072,6 +1610,7 @@ CACHE 1
   "firmware" text COLLATE "pg_catalog"."default",
   "transport" text COLLATE "pg_catalog"."default",
   "stream_mode" text COLLATE "pg_catalog"."default",
+  "on_line" bool DEFAULT false,
   "register_time" text COLLATE "pg_catalog"."default",
   "keepalive_time" text COLLATE "pg_catalog"."default",
   "ip" text COLLATE "pg_catalog"."default",
@@ -2115,10 +1654,10 @@ CACHE 1
   "push_time" text COLLATE "pg_catalog"."default",
   "user_name" text COLLATE "pg_catalog"."default",
   "onvif_auth_type" text COLLATE "pg_catalog"."default",
-  "create_by" text COLLATE "pg_catalog"."default" DEFAULT 0,
-  "update_by" text COLLATE "pg_catalog"."default" DEFAULT 0,
+  "create_by" text COLLATE "pg_catalog"."default" DEFAULT ''::text,
+  "update_by" text COLLATE "pg_catalog"."default" DEFAULT ''::text,
   "remark" text COLLATE "pg_catalog"."default",
-  "on_line" bool DEFAULT false
+  "channel_type_filter" varchar(500) COLLATE "pg_catalog"."default" DEFAULT NULL::character varying
 )
 ;
 COMMENT ON COLUMN "public"."wvp_device"."dept_id" IS '部门ID';
@@ -2140,6 +1679,7 @@ COMMENT ON COLUMN "public"."wvp_device"."onvif_auth_type" IS 'onvif 设备鉴权
 COMMENT ON COLUMN "public"."wvp_device"."create_by" IS '创建者';
 COMMENT ON COLUMN "public"."wvp_device"."update_by" IS '更新者';
 COMMENT ON COLUMN "public"."wvp_device"."remark" IS '备注';
+COMMENT ON COLUMN "public"."wvp_device"."channel_type_filter" IS '通道类型过滤(逗号分隔)';
 
 -- ----------------------------
 -- Records of wvp_device
@@ -2148,7 +1688,7 @@ COMMENT ON COLUMN "public"."wvp_device"."remark" IS '备注';
 -- ----------------------------
 -- Table structure for wvp_device_alarm
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_device_alarm";
+DROP TABLE IF EXISTS "public"."wvp_device_alarm" CASCADE;
 CREATE TABLE "public"."wvp_device_alarm" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2177,7 +1717,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_device_channel
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_device_channel";
+DROP TABLE IF EXISTS "public"."wvp_device_channel" CASCADE;
 CREATE TABLE "public"."wvp_device_channel" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2285,7 +1825,7 @@ COMMENT ON COLUMN "public"."wvp_device_channel"."remark" IS '备注';
 -- ----------------------------
 -- Table structure for wvp_device_mobile_position
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_device_mobile_position";
+DROP TABLE IF EXISTS "public"."wvp_device_mobile_position" CASCADE;
 CREATE TABLE "public"."wvp_device_mobile_position" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2315,7 +1855,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_favorites
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_favorites";
+DROP TABLE IF EXISTS "public"."wvp_favorites" CASCADE;
 CREATE TABLE "public"."wvp_favorites" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2344,10 +1884,11 @@ COMMENT ON COLUMN "public"."wvp_favorites"."remark" IS '备注';
 -- Records of wvp_favorites
 -- ----------------------------
 
+
 -- ----------------------------
 -- Table structure for wvp_favorites_channel
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_favorites_channel";
+DROP TABLE IF EXISTS "public"."wvp_favorites_channel" CASCADE;
 CREATE TABLE "public"."wvp_favorites_channel" (
   "channel_id" int8 NOT NULL,
   "favorites_id" int8,
@@ -2376,10 +1917,11 @@ COMMENT ON COLUMN "public"."wvp_favorites_channel"."remark" IS '备注';
 -- Records of wvp_favorites_channel
 -- ----------------------------
 
+
 -- ----------------------------
 -- Table structure for wvp_mark
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_mark";
+DROP TABLE IF EXISTS "public"."wvp_mark" CASCADE;
 CREATE TABLE "public"."wvp_mark" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2408,10 +1950,11 @@ COMMENT ON COLUMN "public"."wvp_mark"."remark" IS '备注';
 -- Records of wvp_mark
 -- ----------------------------
 
+
 -- ----------------------------
 -- Table structure for wvp_mark_channel
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_mark_channel";
+DROP TABLE IF EXISTS "public"."wvp_mark_channel" CASCADE;
 CREATE TABLE "public"."wvp_mark_channel" (
   "channel_id" int8 NOT NULL,
   "mark_id" int8,
@@ -2439,11 +1982,12 @@ COMMENT ON COLUMN "public"."wvp_mark_channel"."remark" IS '备注';
 -- ----------------------------
 -- Records of wvp_mark_channel
 -- ----------------------------
+INSERT INTO "public"."wvp_mark_channel" VALUES (1, 1, '泉姒禾网络', '34020000001320000001', '34020000001310000001', '', '2025-08-26 13:31:42', '', NULL, '');
 
 -- ----------------------------
 -- Table structure for wvp_media_server
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_media_server";
+DROP TABLE IF EXISTS "public"."wvp_media_server" CASCADE;
 CREATE TABLE "public"."wvp_media_server" (
   "id" text COLLATE "pg_catalog"."default" NOT NULL,
   "ip" text COLLATE "pg_catalog"."default",
@@ -2477,7 +2021,7 @@ CREATE TABLE "public"."wvp_media_server" (
   "transcode_suffix" text COLLATE "pg_catalog"."default",
   "nginx_proxy_enabled" bool DEFAULT false,
   "nginx_http_port" int4,
-  "nginx_https_port" int4
+  "nginx_https_port" int2
 )
 ;
 
@@ -2488,7 +2032,7 @@ CREATE TABLE "public"."wvp_media_server" (
 -- ----------------------------
 -- Table structure for wvp_platform
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_platform";
+DROP TABLE IF EXISTS "public"."wvp_platform" CASCADE;
 CREATE TABLE "public"."wvp_platform" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2540,7 +2084,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_platform_channel
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_platform_channel";
+DROP TABLE IF EXISTS "public"."wvp_platform_channel" CASCADE;
 CREATE TABLE "public"."wvp_platform_channel" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2595,7 +2139,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_platform_group
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_platform_group";
+DROP TABLE IF EXISTS "public"."wvp_platform_group" CASCADE;
 CREATE TABLE "public"."wvp_platform_group" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2616,7 +2160,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_platform_region
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_platform_region";
+DROP TABLE IF EXISTS "public"."wvp_platform_region" CASCADE;
 CREATE TABLE "public"."wvp_platform_region" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2637,7 +2181,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_record_plan
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_record_plan";
+DROP TABLE IF EXISTS "public"."wvp_record_plan" CASCADE;
 CREATE TABLE "public"."wvp_record_plan" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2660,7 +2204,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_record_plan_item
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_record_plan_item";
+DROP TABLE IF EXISTS "public"."wvp_record_plan_item" CASCADE;
 CREATE TABLE "public"."wvp_record_plan_item" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2685,7 +2229,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_resources_tree
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_resources_tree";
+DROP TABLE IF EXISTS "public"."wvp_resources_tree" CASCADE;
 CREATE TABLE "public"."wvp_resources_tree" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2708,9 +2252,43 @@ CACHE 1
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for wvp_sip_black
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."wvp_sip_black" CASCADE;
+CREATE TABLE "public"."wvp_sip_black" (
+  "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 9223372036854775807
+START 1
+CACHE 1
+),
+  "device_id" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "ip" varchar(50) COLLATE "pg_catalog"."default" DEFAULT NULL::character varying,
+  "port" int4,
+  "remark" varchar(255) COLLATE "pg_catalog"."default" DEFAULT NULL::character varying,
+  "create_time" varchar(50) COLLATE "pg_catalog"."default" DEFAULT NULL::character varying,
+  "update_time" varchar(50) COLLATE "pg_catalog"."default" DEFAULT NULL::character varying
+)
+;
+COMMENT ON COLUMN "public"."wvp_sip_black"."id" IS '主键ID';
+COMMENT ON COLUMN "public"."wvp_sip_black"."device_id" IS '设备ID（国标设备编码，唯一）';
+COMMENT ON COLUMN "public"."wvp_sip_black"."ip" IS 'IP地址';
+COMMENT ON COLUMN "public"."wvp_sip_black"."port" IS '端口';
+COMMENT ON COLUMN "public"."wvp_sip_black"."remark" IS '备注';
+COMMENT ON COLUMN "public"."wvp_sip_black"."create_time" IS '创建时间';
+COMMENT ON COLUMN "public"."wvp_sip_black"."update_time" IS '更新时间';
+COMMENT ON TABLE "public"."wvp_sip_black" IS 'SIP黑名单表';
+
+-- ----------------------------
+-- Records of wvp_sip_black
+-- ----------------------------
+
+
+-- ----------------------------
 -- Table structure for wvp_sip_config
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_sip_config";
+DROP TABLE IF EXISTS "public"."wvp_sip_config" CASCADE;
 CREATE TABLE "public"."wvp_sip_config" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2750,12 +2328,12 @@ COMMENT ON COLUMN "public"."wvp_sip_config"."update_time" IS '更新时间';
 -- ----------------------------
 -- Records of wvp_sip_config
 -- ----------------------------
-INSERT INTO "public"."wvp_sip_config" VALUES (1, '192.168.228.134', NULL, 15060, '3402000000', '34020000002000000001', 'gbs12345', NULL, NULL, 'f', NULL, NULL, '2026-07-30 19:24:01');
+INSERT INTO "public"."wvp_sip_config" VALUES (1, '192.168.228.134', NULL, 15060, '3402000000', '34020000002000000001', 'gbs12345', NULL, NULL, 'f', NULL, NULL, '2026-08-15 17:22:27');
 
 -- ----------------------------
 -- Table structure for wvp_stream_proxy
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_stream_proxy";
+DROP TABLE IF EXISTS "public"."wvp_stream_proxy" CASCADE;
 CREATE TABLE "public"."wvp_stream_proxy" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2793,7 +2371,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_stream_push
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_stream_push";
+DROP TABLE IF EXISTS "public"."wvp_stream_push" CASCADE;
 CREATE TABLE "public"."wvp_stream_push" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2823,7 +2401,7 @@ CACHE 1
 -- ----------------------------
 -- Table structure for wvp_user_api_key
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."wvp_user_api_key";
+DROP TABLE IF EXISTS "public"."wvp_user_api_key" CASCADE;
 CREATE TABLE "public"."wvp_user_api_key" (
   "id" int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY (
 INCREMENT 1
@@ -2861,265 +2439,10 @@ COMMENT ON COLUMN "public"."wvp_user_api_key"."remark" IS '备注';
 -- ----------------------------
 -- Records of wvp_user_api_key
 -- ----------------------------
-INSERT INTO "public"."wvp_user_api_key" VALUES (1, 2, 'ak_hOPw-NgBYpFijEzQFWUd6y4n', 'AobdttzX1MiYBNA9sRjvjozh5a8kr7CyttCiF0qSZrI02zjN7f85bZmcquPhgK18', 'test', NULL, 't', 'admin', '2026-07-19 17:30:40', 'admin', '2026-07-19 17:30:40', '');
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."gen_table_column_column_id_seq"
-OWNED BY "public"."gen_table_column"."column_id";
-SELECT setval('"public"."gen_table_column_column_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."gen_table_table_id_seq"
-OWNED BY "public"."gen_table"."table_id";
-SELECT setval('"public"."gen_table_table_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_base_config_config_id_seq"
-OWNED BY "public"."sys_base_config"."config_id";
-SELECT setval('"public"."sys_base_config_config_id_seq"', 2, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_config_config_id_seq"
-OWNED BY "public"."sys_config"."config_id";
-SELECT setval('"public"."sys_config_config_id_seq"', 24, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
-OWNED BY "public"."sys_dept"."dept_id";
-SELECT setval('"public"."sys_dept_dept_id_seq"', 112, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_dict_data_dict_code_seq"
-OWNED BY "public"."sys_dict_data"."dict_code";
-SELECT setval('"public"."sys_dict_data_dict_code_seq"', 62, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_dict_type_dict_id_seq"
-OWNED BY "public"."sys_dict_type"."dict_id";
-SELECT setval('"public"."sys_dict_type_dict_id_seq"', 21, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_job_job_id_seq"
-OWNED BY "public"."sys_job"."job_id";
-SELECT setval('"public"."sys_job_job_id_seq"', 6, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_job_log_job_log_id_seq"
-OWNED BY "public"."sys_job_log"."job_log_id";
-SELECT setval('"public"."sys_job_log_job_log_id_seq"', 5, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_logininfor_info_id_seq"
-OWNED BY "public"."sys_logininfor"."info_id";
-SELECT setval('"public"."sys_logininfor_info_id_seq"', 792, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_menu_menu_id_seq"
-OWNED BY "public"."sys_menu"."menu_id";
-SELECT setval('"public"."sys_menu_menu_id_seq"', 2163, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_notice_notice_id_seq"
-OWNED BY "public"."sys_notice"."notice_id";
-SELECT setval('"public"."sys_notice_notice_id_seq"', 3, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_oper_log_oper_id_seq"
-OWNED BY "public"."sys_oper_log"."oper_id";
-SELECT setval('"public"."sys_oper_log_oper_id_seq"', 2142, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_post_post_id_seq"
-OWNED BY "public"."sys_post"."post_id";
-SELECT setval('"public"."sys_post_post_id_seq"', 7, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_role_role_id_seq"
-OWNED BY "public"."sys_role"."role_id";
-SELECT setval('"public"."sys_role_role_id_seq"', 4, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_user_user_id_seq"
-OWNED BY "public"."sys_user"."user_id";
-SELECT setval('"public"."sys_user_user_id_seq"', 6, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_cloud_record_id_seq"
-OWNED BY "public"."wvp_cloud_record"."id";
-SELECT setval('"public"."wvp_cloud_record_id_seq"', 285, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_common_group_id_seq"
-OWNED BY "public"."wvp_common_group"."id";
-SELECT setval('"public"."wvp_common_group_id_seq"', 6, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_common_region_id_seq"
-OWNED BY "public"."wvp_common_region"."id";
-SELECT setval('"public"."wvp_common_region_id_seq"', 7, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_device_alarm_id_seq"
-OWNED BY "public"."wvp_device_alarm"."id";
-SELECT setval('"public"."wvp_device_alarm_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_device_channel_id_seq"
-OWNED BY "public"."wvp_device_channel"."id";
-SELECT setval('"public"."wvp_device_channel_id_seq"', 1185, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_device_id_seq"
-OWNED BY "public"."wvp_device"."id";
-SELECT setval('"public"."wvp_device_id_seq"', 1115, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_device_mobile_position_id_seq"
-OWNED BY "public"."wvp_device_mobile_position"."id";
-SELECT setval('"public"."wvp_device_mobile_position_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_favorites_id_seq"
-OWNED BY "public"."wvp_favorites"."id";
-SELECT setval('"public"."wvp_favorites_id_seq"', 3, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_mark_id_seq"
-OWNED BY "public"."wvp_mark"."id";
-SELECT setval('"public"."wvp_mark_id_seq"', 3, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_platform_channel_id_seq"
-OWNED BY "public"."wvp_platform_channel"."id";
-SELECT setval('"public"."wvp_platform_channel_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_platform_group_id_seq"
-OWNED BY "public"."wvp_platform_group"."id";
-SELECT setval('"public"."wvp_platform_group_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_platform_id_seq"
-OWNED BY "public"."wvp_platform"."id";
-SELECT setval('"public"."wvp_platform_id_seq"', 2, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_platform_region_id_seq"
-OWNED BY "public"."wvp_platform_region"."id";
-SELECT setval('"public"."wvp_platform_region_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_record_plan_id_seq"
-OWNED BY "public"."wvp_record_plan"."id";
-SELECT setval('"public"."wvp_record_plan_id_seq"', 2, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_record_plan_item_id_seq"
-OWNED BY "public"."wvp_record_plan_item"."id";
-SELECT setval('"public"."wvp_record_plan_item_id_seq"', 3, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_resources_tree_id_seq"
-OWNED BY "public"."wvp_resources_tree"."id";
-SELECT setval('"public"."wvp_resources_tree_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_sip_config_id_seq"
-OWNED BY "public"."wvp_sip_config"."id";
-SELECT setval('"public"."wvp_sip_config_id_seq"', 2, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_stream_proxy_id_seq"
-OWNED BY "public"."wvp_stream_proxy"."id";
-SELECT setval('"public"."wvp_stream_proxy_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_stream_push_id_seq"
-OWNED BY "public"."wvp_stream_push"."id";
-SELECT setval('"public"."wvp_stream_push_id_seq"', 1, false);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."wvp_user_api_key_id_seq"
-OWNED BY "public"."wvp_user_api_key"."id";
-SELECT setval('"public"."wvp_user_api_key_id_seq"', 2, false);
 
 -- ----------------------------
 -- Auto increment value for gen_table
 -- ----------------------------
-SELECT setval('"public"."gen_table_table_id_seq"', 1, false);
-
 -- ----------------------------
 -- Primary Key structure for table gen_table
 -- ----------------------------
@@ -3128,8 +2451,6 @@ ALTER TABLE "public"."gen_table" ADD CONSTRAINT "gen_table_pkey" PRIMARY KEY ("t
 -- ----------------------------
 -- Auto increment value for gen_table_column
 -- ----------------------------
-SELECT setval('"public"."gen_table_column_column_id_seq"', 1, false);
-
 -- ----------------------------
 -- Primary Key structure for table gen_table_column
 -- ----------------------------
@@ -3202,8 +2523,6 @@ ALTER TABLE "public"."qrtz_triggers" ADD CONSTRAINT "qrtz_triggers_pkey" PRIMARY
 -- ----------------------------
 -- Auto increment value for sys_base_config
 -- ----------------------------
-SELECT setval('"public"."sys_base_config_config_id_seq"', 2, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_base_config
 -- ----------------------------
@@ -3212,8 +2531,6 @@ ALTER TABLE "public"."sys_base_config" ADD CONSTRAINT "sys_base_config_pkey" PRI
 -- ----------------------------
 -- Auto increment value for sys_config
 -- ----------------------------
-SELECT setval('"public"."sys_config_config_id_seq"', 24, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_config
 -- ----------------------------
@@ -3222,8 +2539,6 @@ ALTER TABLE "public"."sys_config" ADD CONSTRAINT "sys_config_pkey" PRIMARY KEY (
 -- ----------------------------
 -- Auto increment value for sys_dept
 -- ----------------------------
-SELECT setval('"public"."sys_dept_dept_id_seq"', 112, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_dept
 -- ----------------------------
@@ -3232,8 +2547,6 @@ ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dep
 -- ----------------------------
 -- Auto increment value for sys_dict_data
 -- ----------------------------
-SELECT setval('"public"."sys_dict_data_dict_code_seq"', 62, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_dict_data
 -- ----------------------------
@@ -3242,8 +2555,6 @@ ALTER TABLE "public"."sys_dict_data" ADD CONSTRAINT "sys_dict_data_pkey" PRIMARY
 -- ----------------------------
 -- Auto increment value for sys_dict_type
 -- ----------------------------
-SELECT setval('"public"."sys_dict_type_dict_id_seq"', 21, false);
-
 -- ----------------------------
 -- Uniques structure for table sys_dict_type
 -- ----------------------------
@@ -3257,8 +2568,6 @@ ALTER TABLE "public"."sys_dict_type" ADD CONSTRAINT "sys_dict_type_pkey" PRIMARY
 -- ----------------------------
 -- Auto increment value for sys_job
 -- ----------------------------
-SELECT setval('"public"."sys_job_job_id_seq"', 6, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_job
 -- ----------------------------
@@ -3267,8 +2576,6 @@ ALTER TABLE "public"."sys_job" ADD CONSTRAINT "sys_job_pkey" PRIMARY KEY ("job_i
 -- ----------------------------
 -- Auto increment value for sys_job_log
 -- ----------------------------
-SELECT setval('"public"."sys_job_log_job_log_id_seq"', 5, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_job_log
 -- ----------------------------
@@ -3277,8 +2584,6 @@ ALTER TABLE "public"."sys_job_log" ADD CONSTRAINT "sys_job_log_pkey" PRIMARY KEY
 -- ----------------------------
 -- Auto increment value for sys_logininfor
 -- ----------------------------
-SELECT setval('"public"."sys_logininfor_info_id_seq"', 792, true);
-
 -- ----------------------------
 -- Indexes structure for table sys_logininfor
 -- ----------------------------
@@ -3297,8 +2602,6 @@ ALTER TABLE "public"."sys_logininfor" ADD CONSTRAINT "sys_logininfor_pkey" PRIMA
 -- ----------------------------
 -- Auto increment value for sys_menu
 -- ----------------------------
-SELECT setval('"public"."sys_menu_menu_id_seq"', 2163, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_menu
 -- ----------------------------
@@ -3307,8 +2610,6 @@ ALTER TABLE "public"."sys_menu" ADD CONSTRAINT "sys_menu_pkey" PRIMARY KEY ("men
 -- ----------------------------
 -- Auto increment value for sys_notice
 -- ----------------------------
-SELECT setval('"public"."sys_notice_notice_id_seq"', 3, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_notice
 -- ----------------------------
@@ -3317,8 +2618,6 @@ ALTER TABLE "public"."sys_notice" ADD CONSTRAINT "sys_notice_pkey" PRIMARY KEY (
 -- ----------------------------
 -- Auto increment value for sys_oper_log
 -- ----------------------------
-SELECT setval('"public"."sys_oper_log_oper_id_seq"', 2142, true);
-
 -- ----------------------------
 -- Indexes structure for table sys_oper_log
 -- ----------------------------
@@ -3340,8 +2639,6 @@ ALTER TABLE "public"."sys_oper_log" ADD CONSTRAINT "sys_oper_log_pkey" PRIMARY K
 -- ----------------------------
 -- Auto increment value for sys_post
 -- ----------------------------
-SELECT setval('"public"."sys_post_post_id_seq"', 7, false);
-
 -- ----------------------------
 -- Primary Key structure for table sys_post
 -- ----------------------------
@@ -3350,8 +2647,6 @@ ALTER TABLE "public"."sys_post" ADD CONSTRAINT "sys_post_pkey" PRIMARY KEY ("pos
 -- ----------------------------
 -- Auto increment value for sys_role
 -- ----------------------------
-SELECT setval('"public"."sys_role_role_id_seq"', 4, true);
-
 -- ----------------------------
 -- Primary Key structure for table sys_role
 -- ----------------------------
@@ -3370,8 +2665,6 @@ ALTER TABLE "public"."sys_role_menu" ADD CONSTRAINT "sys_role_menu_pkey" PRIMARY
 -- ----------------------------
 -- Auto increment value for sys_user
 -- ----------------------------
-SELECT setval('"public"."sys_user_user_id_seq"', 6, true);
-
 -- ----------------------------
 -- Primary Key structure for table sys_user
 -- ----------------------------
@@ -3395,8 +2688,6 @@ ALTER TABLE "public"."sys_user_role" ADD CONSTRAINT "sys_user_role_pkey" PRIMARY
 -- ----------------------------
 -- Auto increment value for wvp_cloud_record
 -- ----------------------------
-SELECT setval('"public"."wvp_cloud_record_id_seq"', 285, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_cloud_record
 -- ----------------------------
@@ -3405,8 +2696,6 @@ ALTER TABLE "public"."wvp_cloud_record" ADD CONSTRAINT "wvp_cloud_record_pkey" P
 -- ----------------------------
 -- Auto increment value for wvp_common_group
 -- ----------------------------
-SELECT setval('"public"."wvp_common_group_id_seq"', 6, false);
-
 -- ----------------------------
 -- Uniques structure for table wvp_common_group
 -- ----------------------------
@@ -3420,8 +2709,6 @@ ALTER TABLE "public"."wvp_common_group" ADD CONSTRAINT "wvp_common_group_pkey" P
 -- ----------------------------
 -- Auto increment value for wvp_common_region
 -- ----------------------------
-SELECT setval('"public"."wvp_common_region_id_seq"', 7, false);
-
 -- ----------------------------
 -- Uniques structure for table wvp_common_region
 -- ----------------------------
@@ -3435,8 +2722,6 @@ ALTER TABLE "public"."wvp_common_region" ADD CONSTRAINT "wvp_common_region_pkey"
 -- ----------------------------
 -- Auto increment value for wvp_device
 -- ----------------------------
-SELECT setval('"public"."wvp_device_id_seq"', 1115, true);
-
 -- ----------------------------
 -- Uniques structure for table wvp_device
 -- ----------------------------
@@ -3450,8 +2735,6 @@ ALTER TABLE "public"."wvp_device" ADD CONSTRAINT "wvp_device_pkey" PRIMARY KEY (
 -- ----------------------------
 -- Auto increment value for wvp_device_alarm
 -- ----------------------------
-SELECT setval('"public"."wvp_device_alarm_id_seq"', 1, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_device_alarm
 -- ----------------------------
@@ -3460,8 +2743,6 @@ ALTER TABLE "public"."wvp_device_alarm" ADD CONSTRAINT "wvp_device_alarm_pkey" P
 -- ----------------------------
 -- Auto increment value for wvp_device_channel
 -- ----------------------------
-SELECT setval('"public"."wvp_device_channel_id_seq"', 1185, true);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_device_channel
 -- ----------------------------
@@ -3470,8 +2751,6 @@ ALTER TABLE "public"."wvp_device_channel" ADD CONSTRAINT "wvp_device_channel_pke
 -- ----------------------------
 -- Auto increment value for wvp_device_mobile_position
 -- ----------------------------
-SELECT setval('"public"."wvp_device_mobile_position_id_seq"', 1, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_device_mobile_position
 -- ----------------------------
@@ -3480,8 +2759,6 @@ ALTER TABLE "public"."wvp_device_mobile_position" ADD CONSTRAINT "wvp_device_mob
 -- ----------------------------
 -- Auto increment value for wvp_favorites
 -- ----------------------------
-SELECT setval('"public"."wvp_favorites_id_seq"', 3, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_favorites
 -- ----------------------------
@@ -3495,8 +2772,6 @@ ALTER TABLE "public"."wvp_favorites_channel" ADD CONSTRAINT "wvp_favorites_chann
 -- ----------------------------
 -- Auto increment value for wvp_mark
 -- ----------------------------
-SELECT setval('"public"."wvp_mark_id_seq"', 3, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_mark
 -- ----------------------------
@@ -3520,8 +2795,6 @@ ALTER TABLE "public"."wvp_media_server" ADD CONSTRAINT "wvp_media_server_pkey" P
 -- ----------------------------
 -- Auto increment value for wvp_platform
 -- ----------------------------
-SELECT setval('"public"."wvp_platform_id_seq"', 2, true);
-
 -- ----------------------------
 -- Uniques structure for table wvp_platform
 -- ----------------------------
@@ -3535,8 +2808,6 @@ ALTER TABLE "public"."wvp_platform" ADD CONSTRAINT "wvp_platform_pkey" PRIMARY K
 -- ----------------------------
 -- Auto increment value for wvp_platform_channel
 -- ----------------------------
-SELECT setval('"public"."wvp_platform_channel_id_seq"', 1, false);
-
 -- ----------------------------
 -- Uniques structure for table wvp_platform_channel
 -- ----------------------------
@@ -3551,8 +2822,6 @@ ALTER TABLE "public"."wvp_platform_channel" ADD CONSTRAINT "wvp_platform_channel
 -- ----------------------------
 -- Auto increment value for wvp_platform_group
 -- ----------------------------
-SELECT setval('"public"."wvp_platform_group_id_seq"', 1, false);
-
 -- ----------------------------
 -- Uniques structure for table wvp_platform_group
 -- ----------------------------
@@ -3566,8 +2835,6 @@ ALTER TABLE "public"."wvp_platform_group" ADD CONSTRAINT "wvp_platform_group_pke
 -- ----------------------------
 -- Auto increment value for wvp_platform_region
 -- ----------------------------
-SELECT setval('"public"."wvp_platform_region_id_seq"', 1, false);
-
 -- ----------------------------
 -- Uniques structure for table wvp_platform_region
 -- ----------------------------
@@ -3581,8 +2848,6 @@ ALTER TABLE "public"."wvp_platform_region" ADD CONSTRAINT "wvp_platform_region_p
 -- ----------------------------
 -- Auto increment value for wvp_record_plan
 -- ----------------------------
-SELECT setval('"public"."wvp_record_plan_id_seq"', 2, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_record_plan
 -- ----------------------------
@@ -3591,8 +2856,6 @@ ALTER TABLE "public"."wvp_record_plan" ADD CONSTRAINT "wvp_record_plan_pkey" PRI
 -- ----------------------------
 -- Auto increment value for wvp_record_plan_item
 -- ----------------------------
-SELECT setval('"public"."wvp_record_plan_item_id_seq"', 3, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_record_plan_item
 -- ----------------------------
@@ -3601,18 +2864,29 @@ ALTER TABLE "public"."wvp_record_plan_item" ADD CONSTRAINT "wvp_record_plan_item
 -- ----------------------------
 -- Auto increment value for wvp_resources_tree
 -- ----------------------------
-SELECT setval('"public"."wvp_resources_tree_id_seq"', 1, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_resources_tree
 -- ----------------------------
 ALTER TABLE "public"."wvp_resources_tree" ADD CONSTRAINT "wvp_resources_tree_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
+-- Auto increment value for wvp_sip_black
+-- ----------------------------
+-- ----------------------------
+-- Indexes structure for table wvp_sip_black
+-- ----------------------------
+CREATE UNIQUE INDEX "uk_device_id" ON "public"."wvp_sip_black" USING btree (
+  "device_id" COLLATE "pg_catalog"."C" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+
+-- ----------------------------
+-- Primary Key structure for table wvp_sip_black
+-- ----------------------------
+ALTER TABLE "public"."wvp_sip_black" ADD CONSTRAINT "wvp_sip_black_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
 -- Auto increment value for wvp_sip_config
 -- ----------------------------
-SELECT setval('"public"."wvp_sip_config_id_seq"', 2, false);
-
 -- ----------------------------
 -- Primary Key structure for table wvp_sip_config
 -- ----------------------------
@@ -3621,8 +2895,6 @@ ALTER TABLE "public"."wvp_sip_config" ADD CONSTRAINT "wvp_sip_config_pkey" PRIMA
 -- ----------------------------
 -- Auto increment value for wvp_stream_proxy
 -- ----------------------------
-SELECT setval('"public"."wvp_stream_proxy_id_seq"', 1, false);
-
 -- ----------------------------
 -- Uniques structure for table wvp_stream_proxy
 -- ----------------------------
@@ -3636,8 +2908,6 @@ ALTER TABLE "public"."wvp_stream_proxy" ADD CONSTRAINT "wvp_stream_proxy_pkey" P
 -- ----------------------------
 -- Auto increment value for wvp_stream_push
 -- ----------------------------
-SELECT setval('"public"."wvp_stream_push_id_seq"', 1, false);
-
 -- ----------------------------
 -- Uniques structure for table wvp_stream_push
 -- ----------------------------
@@ -3651,8 +2921,6 @@ ALTER TABLE "public"."wvp_stream_push" ADD CONSTRAINT "wvp_stream_push_pkey" PRI
 -- ----------------------------
 -- Auto increment value for wvp_user_api_key
 -- ----------------------------
-SELECT setval('"public"."wvp_user_api_key_id_seq"', 2, false);
-
 -- ----------------------------
 -- Indexes structure for table wvp_user_api_key
 -- ----------------------------
