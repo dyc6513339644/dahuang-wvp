@@ -50,7 +50,7 @@ public class WvpUserApiKeyServiceImpl implements IWvpUserApiKeyService {
         entity.setAccessKey(generateAccessKey());
         entity.setSecretKey(generateSecretKey());
         entity.setAppName(appName);
-        entity.setEnable(1);
+        entity.setEnable(true);
 
         Date now = new Date();
         entity.setCreateBy(createBy);
@@ -72,7 +72,7 @@ public class WvpUserApiKeyServiceImpl implements IWvpUserApiKeyService {
         if (entity == null) {
             return false;
         }
-        entity.setEnable(entity.getEnable() == 1 ? 0 : 1);
+        entity.setEnable(!entity.getEnable());
         entity.setUpdateBy(updateBy);
         entity.setUpdateTime(new Date());
         apiKeyMapper.updateById(entity);

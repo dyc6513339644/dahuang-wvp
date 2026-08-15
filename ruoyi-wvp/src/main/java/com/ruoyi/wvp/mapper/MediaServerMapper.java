@@ -106,7 +106,6 @@ public interface MediaServerMapper {
             "<if test=\"sendRtpPortRange != null\">, send_rtp_port_range=#{sendRtpPortRange}</if>" +
             "<if test=\"secret != null\">, secret=#{secret}</if>" +
             "<if test=\"recordAssistPort != null\">, record_assist_port=#{recordAssistPort}</if>" +
-            "<if test=\"hookAliveInterval != null\">, hook_alive_interval=#{hookAliveInterval}</if>" +
             "<if test=\"recordDay != null\">, record_day=#{recordDay}</if>" +
             "<if test=\"recordPath != null\">, record_path=#{recordPath}</if>" +
             "<if test=\"transcodeSuffix != null\">, transcode_suffix=#{transcodeSuffix}</if>" +

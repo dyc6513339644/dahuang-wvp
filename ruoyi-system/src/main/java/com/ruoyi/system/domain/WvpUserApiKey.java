@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ruoyi.common.core.domain.BaseEntity;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -47,14 +48,7 @@ public class WvpUserApiKey extends BaseEntity {
     private Date expiredAt;
 
     /** 启用状态 (1:启用, 0:停用) */
-    private Integer enable;
+    private Boolean enable;
 
-    // createBy, createTime, updateBy, updateTime, remark 继承自 BaseEntity
 
-    /**
-     * 是否启用
-     */
-    public boolean isEnabled() {
-        return enable != null && enable == 1;
-    }
 }

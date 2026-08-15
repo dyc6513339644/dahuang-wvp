@@ -110,7 +110,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (apiKey.getEnable() == null || apiKey.getEnable() != 1) {
+        if (apiKey.getEnable() == null || !apiKey.getEnable()) {
             respondUnauthorized(response, "该 API Key 已被停用");
             return;
         }
