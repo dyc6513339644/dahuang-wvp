@@ -12,7 +12,6 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 用户API密钥Service实现类

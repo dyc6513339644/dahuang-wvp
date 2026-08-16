@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * 使用场景：Java Provider 类（如 ChannelProvider）中需要根据数据库类型
  * 生成不同的 SQL 语法（如 MySQL LIMIT vs 达梦 FETCH FIRST）。
  * <p>
- * 支持的数据库：MySQL / 达梦(DM) / SQLite
+ * 支持的数据库：MySQL / 达梦(DM) / SQLite / PostgreSQL
  *
  * @author ruoyi
  */
@@ -21,6 +21,7 @@ public final class DatabaseDialectHolder {
 
     private static volatile boolean dm = false;
     private static volatile boolean sqlite = false;
+    private static volatile boolean postgresql = false;
 
     DatabaseDialectHolder(DataSource dataSource) {
         try (Connection conn = dataSource.getConnection()) {
@@ -30,6 +31,8 @@ public final class DatabaseDialectHolder {
                 dm = true;
             } else if (productName.contains("sqlite")) {
                 sqlite = true;
+            } else if (productName.contains("postgresql")) {
+                postgresql = true;
             }
             // 其余默认 MySQL
         } catch (Exception e) {
@@ -52,10 +55,17 @@ public final class DatabaseDialectHolder {
     }
 
     /**
+     * 当前是否为 PostgreSQL 数据库。
+     */
+    public static boolean isPostgreSQL() {
+        return postgresql;
+    }
+
+    /**
      * 当前是否为 MySQL 数据库。
      */
     public static boolean isMySQL() {
-        return !dm && !sqlite;
+        return !dm && !sqlite && !postgresql;
     }
 
     // ==================== 数据库类型字符串 ====================
@@ -63,11 +73,12 @@ public final class DatabaseDialectHolder {
     /**
      * 获取当前数据库类型字符串（用于传递到 MyBatis Mapper XML 的 params 中）。
      *
-     * @return "mysql" / "dm" / "sqlite"
+     * @return "mysql" / "dm" / "sqlite" / "postgresql"
      */
     public static String getDbType() {
         if (dm) return "dm";
         if (sqlite) return "sqlite";
+        if (postgresql) return "postgresql";
         return "mysql";
     }
 
@@ -88,13 +99,17 @@ public final class DatabaseDialectHolder {
      * MySQL:  FIND_IN_SET(val, col)
      * 达梦:   INSTR(',' || col || ',', ',' || val || ',') > 0
      * SQLite: INSTR(',' || col || ',', ',' || val || ',') > 0（无 FIND_IN_SET 函数）
+     * PostgreSQL: CAST(val AS varchar) = ANY(string_to_array(col, ','))（无 FIND_IN_SET 函数）
      *
      * @param col   列名表达式
-     * @param param 参数占位符（如 #{deptId}）
+     * @param param 参数占位符（如 #{deptId}）或字面量
      */
     public static String findInSet(String col, String param) {
         if (dm || sqlite) {
             return "INSTR(',' || " + col + " || ',', ',' || " + param + " || ',') > 0";
+        }
+        if (postgresql) {
+            return "CAST(" + param + " AS varchar) = ANY(string_to_array(" + col + ", ','))";
         }
         return "FIND_IN_SET(" + param + ", " + col + ")";
     }

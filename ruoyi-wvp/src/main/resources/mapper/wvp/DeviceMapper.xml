@@ -248,6 +248,7 @@
             <if test="device.deptId != null">and (de.dept_id = #{device.deptId} OR de.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE
                 <choose>
                     <when test='device.params.dbType == "mysql"'>find_in_set(#{device.deptId}, ancestors)</when>
+                    <when test='device.params.dbType == "postgresql"'>CAST(#{device.deptId} AS varchar) = ANY(string_to_array(ancestors, ','))</when>
                     <otherwise>INSTR(',' || ancestors || ',', ',' || #{device.deptId} || ',') &gt; 0</otherwise>
                 </choose>
                 ))</if>
@@ -316,6 +317,7 @@
             <if test="device.deptId != null">and (de.dept_id = #{device.deptId} OR de.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE
                 <choose>
                     <when test='device.params.dbType == "mysql"'>find_in_set(#{device.deptId}, ancestors)</when>
+                    <when test='device.params.dbType == "postgresql"'>CAST(#{device.deptId} AS varchar) = ANY(string_to_array(ancestors, ','))</when>
                     <otherwise>INSTR(',' || ancestors || ',', ',' || #{device.deptId} || ',') &gt; 0</otherwise>
                 </choose>
                 ))</if>

@@ -115,10 +115,29 @@ public class PlatformController extends BaseController {
         Assert.notNull(platform.getServerGBId(), "上级平台国标编号不可为空");
         Assert.notNull(platform.getServerIp(), "上级平台IP不可为空");
         Assert.isTrue(platform.getServerPort() > 0 && platform.getServerPort() < 65535, "上级平台端口异常");
-        Assert.notNull(platform.getDeviceGBId(), "本平台国标编号不可为空");
 
         if (ObjectUtils.isEmpty(platform.getServerGBDomain())) {
             platform.setServerGBDomain(platform.getServerGBId().substring(0, 6));
+        }
+
+        // 设备国标编号为空时默认使用本地国标SIP ID
+        if (ObjectUtils.isEmpty(platform.getDeviceGBId())) {
+            platform.setDeviceGBId(sipConfig.getId());
+        }
+
+        // SIP认证用户名默认为本地国标SIP ID
+        if (ObjectUtils.isEmpty(platform.getUsername())) {
+            platform.setUsername(sipConfig.getId());
+        }
+
+        // 本地IP为空时默认使用本地SIP IP
+        if (ObjectUtils.isEmpty(platform.getDeviceIp())) {
+            platform.setDeviceIp(sipConfig.getIp());
+        }
+
+        // 本地端口为空时默认使用本地SIP端口
+        if (platform.getDevicePort() <= 0 && sipConfig.getPort() != null) {
+            platform.setDevicePort(sipConfig.getPort());
         }
 
         if (platform.getExpires() <= 0) {
@@ -168,13 +187,28 @@ public class PlatformController extends BaseController {
                 || ObjectUtils.isEmpty(parentPlatform.getServerGBDomain())
                 || ObjectUtils.isEmpty(parentPlatform.getServerIp())
                 || ObjectUtils.isEmpty(parentPlatform.getServerPort())
-                || ObjectUtils.isEmpty(parentPlatform.getDeviceGBId())
                 || ObjectUtils.isEmpty(parentPlatform.getExpires())
                 || ObjectUtils.isEmpty(parentPlatform.getKeepTimeout())
                 || ObjectUtils.isEmpty(parentPlatform.getTransport())
                 || ObjectUtils.isEmpty(parentPlatform.getCharacterSet())
         ) {
             throw new ControllerException(ErrorCode.ERROR400);
+        }
+        // 设备国标编号为空时默认使用本地国标SIP ID
+        if (ObjectUtils.isEmpty(parentPlatform.getDeviceGBId())) {
+            parentPlatform.setDeviceGBId(sipConfig.getId());
+        }
+        // SIP认证用户名默认为本地国标SIP ID
+        if (ObjectUtils.isEmpty(parentPlatform.getUsername())) {
+            parentPlatform.setUsername(sipConfig.getId());
+        }
+        // 本地IP为空时默认使用本地SIP IP
+        if (ObjectUtils.isEmpty(parentPlatform.getDeviceIp())) {
+            parentPlatform.setDeviceIp(sipConfig.getIp());
+        }
+        // 本地端口为空时默认使用本地SIP端口
+        if (parentPlatform.getDevicePort() <= 0 && sipConfig.getPort() != null) {
+            parentPlatform.setDevicePort(sipConfig.getPort());
         }
         platformService.update(parentPlatform);
         return success();

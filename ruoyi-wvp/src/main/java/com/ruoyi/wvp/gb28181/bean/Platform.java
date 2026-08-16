@@ -63,7 +63,7 @@ public class Platform implements Serializable {
     private int devicePort;
 
     /**
-     * SIP认证用户名(默认使用设备国标编号)
+     * SIP认证用户名(默认使用本地国标SIP ID)
      */
     private String username;
 

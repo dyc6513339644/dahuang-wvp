@@ -75,6 +75,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE
             <choose>
                 <when test='params.dbType == "mysql"'>find_in_set(#{deptId}, ancestors)</when>
+                <when test='params.dbType == "postgresql"'>CAST(#{deptId} AS varchar) = ANY(string_to_array(ancestors, ','))</when>
                 <otherwise>INSTR(',' || ancestors || ',', ',' || #{deptId} || ',') &gt; 0</otherwise>
             </choose>
             ))
