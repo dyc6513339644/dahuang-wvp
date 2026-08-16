@@ -176,12 +176,8 @@ public class SysDeptServiceImpl implements ISysDeptService {
         QueryWrapper<SysDept> wrapper = new QueryWrapper<>();
         wrapper.eq("status", 0);
         wrapper.eq("del_flag", "0");
-        //根据数据库类型判断
-        if(DatabaseDialectHolder.isMySQL()) {
-            wrapper.apply("find_in_set({0}, ancestors)", deptId);
-        }else {
-            wrapper.apply("INSTR(',' || ancestors || ',', ',' || {0} || ',') > 0", deptId);
-        }
+        //根据数据库类型生成 FIND_IN_SET 等价条件
+        wrapper.apply(DatabaseDialectHolder.findInSet("ancestors", "{0}"), deptId);
         return deptMapper.selectCount(wrapper);
     }
 
@@ -318,12 +314,8 @@ public class SysDeptServiceImpl implements ISysDeptService {
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
 
         QueryWrapper<SysDept> wrapper = new QueryWrapper<>();
-        //根据数据库类型判断
-        if(DatabaseDialectHolder.isMySQL()) {
-            wrapper.apply("find_in_set({0}, ancestors)", deptId);
-        }else {
-            wrapper.apply("INSTR(',' || ancestors || ',', ',' || {0} || ',') > 0", deptId);
-        }
+        //根据数据库类型生成 FIND_IN_SET 等价条件
+        wrapper.apply(DatabaseDialectHolder.findInSet("ancestors", "{0}"), deptId);
         List<SysDept> children=deptMapper.selectList(wrapper);
         // List<SysDept> children = deptMapper.selectChildrenDeptById(deptId);
         for (SysDept child : children) {
