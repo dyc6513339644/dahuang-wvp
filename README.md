@@ -14,7 +14,7 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016，兼
    账号：admin
    密码：admin1234
 
-* 移动端H5演示自己
+* 移动端H5演示地址
   https://wvph5.zgdahuan.com/
   账号：admin
   密码：admin1234
