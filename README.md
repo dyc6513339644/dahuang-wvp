@@ -97,15 +97,28 @@ v2.0.0 （2026-08-05）
         <td colspan="2" align="center">Pro版功能</td>        
     </tr>
     <tr>
-        <td><img src="images/mvp-pro11.png"/></td>
-        <td><img src="images/mvp-pro12.png"/></td>
+        <td><img src="images/mvp-pro15.png"/></td>
+        <td><img src="images/mvp-pro16.png"/></td>
     </tr>
     <tr>
-        <td><img src="images/mvp-pro13.png"/></td>
-        <td><img src="images/mvp-pro14.png"/></td>
+        <td><img src="images/mvp-pro17.png"/></td>
+        <td><img src="images/mvp-pro18.png"/></td>
     </tr>
     <tr>
-        <td><img src="images/mvp-pro15.png"/></td>        
+        <td colspan="2" align="center">移动端</td>        
+    </tr>
+
+    <tr>
+        <td><img src="images/app-1.png"/></td>      
+        <td><img src="images/app-2.png"/></td> 
+    </tr>
+    <tr>
+        <td><img src="images/app-3.png"/></td>      
+        <td><img src="images/app-4.png"/></td> 
+    </tr>
+    <tr>
+        <td><img src="images/app-4.png"/></td>      
+        <td><img src="images/app-5.png"/></td> 
     </tr>
 </table>
 
