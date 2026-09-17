@@ -115,7 +115,10 @@ v2.0.0 （2026-08-05）
         <td><img src="images/app-3.png"/></td>
         <td><img src="images/app-4.png"/></td>
     </tr>
-
+    <tr>
+        <td><img src="images/app-5.png"/></td>
+        <td><img src="images/app-6.png"/></td>
+    </tr>
    
 </table>
 
