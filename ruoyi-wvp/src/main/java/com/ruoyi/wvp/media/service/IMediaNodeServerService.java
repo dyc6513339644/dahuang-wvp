@@ -1,12 +1,11 @@
 package com.ruoyi.wvp.media.service;
 
-import com.ruoyi.wvp.common.CommonCallback;
-import com.ruoyi.wvp.common.StreamInfo;
-import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.StreamInfo;
+import com.ruoyi.media.domain.SendRtpInfo;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.streamProxy.bean.StreamProxy;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 
 import java.util.List;
 import java.util.Map;
@@ -15,8 +14,6 @@ public interface IMediaNodeServerService {
     int createRTPServer(MediaServer mediaServer, String streamId, long ssrc, Integer port, Boolean onlyAuto, Boolean disableAudio, Boolean reUsePort, Integer tcpMode);
 
     void closeRtpServer(MediaServer mediaServer, String streamId);
-
-    void closeRtpServer(MediaServer mediaServer, String streamId, CommonCallback<Boolean> callback);
 
     void closeStreams(MediaServer mediaServer, String app, String stream);
 

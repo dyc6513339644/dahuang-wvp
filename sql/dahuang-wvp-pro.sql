@@ -5,13 +5,13 @@
  Source Server Type    : MySQL
  Source Server Version : 50726 (5.7.26)
  Source Host           : localhost:3306
- Source Schema         : dahuang-wvp-pro
+ Source Schema         : dahuang-wvp
 
  Target Server Type    : MySQL
  Target Server Version : 50726 (5.7.26)
  File Encoding         : 65001
 
- Date: 15/08/2026 14:46:39
+ Date: 17/09/2026 15:11:53
 */
 
 SET NAMES utf8mb4;
@@ -132,7 +132,6 @@ CREATE TABLE `isup_device`  (
 -- ----------------------------
 -- Records of isup_device
 -- ----------------------------
-INSERT INTO `isup_device` VALUES (1, NULL, 'L29174662', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, '', '192.168.1.29', -1150, '', 31, 0, NULL, '', 'L29174662', 0, 0, 0, '5.0', '610E3F2904F253FD', '', 0, 0, 'ON', NULL, NULL, NULL, '', '2026-08-11 22:24:06', '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for qrtz_blob_triggers
@@ -352,6 +351,30 @@ CREATE TABLE `qrtz_triggers`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for sys_agreement
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_agreement`;
+CREATE TABLE `sys_agreement`  (
+  `agreement_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '协议ID',
+  `agreement_type` varchar(32) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '协议类型（agreement用户协议 privacy隐私政策）',
+  `agreement_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '协议名称',
+  `content` longtext CHARACTER SET utf8 COLLATE utf8_bin NULL COMMENT '协议内容（富文本HTML）',
+  `create_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`agreement_id`) USING BTREE,
+  UNIQUE INDEX `uk_agreement_type`(`agreement_type`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '协议管理表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_agreement
+-- ----------------------------
+INSERT INTO `sys_agreement` VALUES (1, 'agreement', '用户协议', '<p>本协议是您与本应用运营方之间关于使用本软件所订立的协议。请您在使用前仔细阅读，使用本软件即视为同意本协议全部条款。</p><p>一、服务内容<br/>1. 本应用为视频监控综合管理平台的移动客户端，提供设备查看、通道预览、云台控制、录像回放、报警消息查看等功能。<br/>2. 部分功能需要配合服务端与流媒体服务使用，具体功能以您所在单位实际部署为准。</p><p>二、账号与使用<br/>1. 账号由所在单位管理员分配，您应妥善保管账号与密码，因个人原因泄露造成的损失由您自行承担。<br/>2. 请勿将账号出借他人使用；发现账号异常应立即修改密码并联系管理员。<br/>3. 您应在授权范围内访问设备与视频资源，不得越权访问他人数据。</p><p>三、使用规范<br/>您承诺不利用本应用从事以下行为：<br/>1. 破解、反向工程、非法抓取平台数据；<br/>2. 传播病毒、恶意代码或干扰平台正常运行；<br/>3. 未经授权录制、复制、传播监控视频内容；<br/>4. 违反法律法规、侵犯他人合法权益的其他行为。</p><p>四、知识产权<br/>本应用及其包含的源代码、界面设计、文档、商标等知识产权归运营方所有，未经书面许可不得复制、修改、传播或用于商业用途。</p><p>五、免责声明<br/>1. 视频监控服务的可用性受网络环境、设备状态、服务器负载等因素影响，我们不保证服务不中断。<br/>2. 因不可抗力（自然灾害、网络攻击、基础电信故障等）导致服务中断或数据损失，我们不承担责任。<br/>3. 本应用提供的监控画面仅供参考，不构成任何法律证据或事实认定依据。</p><p>六、协议变更与终止<br/>1. 我们有权在必要时修订本协议，修订后在应用内公示。<br/>2. 若您违反本协议任一约定，我们有权暂停或终止向您提供服务。</p><p>七、其他<br/>本协议适用中华人民共和国法律。如发生争议，双方应友好协商解决。</p>', 'admin', '2026-09-14 09:56:38', 'admin', '2026-09-14 09:56:38', NULL);
+INSERT INTO `sys_agreement` VALUES (2, 'privacy', '隐私政策', '<p>本政策说明本应用如何收集、使用与保护您的个人信息。请您在使用前仔细阅读。</p><p>一、我们收集的信息<br/>1. 账号信息：您在登录时使用的用户名、密码（传输过程加密）等。<br/>2. 设备与日志信息：为保障服务稳定，我们会记录设备型号、系统版本、网络环境及操作日志。<br/>3. 业务数据：您在使用视频监控功能时产生的设备信息、通道信息、报警记录与录像记录。</p><p>二、信息的使用<br/>1. 用于完成身份认证、权限校验与账号安全管理。<br/>2. 用于提供视频点播、云台控制、录像回放、报警推送等核心功能。<br/>3. 用于排查故障、优化性能与改进产品体验。<br/>4. 法律法规要求或经您授权的其他用途。</p><p>三、信息的共享与披露<br/>我们不会向任何第三方出售您的个人信息。仅在以下情形共享：<br/>1. 获得您的明确同意；<br/>2. 为提供服务所必需（如流媒体服务节点、云存储服务）；<br/>3. 依据法律法规或监管部门强制性要求。</p><p>四、信息的存储与安全<br/>1. 您的数据存储于您所在单位部署的服务器中，我们采取加密传输、访问控制、权限分级等措施保护数据安全。<br/>2. 视频数据属于敏感信息，仅授权用户可访问，所有访问行为均有日志记录。<br/>3. 我们会按与您约定的期限保留数据，超期后按策略清理。</p><p>五、您的权利<br/>您有权访问、更正、删除您的个人信息，也有权撤回已授予的权限。可通过本应用「关于我们」中的联系方式或联系系统管理员处理。</p><p>六、未成年人信息保护<br/>本应用面向企业及行业用户，不面向未成年人提供服务。</p><p>七、政策更新<br/>本政策如有更新，我们会在应用内提示。继续使用即视为接受更新后的政策。</p>', 'admin', '2026-09-14 09:56:38', 'admin', '2026-09-14 09:56:38', NULL);
+
+-- ----------------------------
 -- Table structure for sys_base_config
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_base_config`;
@@ -400,7 +423,7 @@ CREATE TABLE `sys_config`  (
 INSERT INTO `sys_config` VALUES (1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow');
 INSERT INTO `sys_config` VALUES (2, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '初始化密码 123456');
 INSERT INTO `sys_config` VALUES (3, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '深色主题theme-dark，浅色主题theme-light');
-INSERT INTO `sys_config` VALUES (4, '账号自助-验证码开关', 'sys.account.captchaEnabled', 'true', 'Y', 'admin', '2025-04-03 09:03:39', 'admin', '2026-07-21 15:09:29', '是否开启验证码功能（true开启，false关闭）');
+INSERT INTO `sys_config` VALUES (4, '账号自助-验证码开关', 'sys.account.captchaEnabled', 'false', 'Y', 'admin', '2025-04-03 09:03:39', 'admin', '2026-09-06 16:27:00', '是否开启验证码功能（true开启，false关闭）');
 INSERT INTO `sys_config` VALUES (5, '账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '是否开启注册用户功能（true开启，false关闭）');
 INSERT INTO `sys_config` VALUES (6, '用户登录-黑名单列表', 'sys.login.blackIPList', '', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '设置登录IP黑名单限制，多个匹配项以;分隔，支持匹配（*通配、网段）');
 INSERT INTO `sys_config` VALUES (19, '高德地图KEY ', 'gaode_map_key', '88f28edf21df134b8b4c45ae6b87761a', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-06-07 15:39:26', NULL);
@@ -630,7 +653,7 @@ CREATE TABLE `sys_logininfor`  (
   PRIMARY KEY (`info_id`) USING BTREE,
   INDEX `idx_sys_logininfor_s`(`status`) USING BTREE,
   INDEX `idx_sys_logininfor_lt`(`login_time`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 889 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 937 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_logininfor
@@ -662,7 +685,7 @@ CREATE TABLE `sys_menu`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`menu_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2170 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '菜单权限表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2173 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '菜单权限表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_menu
@@ -740,7 +763,7 @@ INSERT INTO `sys_menu` VALUES (1053, '状态修改', 110, 5, '#', '', '', '', 1,
 INSERT INTO `sys_menu` VALUES (1054, '任务导出', 110, 6, '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:job:export', '#', 'admin', '2025-04-03 09:03:39', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (2000, '基础配置', 0, 7, 'node', 'wvp/mediaServer/index', NULL, 'node', 1, 0, 'C', '0', '0', 'wvp:server:list', 'el-icon-document', 'admin', '2025-04-03 09:08:16', 'admin', '2026-08-06 16:12:45', '');
 INSERT INTO `sys_menu` VALUES (2003, '国标设备', 2015, 1, 'device', 'wvp/device/index', NULL, 'device', 1, 0, 'C', '0', '0', 'wvp:device:list', '#', 'admin', '2025-04-09 14:54:29', 'admin', '2025-04-18 09:00:20', '');
-INSERT INTO `sys_menu` VALUES (2004, 'ONVIF设备', 2015, 4, 'onvif', 'onvif/index', NULL, 'onvif', 1, 0, 'C', '0', '0', 'onvif:device:list', '#', 'admin', '2025-04-09 17:31:15', 'admin', '2026-06-29 22:17:20', '');
+INSERT INTO `sys_menu` VALUES (2004, 'ONVIF设备', 2015, 4, 'onvif', 'onvif/index', NULL, 'onvif', 1, 0, 'C', '1', '0', 'onvif:device:list', '#', 'admin', '2025-04-09 17:31:15', 'admin', '2026-09-17 15:02:38', '');
 INSERT INTO `sys_menu` VALUES (2006, '云端录像', 2162, 99, 'cloudRecord', 'wvp/cloudRecord/index', NULL, 'cloudRecord', 1, 0, 'C', '0', '0', 'wvp:record:list', '#', 'admin', '2025-04-11 11:31:09', 'admin', '2026-06-20 23:42:51', '');
 INSERT INTO `sys_menu` VALUES (2007, '推流设备', 2015, 3, 'streamPush', 'wvp/streamPush/index', NULL, 'streamPush', 1, 0, 'C', '0', '0', 'wvp:push:list', '#', 'admin', '2025-04-11 14:53:58', 'admin', '2026-06-20 23:31:04', '');
 INSERT INTO `sys_menu` VALUES (2008, '拉流设备', 2015, 2, 'streamProxy', 'wvp/streamProxy/index', NULL, 'streamProxy', 1, 1, 'C', '0', '0', 'wvp:proxy:list', '#', 'admin', '2025-04-12 09:13:44', 'admin', '2026-06-20 23:30:49', '');
@@ -802,9 +825,13 @@ INSERT INTO `sys_menu` VALUES (2162, '录像管理', 0, 5, 'record', NULL, NULL,
 INSERT INTO `sys_menu` VALUES (2163, '云台控制', 2003, 99, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'wvp:play:ptz', '#', 'admin', '2026-07-30 20:44:31', '', '2026-07-30 20:44:31', '');
 INSERT INTO `sys_menu` VALUES (2164, '基础配置查看', 2000, 2, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'system:baseconfig:query', '#', 'admin', '2026-07-30 20:48:42', '', '2026-07-30 20:48:42', '');
 INSERT INTO `sys_menu` VALUES (2165, '基础配置编辑', 2000, 0, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'system:baseconfig:edit', '#', 'admin', '2026-07-30 20:49:11', '', '2026-07-30 20:49:11', '');
-INSERT INTO `sys_menu` VALUES (2166, '报警管理', 0, 3, 'gbmanger', NULL, NULL, '', 1, 0, 'M', '0', '0', NULL, 'el-icon-loading', 'admin', '2026-08-06 16:11:40', 'admin', '2026-08-06 16:15:39', '');
+INSERT INTO `sys_menu` VALUES (2166, '报警管理', 0, 3, 'gbmanger', NULL, NULL, '', 1, 0, 'M', '0', '0', NULL, 'el-icon-message-solid', 'admin', '2026-08-06 16:11:40', 'admin', '2026-09-06 15:33:51', '');
 INSERT INTO `sys_menu` VALUES (2167, '报警查询', 2166, 0, 'alarm', 'wvp/alarm/index', NULL, 'alarm', 1, 0, 'C', '0', '0', 'wvp:alarm:list', 'el-icon-bell', 'admin', '2026-08-06 16:14:25', 'admin', '2026-08-06 16:28:28', '');
 INSERT INTO `sys_menu` VALUES (2168, '删除', 2167, 0, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'wvp:alarm:remove', '#', 'admin', '2026-08-06 16:28:55', '', '2026-08-06 16:28:55', '');
+INSERT INTO `sys_menu` VALUES (2169, '海康ISUP', 2015, 5, 'isup', 'wvp/isup/index', NULL, '', 1, 0, 'C', '1', '0', 'isup:lsupDevice:list', '#', 'admin', '2026-08-11 23:44:39', 'admin', '2026-09-17 15:01:17', '');
+INSERT INTO `sys_menu` VALUES (2170, '协议管理', 1, 9, 'agreement', 'system/agreement/index', '', '', 1, 0, 'C', '0', '0', '', '', 'admin', '2026-09-14 10:00:07', 'admin', '2026-09-14 11:08:24', '协议管理菜单');
+INSERT INTO `sys_menu` VALUES (2171, '协议查询', 2167, 1, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'system:agreement:query', '#', 'admin', '2026-09-14 10:00:07', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2172, '协议保存', 2167, 2, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'system:agreement:edit', '#', 'admin', '2026-09-14 10:00:07', '', NULL, '');
 
 -- ----------------------------
 -- Table structure for sys_notice
@@ -822,7 +849,7 @@ CREATE TABLE `sys_notice`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`notice_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '通知公告表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '通知公告表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_notice
@@ -854,7 +881,7 @@ CREATE TABLE `sys_oper_log`  (
   INDEX `idx_sys_oper_log_bt`(`business_type`) USING BTREE,
   INDEX `idx_sys_oper_log_s`(`status`) USING BTREE,
   INDEX `idx_sys_oper_log_ot`(`oper_time`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2221 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '操作日志记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2238 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '操作日志记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_oper_log
@@ -1283,7 +1310,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 100, 'admin', '超级系统管理员', '00', 'ry@163.com', '', '1', '/profile/avatar/2025/06/17/透明底logo_20250617143004A001.png', '$2a$10$7hGDAACyoyJF9SFe5WHJg.3aqcJaSpQAY.7ar4tpuoPIf1su7zBne', '0', '0', '127.0.0.1', '2026-08-11 22:27:50', '2026-08-05 20:56:08', '3e80d1762a324d5b0ff636e0bd16f1e3', 'admin', '2025-04-03 09:03:39', '', '2026-08-11 22:27:50', '管理员');
+INSERT INTO `sys_user` VALUES (1, 100, 'admin', '超级系统管理员', '00', 'ry@163.com', '', '1', '/profile/avatar/2025/06/17/透明底logo_20250617143004A001.png', '$2a$10$7hGDAACyoyJF9SFe5WHJg.3aqcJaSpQAY.7ar4tpuoPIf1su7zBne', '0', '0', '127.0.0.1', '2026-09-17 14:56:45', '2026-08-05 20:56:08', '3e80d1762a324d5b0ff636e0bd16f1e3', 'admin', '2025-04-03 09:03:39', '', '2026-09-17 14:56:45', '管理员');
 INSERT INTO `sys_user` VALUES (4, 100, 'admin_wvp', '系统管理员', '00', '', '', '0', '/profile/avatar/2025/06/17/透明底logo_20250617143004A001.png', '$2a$10$E46LV8OFOMFQDZ54X3mI2.FhDkmZ9xOQ4mdoByisRBP5fL8p2y5JC', '0', '0', '127.0.0.1', '2026-06-23 17:38:39', NULL, NULL, 'admin', '2026-06-23 16:52:55', '', '2026-06-23 17:38:39', NULL);
 INSERT INTO `sys_user` VALUES (6, 100, 'wvp', '演示用户', '00', '', '', '0', '', '$2a$10$By7UFaalJO90qOvYYVPSaeM.HtffdqJQGdwykljAYos18uW8P3jSm', '0', '0', '127.0.0.1', '2026-08-04 23:04:37', NULL, NULL, 'admin', '2026-07-30 20:23:44', 'admin', '2026-08-04 23:04:37', NULL);
 INSERT INTO `sys_user` VALUES (7, NULL, 'test', 'test', '00', '', '', '0', '', '$2a$10$YdTLicqkwhEhhjOH..lkxuPOruetGzlEHap3AmBkMsTJKEXIAI9ca', '0', '0', '127.0.0.1', '2026-08-05 20:57:19', '2026-08-01 20:43:22', NULL, 'admin', '2026-08-05 17:01:53', 'admin', '2026-08-05 20:57:19', NULL);
@@ -1297,12 +1324,11 @@ CREATE TABLE `sys_user_channel`  (
   `channel_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `device_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`user_id`, `channel_id`) USING BTREE
-) ENGINE = MyISAM CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_user_channel
 -- ----------------------------
-
 
 -- ----------------------------
 -- Table structure for sys_user_post
@@ -1357,7 +1383,7 @@ CREATE TABLE `wvp_cloud_record`  (
   `time_len` bigint(20) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 44 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_cloud_record
@@ -1419,6 +1445,7 @@ CREATE TABLE `wvp_device`  (
   `manufacturer` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   `db_model` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   `firmware` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `channel_num` int(11) NULL DEFAULT 0 COMMENT '通道数量',
   `transport` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   `stream_mode` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   `on_line` tinyint(1) NULL DEFAULT 0,
@@ -1472,7 +1499,7 @@ CREATE TABLE `wvp_device`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   UNIQUE INDEX `uk_device_device`(`device_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 41 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_device
@@ -1494,6 +1521,7 @@ CREATE TABLE `wvp_device_alarm`  (
   `latitude` double NULL DEFAULT NULL,
   `alarm_type` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   `create_time` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `channel_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '通道名称(报警发生时快照)',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
@@ -1594,7 +1622,7 @@ CREATE TABLE `wvp_device_channel`  (
   `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 80 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 90 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_device_channel
@@ -1624,7 +1652,6 @@ CREATE TABLE `wvp_device_mobile_position`  (
 -- ----------------------------
 -- Records of wvp_device_mobile_position
 -- ----------------------------
-
 
 -- ----------------------------
 -- Table structure for wvp_favorites
@@ -1900,7 +1927,7 @@ CREATE TABLE `wvp_record_plan`  (
   `update_time` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_record_plan
@@ -1920,11 +1947,13 @@ CREATE TABLE `wvp_record_plan_item`  (
   `update_time` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_record_plan_item
 -- ----------------------------
+INSERT INTO `wvp_record_plan_item` VALUES (2, 0, 47, 2, 1, NULL, NULL);
+INSERT INTO `wvp_record_plan_item` VALUES (3, 0, 47, 3, 1, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for wvp_resources_tree
@@ -1960,7 +1989,7 @@ CREATE TABLE `wvp_sip_black`  (
   `update_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_device_id`(`device_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'SIP黑名单表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'SIP黑名单表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of wvp_sip_black
@@ -1990,7 +2019,7 @@ CREATE TABLE `wvp_sip_config`  (
 -- ----------------------------
 -- Records of wvp_sip_config
 -- ----------------------------
-INSERT INTO `wvp_sip_config` VALUES (1, '127.0.0.1', NULL, 15060, '3402000000', '34020000002000000001', 'gbs12345', NULL, NULL, 0, NULL, NULL, '2026-07-16 20:28:00');
+INSERT INTO `wvp_sip_config` VALUES (1, '127.0.0.1', NULL, 15060, '3402000000', '34020000002000000001', 'gbs12345', NULL, NULL, 1, NULL, NULL, '2026-09-17 14:57:28');
 
 -- ----------------------------
 -- Table structure for wvp_stream_proxy
@@ -2074,3 +2103,8 @@ CREATE TABLE `wvp_user_api_key`  (
   INDEX `idx_user_id`(`user_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
 
+-- ----------------------------
+-- Records of wvp_user_api_key
+-- ----------------------------
+
+SET FOREIGN_KEY_CHECKS = 1;

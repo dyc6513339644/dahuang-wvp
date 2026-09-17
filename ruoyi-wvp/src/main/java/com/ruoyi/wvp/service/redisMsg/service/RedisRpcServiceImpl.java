@@ -2,21 +2,21 @@ package com.ruoyi.wvp.service.redisMsg.service;
 
 import com.alibaba.fastjson2.JSON;
 import com.ruoyi.wvp.common.CommonCallback;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.conf.redis.RedisRpcConfig;
 import com.ruoyi.wvp.conf.redis.bean.RedisRpcRequest;
 import com.ruoyi.wvp.conf.redis.bean.RedisRpcResponse;
-import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
-import com.ruoyi.wvp.gb28181.session.SSRCFactory;
-import com.ruoyi.wvp.media.event.hook.Hook;
-import com.ruoyi.wvp.media.event.hook.HookSubscribe;
-import com.ruoyi.wvp.media.event.hook.HookType;
+import com.ruoyi.media.domain.SendRtpInfo;
+import com.ruoyi.media.service.ISSRCService;
+import com.ruoyi.media.event.hook.Hook;
+import com.ruoyi.media.event.hook.HookSubscribe;
+import com.ruoyi.media.event.hook.HookType;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.ISendRtpServerService;
 import com.ruoyi.wvp.service.redisMsg.IRedisRpcService;
 import com.ruoyi.common.enums.ErrorCode;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -37,7 +37,7 @@ public class RedisRpcServiceImpl implements IRedisRpcService {
     private HookSubscribe hookSubscribe;
 
     @Autowired
-    private SSRCFactory ssrcFactory;
+    private ISSRCService ssrcService;
 
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
@@ -101,7 +101,7 @@ public class RedisRpcServiceImpl implements IRedisRpcService {
             // 读取redis中的上级点播信息，生成sendRtpItm发送出去
             if (sendRtpItem.getSsrc() == null) {
                 // 上级平台点播时不使用上级平台指定的ssrc，使用自定义的ssrc，参考国标文档-点播外域设备媒体流SSRC处理方式
-                String ssrc = "Play".equalsIgnoreCase(sendRtpItem.getSessionName()) ? ssrcFactory.getPlaySsrc(hookData.getMediaServer().getId()) : ssrcFactory.getPlayBackSsrc(hookData.getMediaServer().getId());
+                String ssrc = "Play".equalsIgnoreCase(sendRtpItem.getSessionName()) ? ssrcService.getPlaySsrc(hookData.getMediaServer().getId(), userSetting.getServerId()) : ssrcService.getPlayBackSsrc(hookData.getMediaServer().getId(), userSetting.getServerId());
                 sendRtpItem.setSsrc(ssrc);
             }
             sendRtpItem.setMediaServerId(hookData.getMediaServer().getId());

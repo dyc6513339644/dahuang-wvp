@@ -2,7 +2,7 @@ package com.ruoyi.wvp.gb28181.service;
 
 import com.ruoyi.wvp.common.InviteInfo;
 import com.ruoyi.wvp.common.InviteSessionType;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
 
 import java.util.List;

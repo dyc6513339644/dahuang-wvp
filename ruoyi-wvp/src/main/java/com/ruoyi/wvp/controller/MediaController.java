@@ -2,14 +2,14 @@ package com.ruoyi.wvp.controller;
 
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.media.service.IMediaServerService;
-import com.ruoyi.wvp.media.zlm.dto.StreamAuthorityInfo;
+import com.ruoyi.media.zlm.dto.StreamAuthorityInfo;
 import com.ruoyi.wvp.storager.IRedisCatchStorage;
 import com.ruoyi.wvp.streamProxy.service.IStreamProxyService;
 import com.ruoyi.common.enums.ErrorCode;
-import com.ruoyi.wvp.vmanager.bean.StreamContent;
+import com.ruoyi.media.domain.StreamContent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

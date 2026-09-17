@@ -1,8 +1,8 @@
 package com.ruoyi.wvp.service;
 
 
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.bean.ResultForOnPublish;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.domain.ResultForOnPublish;
 
 /**
  * 媒体信息业务

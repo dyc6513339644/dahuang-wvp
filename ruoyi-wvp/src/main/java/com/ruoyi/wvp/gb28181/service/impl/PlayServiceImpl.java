@@ -4,11 +4,11 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.SsrcTransactionNotFoundException;
-import com.ruoyi.wvp.media.bean.RecordInfo;
+import com.ruoyi.media.domain.RecordInfo;
 import com.ruoyi.wvp.common.InviteInfo;
 import com.ruoyi.wvp.common.InviteSessionStatus;
 import com.ruoyi.wvp.common.InviteSessionType;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.common.VideoManagerConstants;
 import com.ruoyi.system.config.SslConfig;
@@ -16,25 +16,27 @@ import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.*;
+import com.ruoyi.media.domain.SendRtpInfo;
+import com.ruoyi.media.domain.InviteStreamType;
 import com.ruoyi.wvp.gb28181.controller.bean.AudioBroadcastEvent;
 import com.ruoyi.wvp.gb28181.event.SipSubscribe;
 import com.ruoyi.wvp.gb28181.service.*;
 import com.ruoyi.wvp.gb28181.session.AudioBroadcastManager;
-import com.ruoyi.wvp.gb28181.session.SSRCFactory;
+import com.ruoyi.media.service.ISSRCService;
 import com.ruoyi.wvp.gb28181.session.SipInviteSessionManager;
 import com.ruoyi.wvp.gb28181.transmit.cmd.ISIPCommander;
 import com.ruoyi.wvp.gb28181.transmit.cmd.ISIPCommanderForPlatform;
 import com.ruoyi.wvp.gb28181.utils.SipUtils;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.hook.Hook;
-import com.ruoyi.wvp.media.event.hook.HookSubscribe;
-import com.ruoyi.wvp.media.event.hook.HookType;
-import com.ruoyi.wvp.media.event.media.MediaArrivalEvent;
-import com.ruoyi.wvp.media.event.media.MediaDepartureEvent;
-import com.ruoyi.wvp.media.event.media.MediaNotFoundEvent;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.hook.Hook;
+import com.ruoyi.media.event.hook.HookSubscribe;
+import com.ruoyi.media.event.hook.HookType;
+import com.ruoyi.media.event.media.MediaArrivalEvent;
+import com.ruoyi.media.event.media.MediaDepartureEvent;
+import com.ruoyi.media.event.media.MediaNotFoundEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
-import com.ruoyi.wvp.media.zlm.dto.StreamAuthorityInfo;
+import com.ruoyi.media.zlm.dto.StreamAuthorityInfo;
 import com.ruoyi.wvp.service.IReceiveRtpServerService;
 import com.ruoyi.wvp.service.ISendRtpServerService;
 import com.ruoyi.wvp.service.bean.*;
@@ -43,7 +45,7 @@ import com.ruoyi.wvp.utils.CloudRecordUtils;
 import com.ruoyi.wvp.utils.DateUtil;
 import com.ruoyi.wvp.vmanager.bean.AudioBroadcastResult;
 import com.ruoyi.common.enums.ErrorCode;
-import com.ruoyi.wvp.vmanager.bean.StreamContent;
+import com.ruoyi.media.domain.StreamContent;
 import gov.nist.javax.sip.message.SIPResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
+import com.ruoyi.media.domain.DownloadFileInfo;
+import com.ruoyi.media.domain.SSRCInfo;
 
 @SuppressWarnings(value = {"rawtypes", "unchecked"})
 @Slf4j
@@ -120,7 +124,7 @@ public class PlayServiceImpl implements IPlayService {
     private ISIPCommanderForPlatform commanderForPlatform;
 
     @Autowired
-    private SSRCFactory ssrcFactory;
+    private ISSRCService ssrcService;
 
     @Autowired
     private IPlatformService platformService;
@@ -336,7 +340,7 @@ public class PlayServiceImpl implements IPlayService {
             if (inviteInfoInCatch.getStreamInfo() == null) {
                 // 释放生成的ssrc，使用上一次申请的322
 
-                ssrcFactory.releaseSsrc(mediaServerItem.getId(), ssrc);
+                ssrcService.releaseSsrc(mediaServerItem.getId(), ssrc, userSetting.getServerId());
                 // 点播发起了但是尚未成功, 仅注册回调等待结果即可
                 inviteStreamService.once(InviteSessionType.PLAY, channel.getId(), null, callback);
                 log.info("[点播开始] 已经请求中，等待结果， deviceId: {}, channelId({}): {}", device.getDeviceId(), channel.getDeviceId(), channel.getId());
@@ -493,7 +497,7 @@ public class PlayServiceImpl implements IPlayService {
                       HookSubscribe.Event hookEvent, SipSubscribe.Event errorEvent,
                       Runnable timeoutCallback, AudioBroadcastEvent audioEvent) {
 
-        String playSsrc = ssrcFactory.getPlaySsrc(mediaServerItem.getId());
+        String playSsrc = ssrcService.getPlaySsrc(mediaServerItem.getId(), userSetting.getServerId());
 
         if (playSsrc == null) {
             audioEvent.call("ssrc已经用尽");
@@ -1553,7 +1557,7 @@ public class PlayServiceImpl implements IPlayService {
             mediaServerService.stopSendRtp(mediaServer, sendRtpInfo.getApp(), sendRtpInfo.getStream(), sendRtpInfo.getSsrc());
         }
 
-        ssrcFactory.releaseSsrc(mediaServerId, sendRtpInfo.getSsrc());
+        ssrcService.releaseSsrc(mediaServerId, sendRtpInfo.getSsrc(), userSetting.getServerId());
 
         SsrcTransaction ssrcTransaction = sessionManager.getSsrcTransactionByStream(sendRtpInfo.getApp(), sendRtpInfo.getStream());
         if (ssrcTransaction != null) {

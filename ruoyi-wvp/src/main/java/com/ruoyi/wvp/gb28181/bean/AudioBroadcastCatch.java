@@ -1,7 +1,7 @@
 package com.ruoyi.wvp.gb28181.bean;
 
 import com.ruoyi.wvp.gb28181.controller.bean.AudioBroadcastEvent;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import gov.nist.javax.sip.message.SIPResponse;
 import lombok.Data;
 

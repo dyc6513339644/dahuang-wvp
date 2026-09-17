@@ -1,13 +1,13 @@
 package com.ruoyi.wvp.streamPush.service.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.wvp.conf.UserSetting;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
-import com.ruoyi.wvp.media.zlm.dto.StreamAuthorityInfo;
+import com.ruoyi.media.zlm.dto.StreamAuthorityInfo;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
 import com.ruoyi.wvp.service.bean.MessageForPushChannel;
 import com.ruoyi.wvp.service.redisMsg.IRedisRpcService;

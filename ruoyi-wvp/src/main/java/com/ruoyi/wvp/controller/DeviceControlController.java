@@ -17,7 +17,7 @@ import com.ruoyi.wvp.gb28181.transmit.callback.DeferredResultHolder;
 import com.ruoyi.wvp.gb28181.transmit.callback.RequestMessage;
 import com.ruoyi.wvp.gb28181.transmit.cmd.ISIPCommander;
 import com.ruoyi.common.enums.ErrorCode;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

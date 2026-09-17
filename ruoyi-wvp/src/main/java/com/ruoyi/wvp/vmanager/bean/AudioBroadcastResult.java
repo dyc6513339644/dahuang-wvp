@@ -1,5 +1,7 @@
 package com.ruoyi.wvp.vmanager.bean;
 
+import com.ruoyi.media.domain.StreamContent;
+
 /**
  * @author lin
  */

@@ -8,16 +8,18 @@ import com.ruoyi.wvp.conf.SipConfig;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.*;
+import com.ruoyi.media.domain.SendRtpInfo;
+import com.ruoyi.media.domain.InviteStreamType;
 import com.ruoyi.wvp.gb28181.service.*;
 import com.ruoyi.wvp.gb28181.session.AudioBroadcastManager;
-import com.ruoyi.wvp.gb28181.session.SSRCFactory;
+import com.ruoyi.media.service.ISSRCService;
 import com.ruoyi.wvp.gb28181.session.SipInviteSessionManager;
 import com.ruoyi.wvp.gb28181.transmit.SIPProcessorObserver;
 import com.ruoyi.wvp.gb28181.transmit.cmd.ISIPCommanderForPlatform;
 import com.ruoyi.wvp.gb28181.transmit.event.request.ISIPRequestProcessor;
 import com.ruoyi.wvp.gb28181.transmit.event.request.SIPRequestProcessorParent;
 import com.ruoyi.wvp.gb28181.utils.SipUtils;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.ISendRtpServerService;
 import com.ruoyi.wvp.service.bean.InviteErrorCode;
@@ -103,7 +105,7 @@ public class InviteRequestProcessor extends SIPRequestProcessorParent implements
     private UserSetting userSetting;
 
     @Autowired
-    private SSRCFactory ssrcFactory;
+    private ISSRCService ssrcService;
 
 
     @Override
@@ -174,8 +176,8 @@ public class InviteRequestProcessor extends SIPRequestProcessorParent implements
                         if (userSetting.getUseCustomSsrcForParentInvite()) {
                             // 上级平台点播时不使用上级平台指定的ssrc，使用自定义的ssrc，参考国标文档-点播外域设备媒体流SSRC处理方式
                             String ssrc = "Play".equalsIgnoreCase(inviteInfo.getSessionName())
-                                        ? ssrcFactory.getPlaySsrc(streamInfo.getMediaServer().getId())
-                                    : ssrcFactory.getPlayBackSsrc(streamInfo.getMediaServer().getId());
+                                        ? ssrcService.getPlaySsrc(streamInfo.getMediaServer().getId(), userSetting.getServerId())
+                                    : ssrcService.getPlayBackSsrc(streamInfo.getMediaServer().getId(), userSetting.getServerId());
                             inviteInfo.setSsrc(ssrc);
                         }
                         // 构建sendRTP内容

@@ -1,6 +1,6 @@
 package com.ruoyi.wvp.service.bean;
 
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import lombok.Data;
 
 @Data

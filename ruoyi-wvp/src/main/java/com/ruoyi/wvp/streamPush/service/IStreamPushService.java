@@ -1,7 +1,7 @@
 package com.ruoyi.wvp.streamPush.service;
 
 import com.github.pagehelper.PageInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.service.bean.GPSMsgInfo;
 import com.ruoyi.wvp.service.bean.StreamPushItemFromRedis;
 import com.ruoyi.wvp.streamPush.bean.StreamPush;

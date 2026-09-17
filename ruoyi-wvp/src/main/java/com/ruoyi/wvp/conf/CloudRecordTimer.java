@@ -2,7 +2,7 @@ package com.ruoyi.wvp.conf;
 
 
 
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.bean.CloudRecordItem;
 import com.ruoyi.wvp.mapper.CloudRecordServiceMapper;

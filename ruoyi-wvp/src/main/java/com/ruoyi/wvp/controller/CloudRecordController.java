@@ -6,7 +6,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.service.ICloudRecordService;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.bean.CloudRecordItem;
 import com.ruoyi.wvp.utils.DateUtil;

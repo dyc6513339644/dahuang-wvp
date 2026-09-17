@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.ruoyi.media.event.media.MediaArrivalEvent;
+import com.ruoyi.media.event.media.MediaDepartureEvent;
 
 /**
  * 语音/广播对讲设备缓存管理器（纯内存，不落DB）

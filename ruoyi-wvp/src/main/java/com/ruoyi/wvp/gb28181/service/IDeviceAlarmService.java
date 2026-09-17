@@ -15,6 +15,7 @@ public interface IDeviceAlarmService {
      * @param page 当前页
      * @param count 每页数量
      * @param deviceId 设备id
+     * @param channelId 通道编码（channel_id 过滤，精确匹配）
      * @param alarmPriority  报警级别, 1为一级警情, 2为二级警情, 3为三级警情, 4为四级 警情-
      * @param alarmMethod 报警方式 , 1为电话报警, 2为设备报警, 3为短信报警, 4为 GPS报警, 5为视频报警, 6为设备故障报警,
      * 	                            7其他报警;可以为直接组合如12为电话报警或 设备报警-
@@ -23,7 +24,7 @@ public interface IDeviceAlarmService {
      * @param endTime 结束时间
      * @return 报警列表
      */
-    PageInfo<DeviceAlarm> getAllAlarm(int page, int count, String deviceId, String alarmPriority, String alarmMethod,
+    PageInfo<DeviceAlarm> getAllAlarm(int page, int count, String deviceId, String channelId, String alarmPriority, String alarmMethod,
                                       String alarmType, String startTime, String endTime);
 
     /**
@@ -31,6 +32,12 @@ public interface IDeviceAlarmService {
      * @param deviceAlarm 添加报警
      */
     void add(DeviceAlarm deviceAlarm);
+
+    /**
+     * 异步回填报警通道名称（报警报文本身不含通道名，落库后异步查通道表补齐）
+     * @param deviceAlarm 已落库的报警（需携带自增 id）
+     */
+    void asyncFillChannelName(DeviceAlarm deviceAlarm);
 
     /**
      * 清空时间以前的报警

@@ -1,7 +1,7 @@
 package com.ruoyi.wvp.controller;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -10,7 +10,7 @@ import com.ruoyi.wvp.gb28181.bean.Device;
 import com.ruoyi.wvp.gb28181.bean.DeviceChannel;
 import com.ruoyi.wvp.gb28181.service.IDeviceChannelService;
 import com.ruoyi.wvp.mapper.DeviceMapper;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
 import com.ruoyi.wvp.service.bean.InviteErrorCode;
@@ -18,8 +18,8 @@ import com.ruoyi.wvp.streamProxy.bean.StreamProxyParam;
 import com.ruoyi.wvp.streamProxy.service.IStreamProxyPlayService;
 import com.ruoyi.wvp.streamProxy.service.IStreamProxyService;
 import com.ruoyi.wvp.vmanager.bean.ResourceBaseInfo;
-import com.ruoyi.wvp.vmanager.bean.StreamContent;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.StreamContent;
+import com.ruoyi.media.domain.WVPResult;
 import com.ruoyi.common.enums.ErrorCode;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.transmit.callback.DeferredResultHolder;

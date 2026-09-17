@@ -14,7 +14,7 @@ import com.ruoyi.wvp.gb28181.service.IPlatformChannelService;
 import com.ruoyi.wvp.gb28181.service.IPlatformService;
 import com.ruoyi.wvp.utils.DateUtil;
 import com.ruoyi.common.enums.ErrorCode;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

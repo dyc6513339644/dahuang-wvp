@@ -1,7 +1,7 @@
 package com.ruoyi.wvp.gb28181.service;
 
 
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
 import com.ruoyi.wvp.gb28181.bean.InviteInfo;
 import com.ruoyi.wvp.gb28181.bean.Platform;

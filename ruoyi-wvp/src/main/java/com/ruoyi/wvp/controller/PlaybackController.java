@@ -5,10 +5,10 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.wvp.common.InviteInfo;
 import com.ruoyi.wvp.common.InviteSessionType;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.conf.UserSetting;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.Device;
 import com.ruoyi.wvp.gb28181.bean.DeviceChannel;
@@ -21,8 +21,8 @@ import com.ruoyi.wvp.gb28181.transmit.callback.RequestMessage;
 import com.ruoyi.wvp.gb28181.transmit.cmd.impl.SIPCommander;
 import com.ruoyi.wvp.service.bean.InviteErrorCode;
 import com.ruoyi.common.enums.ErrorCode;
-import com.ruoyi.wvp.vmanager.bean.StreamContent;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.StreamContent;
+import com.ruoyi.media.domain.WVPResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -147,6 +147,18 @@ public class PlaybackController extends BaseController {
 					requestMessage.setData(wvpResult);
 					resultHolder.invokeResult(requestMessage);
 				});
+
+		// 回放请求超时兜底：设备不回放 / INVITE 无响应 / hook 未触发时，playBack 回调可能不触发，
+		// 导致 DeferredResult 挂到超时后返回 503 或挂起，前端 axios 等满 100s 才超时。
+		// 此处超时主动返回错误结果（对齐 GBRecordController 录像查询的 onTimeout 处理）。
+		result.onTimeout(() -> {
+			log.warn("[录像回放] 请求超时 deviceId: {}, channelId: {}", deviceId, channelId);
+			WVPResult<StreamContent> timeoutResult = new WVPResult<>();
+			timeoutResult.setCode(ErrorCode.ERROR100.getCode());
+			timeoutResult.setMsg("回放请求超时");
+			requestMessage.setData(timeoutResult);
+			resultHolder.invokeResult(requestMessage);
+		});
 
 		return result;
 	}

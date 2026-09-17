@@ -11,6 +11,7 @@ import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.common.utils.DatabaseDialectHolder;
 import com.ruoyi.wvp.gb28181.bean.*;
+import com.ruoyi.media.domain.SendRtpInfo;
 import com.ruoyi.wvp.gb28181.service.IDeviceService;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
 import com.ruoyi.wvp.gb28181.session.AudioBroadcastManager;
@@ -24,7 +25,7 @@ import com.ruoyi.wvp.gb28181.transmit.event.request.impl.message.response.cmd.Ca
 import com.ruoyi.wvp.mapper.DeviceChannelMapper;
 import com.ruoyi.wvp.mapper.DeviceMapper;
 import com.ruoyi.wvp.mapper.PlatformChannelMapper;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.ISendRtpServerService;
 import com.ruoyi.wvp.storager.IRedisCatchStorage;

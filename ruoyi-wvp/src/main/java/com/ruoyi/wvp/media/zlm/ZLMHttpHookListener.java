@@ -4,17 +4,17 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.wvp.conf.UserSetting;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.bean.ResultForOnPublish;
-import com.ruoyi.wvp.media.event.media.*;
-import com.ruoyi.wvp.media.event.mediaServer.MediaSendRtpStoppedEvent;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.domain.ResultForOnPublish;
+import com.ruoyi.media.event.media.*;
+import com.ruoyi.media.event.mediaServer.MediaSendRtpStoppedEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
-import com.ruoyi.wvp.media.zlm.dto.ZLMServerConfig;
-import com.ruoyi.wvp.media.zlm.dto.hook.*;
-import com.ruoyi.wvp.media.zlm.event.HookZlmServerKeepaliveEvent;
-import com.ruoyi.wvp.media.zlm.event.HookZlmServerStartEvent;
+import com.ruoyi.media.zlm.dto.ZLMServerConfig;
+import com.ruoyi.media.zlm.dto.hook.*;
+import com.ruoyi.media.event.zlm.HookZlmServerKeepaliveEvent;
+import com.ruoyi.media.event.zlm.HookZlmServerStartEvent;
 import com.ruoyi.wvp.service.IMediaService;
-import com.ruoyi.wvp.utils.MediaServerUtils;
+import com.ruoyi.media.utils.MediaServerUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,6 +26,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import com.ruoyi.media.event.media.MediaArrivalEvent;
+import com.ruoyi.media.event.media.MediaDepartureEvent;
+import com.ruoyi.media.event.media.MediaNotFoundEvent;
+import com.ruoyi.media.event.media.MediaRecordMp4Event;
+import com.ruoyi.media.event.media.MediaRtpServerTimeoutEvent;
+import com.ruoyi.media.zlm.dto.hook.HookResult;
+import com.ruoyi.media.zlm.dto.hook.HookResultForOnPublish;
+import com.ruoyi.media.zlm.dto.hook.OnPlayHookParam;
+import com.ruoyi.media.zlm.dto.hook.OnPublishHookParam;
+import com.ruoyi.media.zlm.dto.hook.OnRecordMp4HookParam;
+import com.ruoyi.media.zlm.dto.hook.OnRtpServerTimeoutHookParam;
+import com.ruoyi.media.zlm.dto.hook.OnSendRtpStoppedHookParam;
+import com.ruoyi.media.zlm.dto.hook.OnServerKeepaliveHookParam;
+import com.ruoyi.media.zlm.dto.hook.OnStreamChangedHookParam;
+import com.ruoyi.media.zlm.dto.hook.OnStreamNoneReaderHookParam;
+import com.ruoyi.media.zlm.dto.hook.OnStreamNotFoundHookParam;
 
 /**
  * @description:针对 ZLMediaServer的hook事件监听
@@ -265,6 +281,9 @@ public class ZLMHttpHookListener {
             MediaServer mediaServerItem = mediaServerService.getOne(param.getMediaServerId());
             if (mediaServerItem != null) {
                 event.setMediaServer(mediaServerItem);
+                // 监听方(PlatformServiceImpl)依赖 app/stream 查询并匹配发流记录，必须带上
+                event.setApp(param.getApp());
+                event.setStream(param.getStream());
                 applicationEventPublisher.publishEvent(event);
             }
         }catch (Exception e) {

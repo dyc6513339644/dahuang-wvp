@@ -1,7 +1,7 @@
 package com.ruoyi.wvp.gb28181.bean;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 
 public class InviteStreamInfo {
 

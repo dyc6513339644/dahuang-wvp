@@ -9,7 +9,7 @@ import com.ruoyi.wvp.gb28181.transmit.event.request.SIPRequestProcessorParent;
 import com.ruoyi.wvp.gb28181.transmit.event.request.impl.message.IMessageHandler;
 import com.ruoyi.wvp.gb28181.transmit.event.request.impl.message.response.ResponseMessageHandler;
 import com.ruoyi.common.enums.ErrorCode;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 import gov.nist.javax.sip.message.SIPRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Element;

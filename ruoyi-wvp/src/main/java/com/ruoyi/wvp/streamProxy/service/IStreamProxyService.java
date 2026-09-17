@@ -1,8 +1,8 @@
 package com.ruoyi.wvp.streamProxy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.ruoyi.wvp.common.StreamInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.StreamInfo;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.streamProxy.bean.StreamProxy;
 import com.ruoyi.wvp.streamProxy.bean.StreamProxyParam;
 import com.ruoyi.wvp.vmanager.bean.ResourceBaseInfo;

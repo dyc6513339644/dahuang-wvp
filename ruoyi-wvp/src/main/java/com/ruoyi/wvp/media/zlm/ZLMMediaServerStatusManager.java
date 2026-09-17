@@ -4,18 +4,20 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.wvp.conf.DynamicTask;
-import com.ruoyi.wvp.gb28181.event.EventPublisher;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerChangeEvent;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerDeleteEvent;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.mediaServer.MediaServerChangeEvent;
+import com.ruoyi.media.event.mediaServer.MediaServerDeleteEvent;
+import com.ruoyi.media.event.mediaServer.MediaServerOfflineEvent;
+import com.ruoyi.media.event.mediaServer.MediaServerOnlineEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
-import com.ruoyi.wvp.media.zlm.dto.ZLMServerConfig;
-import com.ruoyi.wvp.media.zlm.event.HookZlmServerKeepaliveEvent;
-import com.ruoyi.wvp.media.zlm.event.HookZlmServerStartEvent;
+import com.ruoyi.media.zlm.dto.ZLMServerConfig;
+import com.ruoyi.media.event.zlm.HookZlmServerKeepaliveEvent;
+import com.ruoyi.media.event.zlm.HookZlmServerStartEvent;
 import com.ruoyi.system.config.SslConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import com.ruoyi.media.zlm.ZLMRESTfulUtils;
 
 /**
  * 管理zlm流媒体节点的状态
@@ -58,7 +61,7 @@ public class ZLMMediaServerStatusManager {
     private String serverServletContextPath;
 
     @Autowired
-    private EventPublisher eventPublisher;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private final String type = "zlm";
 
@@ -193,7 +196,9 @@ public class ZLMMediaServerStatusManager {
             mediaServerItem.setHookAliveInterval(10F);
             mediaServerService.update(mediaServerItem);
             // 发送上线通知
-            eventPublisher.mediaServerOnlineEventPublish(mediaServerItem);
+            MediaServerOnlineEvent onlineEvent = new MediaServerOnlineEvent(this);
+            onlineEvent.setMediaServer(mediaServerItem);
+            applicationEventPublisher.publishEvent(onlineEvent);
             if(mediaServerItem.isAutoConfig()) {
                 if (config == null) {
                     JSONObject responseJSON = zlmresTfulUtils.getMediaServerConfig(mediaServerItem);
@@ -219,7 +224,9 @@ public class ZLMMediaServerStatusManager {
                 offlineZlmPrimaryMap.put(mediaServerItem.getId(), mediaServerItem);
                 offlineZlmTimeMap.put(mediaServerItem.getId(), System.currentTimeMillis());
                 // 发送离线通知
-                eventPublisher.mediaServerOfflineEventPublish(mediaServerItem);
+                MediaServerOfflineEvent offlineEvent = new MediaServerOfflineEvent(this);
+                offlineEvent.setMediaServer(mediaServerItem);
+                applicationEventPublisher.publishEvent(offlineEvent);
                 mediaServerService.update(mediaServerItem);
             }, (int)(mediaServerItem.getHookAliveInterval() * 2 * 1000));
         }

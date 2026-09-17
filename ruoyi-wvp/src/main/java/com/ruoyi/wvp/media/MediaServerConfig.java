@@ -1,8 +1,8 @@
 package com.ruoyi.wvp.media;
 
 
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerChangeEvent;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.mediaServer.MediaServerChangeEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

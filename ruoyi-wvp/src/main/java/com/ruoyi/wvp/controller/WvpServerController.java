@@ -14,10 +14,10 @@ import com.ruoyi.wvp.conf.VersionInfo;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.service.IDeviceChannelService;
 import com.ruoyi.wvp.gb28181.service.IDeviceService;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerChangeEvent;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.mediaServer.MediaServerChangeEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
-import com.ruoyi.wvp.service.bean.MediaServerLoad;
+import com.ruoyi.media.domain.MediaServerLoad;
 import com.ruoyi.wvp.storager.IRedisCatchStorage;
 import com.ruoyi.wvp.streamProxy.service.IStreamProxyService;
 import com.ruoyi.wvp.streamPush.service.IStreamPushService;
@@ -32,12 +32,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
-import oshi.hardware.NetworkIF;
-import oshi.software.os.OperatingSystem;
+import com.sun.management.OperatingSystemMXBean;
+import java.lang.management.ManagementFactory;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -46,6 +46,7 @@ import java.util.*;
 /**
  * 服务控制
  */
+@Slf4j
 @SuppressWarnings("rawtypes")
 @RestController
 @RequestMapping("/api/server")
@@ -370,37 +371,44 @@ public class WvpServerController extends BaseController {
         Map<String, String> hardwareMap = new LinkedHashMap<>();
         result.put("硬件信息", hardwareMap);
 
-        SystemInfo systemInfo = new SystemInfo();
-        HardwareAbstractionLayer hardware = systemInfo.getHardware();
+        OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         // 获取CPU信息
-        CentralProcessor.ProcessorIdentifier processorIdentifier = hardware.getProcessor().getProcessorIdentifier();
-        hardwareMap.put("CPU", processorIdentifier.getName());
+        hardwareMap.put("CPU", getCpuName());
         // 获取内存
-        GlobalMemory memory = hardware.getMemory();
-        hardwareMap.put("内存", formatByte(memory.getTotal() - memory.getAvailable()) + "/" + formatByte(memory.getTotal()));
-        hardwareMap.put("制造商", systemInfo.getHardware().getComputerSystem().getManufacturer());
-        hardwareMap.put("产品名称", systemInfo.getHardware().getComputerSystem().getModel());
-        // 网卡
-        List<NetworkIF> networkIFs = hardware.getNetworkIFs();
+        long totalMem = osBean.getTotalPhysicalMemorySize();
+        long freeMem = osBean.getFreePhysicalMemorySize();
+        hardwareMap.put("内存", formatByte(totalMem - freeMem) + "/" + formatByte(totalMem));
+        // 制造商 / 产品名称（纯 JDK 无法稳定获取，降级展示）
+        hardwareMap.put("制造商", getManufacturer());
+        hardwareMap.put("产品名称", getModel());
+        // 网卡 IP（纯 JDK，不依赖 JNA）
         StringBuilder ips = new StringBuilder();
-        for (int i = 0; i < networkIFs.size(); i++) {
-            NetworkIF networkIF = networkIFs.get(i);
-            String ipsStr = StringUtils.join(networkIF.getIPv4addr());
-            if (ObjectUtils.isEmpty(ipsStr)) {
-                continue;
+        try {
+            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+            List<String> allIps = new ArrayList<>();
+            while (nets.hasMoreElements()) {
+                NetworkInterface nif = nets.nextElement();
+                if (nif.isLoopback() || !nif.isUp()) {
+                    continue;
+                }
+                Enumeration<InetAddress> addrs = nif.getInetAddresses();
+                while (addrs.hasMoreElements()) {
+                    InetAddress addr = addrs.nextElement();
+                    if (addr instanceof Inet4Address) {
+                        allIps.add(addr.getHostAddress());
+                    }
+                }
             }
-            ips.append(ipsStr);
-            if (i < networkIFs.size() - 1) {
-                ips.append(",");
-            }
+            ips.append(StringUtils.join(allIps, ","));
+        } catch (Exception e) {
+            log.error("[获取网卡信息失败] {}", e.getMessage());
         }
         hardwareMap.put("网卡", ips.toString());
 
         Map<String, String> operatingSystemMap = new LinkedHashMap<>();
         result.put("操作系统", operatingSystemMap);
-        OperatingSystem operatingSystem = systemInfo.getOperatingSystem();
-        operatingSystemMap.put("名称", operatingSystem.getFamily() + " " + operatingSystem.getVersionInfo().getVersion());
-        operatingSystemMap.put("类型", operatingSystem.getManufacturer());
+        operatingSystemMap.put("名称", System.getProperty("os.name") + " " + System.getProperty("os.version"));
+        operatingSystemMap.put("类型", System.getProperty("os.arch"));
 
         Map<String, String> platformMap = new LinkedHashMap<>();
         result.put("平台信息", platformMap);
@@ -414,6 +422,35 @@ public class WvpServerController extends BaseController {
         platformMap.put("DOCKER环境", new File("/.dockerenv").exists() ? "是" : "否");
 
         return result;
+    }
+
+    private String getCpuName() {
+        try {
+            String os = System.getProperty("os.name", "");
+            if (os.startsWith("Windows")) {
+                return System.getenv("PROCESSOR_IDENTIFIER");
+            } else if (os.startsWith("Linux")) {
+                for (String line : java.nio.file.Files.readAllLines(java.nio.file.Paths.get("/proc/cpuinfo"))) {
+                    if (line.startsWith("model name")) {
+                        int idx = line.indexOf(':');
+                        if (idx >= 0) {
+                            return line.substring(idx + 1).trim();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("[读取 CPU 名称失败] {}", e.getMessage());
+        }
+        return "Unknown";
+    }
+
+    private String getManufacturer() {
+        return System.getProperty("os.arch", "Unknown");
+    }
+
+    private String getModel() {
+        return "Unknown";
     }
 
     @GetMapping(value = "/channel/datatype")

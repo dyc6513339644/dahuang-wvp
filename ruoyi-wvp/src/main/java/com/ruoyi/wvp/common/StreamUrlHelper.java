@@ -1,10 +1,11 @@
 package com.ruoyi.wvp.common;
 
 import com.ruoyi.system.config.SslConfig;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.ruoyi.media.domain.StreamInfo;
 
 /**
  * 流地址 nginx 统一代理处理工具

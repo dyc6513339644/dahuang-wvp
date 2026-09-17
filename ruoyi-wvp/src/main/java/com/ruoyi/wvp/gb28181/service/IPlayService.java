@@ -2,13 +2,14 @@ package com.ruoyi.wvp.gb28181.service;
 
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.wvp.common.InviteSessionType;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.gb28181.bean.*;
+import com.ruoyi.media.domain.SendRtpInfo;
 import com.ruoyi.wvp.gb28181.controller.bean.AudioBroadcastEvent;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
-import com.ruoyi.wvp.service.bean.SSRCInfo;
+import com.ruoyi.media.domain.SSRCInfo;
 import com.ruoyi.wvp.vmanager.bean.AudioBroadcastResult;
 import gov.nist.javax.sip.message.SIPResponse;
 

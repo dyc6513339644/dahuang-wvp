@@ -3,6 +3,7 @@ package com.ruoyi.wvp.gb28181.transmit.event.request.impl.info;
 
 import com.ruoyi.wvp.common.enums.ChannelDataType;
 import com.ruoyi.wvp.gb28181.bean.*;
+import com.ruoyi.media.domain.SendRtpInfo;
 import com.ruoyi.wvp.gb28181.event.SipSubscribe;
 import com.ruoyi.wvp.gb28181.service.*;
 import com.ruoyi.wvp.gb28181.session.SipInviteSessionManager;

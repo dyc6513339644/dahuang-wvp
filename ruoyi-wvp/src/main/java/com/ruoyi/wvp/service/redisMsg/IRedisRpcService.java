@@ -1,9 +1,9 @@
 package com.ruoyi.wvp.service.redisMsg;
 
 import com.ruoyi.wvp.common.CommonCallback;
-import com.ruoyi.wvp.common.StreamInfo;
-import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.StreamInfo;
+import com.ruoyi.media.domain.SendRtpInfo;
+import com.ruoyi.media.domain.WVPResult;
 
 public interface IRedisRpcService {
 

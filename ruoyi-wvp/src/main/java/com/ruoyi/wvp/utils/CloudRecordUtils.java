@@ -1,7 +1,7 @@
 package com.ruoyi.wvp.utils;
 
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.service.bean.DownloadFileInfo;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.domain.DownloadFileInfo;
 import org.apache.commons.lang3.StringUtils;
 
 public class CloudRecordUtils {

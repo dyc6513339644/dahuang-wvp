@@ -1,6 +1,6 @@
 package com.ruoyi.wvp.streamProxy.service;
 
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
 import com.ruoyi.wvp.streamProxy.bean.StreamProxy;
 

@@ -6,8 +6,8 @@ import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
 import com.ruoyi.wvp.gb28181.bean.Platform;
 import com.ruoyi.wvp.gb28181.bean.SipTransactionInfo;
 import com.ruoyi.wvp.gb28181.event.SipSubscribe;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.hook.HookSubscribe;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.hook.HookSubscribe;
 import com.ruoyi.wvp.service.bean.InviteTimeOutCallback;
 
 import javax.sip.InvalidArgumentException;

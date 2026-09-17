@@ -6,9 +6,6 @@ import com.ruoyi.wvp.gb28181.event.alarm.AlarmEvent;
 import com.ruoyi.wvp.gb28181.event.record.RecordEndEvent;
 import com.ruoyi.wvp.gb28181.event.subscribe.catalog.CatalogEvent;
 import com.ruoyi.wvp.gb28181.event.subscribe.mobilePosition.MobilePositionEvent;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerOfflineEvent;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerOnlineEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -19,7 +16,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @description:Event事件通知推送器，支持推送在线事件、离线事件
+ * @description:Event事件通知推送器，支持推送报警事件、目录事件、移动位置事件、录像结束事件
+ *              注：媒体节点在线/离线事件已改由 ZLMMediaServerStatusManager 直接使用
+ *              ApplicationEventPublisher 发布，不再经由本类
  * @author: swwheihei
  * @date:   2020年5月6日 上午11:30:50
  */
@@ -37,18 +36,6 @@ public class EventPublisher {
 		AlarmEvent alarmEvent = new AlarmEvent(this);
 		alarmEvent.setAlarmInfo(deviceAlarm);
 		applicationEventPublisher.publishEvent(alarmEvent);
-	}
-
-	public void mediaServerOfflineEventPublish(MediaServer mediaServer){
-		MediaServerOfflineEvent outEvent = new MediaServerOfflineEvent(this);
-		outEvent.setMediaServer(mediaServer);
-		applicationEventPublisher.publishEvent(outEvent);
-	}
-
-	public void mediaServerOnlineEventPublish(MediaServer mediaServer) {
-		MediaServerOnlineEvent outEvent = new MediaServerOnlineEvent(this);
-		outEvent.setMediaServer(mediaServer);
-		applicationEventPublisher.publishEvent(outEvent);
 	}
 
 

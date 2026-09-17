@@ -2,9 +2,9 @@ package com.ruoyi.wvp.gb28181.service;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.github.pagehelper.PageInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.service.bean.CloudRecordItem;
-import com.ruoyi.wvp.service.bean.DownloadFileInfo;
+import com.ruoyi.media.domain.DownloadFileInfo;
 
 import java.util.List;
 

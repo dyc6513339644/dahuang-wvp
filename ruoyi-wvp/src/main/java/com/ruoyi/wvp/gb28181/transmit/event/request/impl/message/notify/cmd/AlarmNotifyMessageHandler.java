@@ -116,7 +116,6 @@ public class AlarmNotifyMessageHandler extends SIPRequestProcessorParent impleme
                 DeviceAlarm deviceAlarm = new DeviceAlarm();
                 deviceAlarm.setCreateTime(DateUtil.getNow());
                 deviceAlarm.setDeviceId(sipMsgInfo.getDevice().getDeviceId());
-                deviceAlarm.setDeviceName(sipMsgInfo.getDevice().getName());
                 deviceAlarm.setChannelId(channelId);
                 deviceAlarm.setAlarmPriority(getText(sipMsgInfo.getRootElement(), "AlarmPriority"));
                 deviceAlarm.setAlarmMethod(getText(sipMsgInfo.getRootElement(), "AlarmMethod"));
@@ -195,6 +194,8 @@ public class AlarmNotifyMessageHandler extends SIPRequestProcessorParent impleme
                 // 存储报警信息、报警分类
                 if (sipConfig.isAlarm()) {
                     deviceAlarmService.add(deviceAlarm);
+                    // 报警报文本身不含通道名称，落库成功后异步查通道表回填 channel_name
+                    deviceAlarmService.asyncFillChannelName(deviceAlarm);
                 }
 
                 if (redisCatchStorage.deviceIsOnline(sipMsgInfo.getDevice().getDeviceId())) {
@@ -223,7 +224,6 @@ public class AlarmNotifyMessageHandler extends SIPRequestProcessorParent impleme
         DeviceAlarm deviceAlarm = new DeviceAlarm();
         deviceAlarm.setCreateTime(DateUtil.getNow());
         deviceAlarm.setDeviceId(parentPlatform.getServerGBId());
-        deviceAlarm.setDeviceName(parentPlatform.getName());
         deviceAlarm.setChannelId(channelId);
         deviceAlarm.setAlarmPriority(getText(rootElement, "AlarmPriority"));
         deviceAlarm.setAlarmMethod(getText(rootElement, "AlarmMethod"));

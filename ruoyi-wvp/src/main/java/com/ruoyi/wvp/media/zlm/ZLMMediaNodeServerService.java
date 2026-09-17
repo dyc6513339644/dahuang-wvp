@@ -5,16 +5,15 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.enums.ErrorCode;
 import com.ruoyi.common.exception.ControllerException;
-import com.ruoyi.wvp.common.CommonCallback;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.conf.UserSetting;
-import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.SendRtpInfo;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaNodeServerService;
-import com.ruoyi.wvp.media.zlm.dto.ZLMServerConfig;
+import com.ruoyi.media.zlm.dto.ZLMServerConfig;
 import com.ruoyi.wvp.streamProxy.bean.StreamProxy;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.ruoyi.media.zlm.ZLMRESTfulUtils;
+import com.ruoyi.media.service.IZLMServerService;
 
 @Slf4j
 @Service("zlm")
@@ -34,24 +35,19 @@ public class ZLMMediaNodeServerService implements IMediaNodeServerService {
     private ZLMRESTfulUtils zlmresTfulUtils;
 
     @Autowired
-    private ZLMServerFactory zlmServerFactory;
+    private IZLMServerService zlmServerService;
 
     @Autowired
     private UserSetting userSetting;
 
     @Override
     public int createRTPServer(MediaServer mediaServer, String streamId, long ssrc, Integer port, Boolean onlyAuto, Boolean disableAudio, Boolean reUsePort, Integer tcpMode) {
-        return zlmServerFactory.createRTPServer(mediaServer, streamId, ssrc, port, onlyAuto, reUsePort, tcpMode);
+        return zlmServerService.createRTPServer(mediaServer, streamId, ssrc, port, onlyAuto, reUsePort, tcpMode);
     }
 
     @Override
     public void closeRtpServer(MediaServer mediaServer, String streamId) {
-        zlmServerFactory.closeRtpServer(mediaServer, streamId);
-    }
-
-    @Override
-    public void closeRtpServer(MediaServer mediaServer, String streamId, CommonCallback<Boolean> callback) {
-        zlmServerFactory.closeRtpServer(mediaServer, streamId, callback);
+        zlmServerService.closeRtpServer(mediaServer, streamId);
     }
 
     @Override
@@ -61,7 +57,7 @@ public class ZLMMediaNodeServerService implements IMediaNodeServerService {
 
     @Override
     public Boolean updateRtpServerSSRC(MediaServer mediaServer, String streamId, String ssrc) {
-        return zlmServerFactory.updateRtpServerSSRC(mediaServer, streamId, ssrc);
+        return zlmServerService.updateRtpServerSSRC(mediaServer, streamId, ssrc);
     }
 
     @Override
@@ -358,7 +354,7 @@ public class ZLMMediaNodeServerService implements IMediaNodeServerService {
             param.put("dst_port", sendRtpItem.getPort());
         }
 
-        JSONObject jsonObject = zlmServerFactory.startSendRtpPassive(mediaServer, param, null);
+        JSONObject jsonObject = zlmServerService.startSendRtpPassive(mediaServer, param, null);
         if (jsonObject == null || jsonObject.getInteger("code") != 0 ) {
             log.error("启动监听TCP被动推流失败: {}, 参数：{}", jsonObject.getString("msg"), JSON.toJSONString(param));
             throw new ControllerException(jsonObject.getInteger("code"), jsonObject.getString("msg"));

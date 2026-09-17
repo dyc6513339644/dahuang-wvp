@@ -2,7 +2,7 @@ package com.ruoyi.wvp.service.bean;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.wvp.gb28181.event.SipSubscribe;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 
 import java.util.EventObject;
 

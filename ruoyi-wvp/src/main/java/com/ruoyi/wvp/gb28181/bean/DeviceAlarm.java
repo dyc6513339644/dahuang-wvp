@@ -18,7 +18,7 @@ public class DeviceAlarm {
 	/**
 	 * 数据库id
 	 */
-	private String id;
+	private Long id;
 
 	/**
 	 * 设备的国标编号
@@ -26,9 +26,9 @@ public class DeviceAlarm {
 	private String deviceId;
 
 	/**
-	 * 设备名称
+	 * 通道名称（报警落库后异步回填，取通道表 coalesce(gb_name, name)）
 	 */
-	private String deviceName;
+	private String channelName;
 
 	/**
 	 * 通道Id

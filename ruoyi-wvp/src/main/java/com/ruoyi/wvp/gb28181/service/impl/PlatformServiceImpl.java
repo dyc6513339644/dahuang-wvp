@@ -9,26 +9,27 @@ import com.github.pagehelper.PageInfo;
 import com.ruoyi.wvp.common.CommonCallback;
 import com.ruoyi.wvp.common.InviteSessionStatus;
 import com.ruoyi.wvp.common.InviteSessionType;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.*;
+import com.ruoyi.media.domain.SendRtpInfo;
 import com.ruoyi.wvp.mapper.PlatformChannelMapper;
 import com.ruoyi.wvp.mapper.PlatformMapper;
 import com.ruoyi.wvp.gb28181.event.SipSubscribe;
 import com.ruoyi.wvp.gb28181.service.IGbChannelService;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
 import com.ruoyi.wvp.gb28181.service.IPlatformService;
-import com.ruoyi.wvp.gb28181.session.SSRCFactory;
+import com.ruoyi.media.service.ISSRCService;
 import com.ruoyi.wvp.gb28181.session.SipInviteSessionManager;
 import com.ruoyi.wvp.gb28181.transmit.cmd.ISIPCommanderForPlatform;
 import com.ruoyi.wvp.gb28181.utils.SipUtils;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.hook.HookData;
-import com.ruoyi.wvp.media.event.hook.HookSubscribe;
-import com.ruoyi.wvp.media.event.media.MediaDepartureEvent;
-import com.ruoyi.wvp.media.event.mediaServer.MediaSendRtpStoppedEvent;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.hook.HookData;
+import com.ruoyi.media.event.hook.HookSubscribe;
+import com.ruoyi.media.event.media.MediaDepartureEvent;
+import com.ruoyi.media.event.mediaServer.MediaSendRtpStoppedEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.ISendRtpServerService;
 import com.ruoyi.wvp.service.bean.*;
@@ -51,6 +52,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
+import com.ruoyi.media.domain.SSRCInfo;
 
 /**
  * @author lin
@@ -72,7 +74,7 @@ public class PlatformServiceImpl implements IPlatformService {
     private IRedisCatchStorage redisCatchStorage;
 
     @Autowired
-    private SSRCFactory ssrcFactory;
+    private ISSRCService ssrcService;
 
     @Autowired
     private IMediaServerService mediaServerService;
@@ -143,7 +145,7 @@ public class PlatformServiceImpl implements IPlatformService {
                 if (sendRtpItem != null && sendRtpItem.getApp().equals(event.getApp()) && sendRtpItem.isSendToPlatform()) {
                     Platform platform = platformMapper.getParentPlatByServerGBId(sendRtpItem.getTargetId());
                     CommonGBChannel channel = channelService.getOne(sendRtpItem.getChannelId());
-                    ssrcFactory.releaseSsrc(sendRtpItem.getMediaServerId(), sendRtpItem.getSsrc());
+                    ssrcService.releaseSsrc(sendRtpItem.getMediaServerId(), sendRtpItem.getSsrc(), userSetting.getServerId());
                     try {
                         commanderForPlatform.streamByeCmd(platform, sendRtpItem, channel);
                     } catch (SipException | InvalidArgumentException | ParseException e) {
@@ -429,7 +431,7 @@ public class PlatformServiceImpl implements IPlatformService {
         List<SendRtpInfo> sendRtpItems = sendRtpServerService.queryForPlatform(platformId);
         if (sendRtpItems != null && sendRtpItems.size() > 0) {
             for (SendRtpInfo sendRtpItem : sendRtpItems) {
-                ssrcFactory.releaseSsrc(sendRtpItem.getMediaServerId(), sendRtpItem.getSsrc());
+                ssrcService.releaseSsrc(sendRtpItem.getMediaServerId(), sendRtpItem.getSsrc(), userSetting.getServerId());
                 sendRtpServerService.delete(sendRtpItem);
                 MediaServer mediaInfo = mediaServerService.getOne(sendRtpItem.getMediaServerId());
                 mediaServerService.stopSendRtp(mediaInfo, sendRtpItem.getApp(), sendRtpItem.getStream(), null);

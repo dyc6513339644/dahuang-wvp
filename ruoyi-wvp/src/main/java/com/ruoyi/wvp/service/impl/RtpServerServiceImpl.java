@@ -3,20 +3,20 @@ package com.ruoyi.wvp.service.impl;
 import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.OpenRTPServerResult;
-import com.ruoyi.wvp.gb28181.session.SSRCFactory;
+import com.ruoyi.media.service.ISSRCService;
 import com.ruoyi.wvp.gb28181.session.SipInviteSessionManager;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.hook.Hook;
-import com.ruoyi.wvp.media.event.hook.HookSubscribe;
-import com.ruoyi.wvp.media.event.hook.HookType;
-import com.ruoyi.wvp.media.event.media.MediaArrivalEvent;
-import com.ruoyi.wvp.media.event.media.MediaDepartureEvent;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.hook.Hook;
+import com.ruoyi.media.event.hook.HookSubscribe;
+import com.ruoyi.media.event.hook.HookType;
+import com.ruoyi.media.event.media.MediaArrivalEvent;
+import com.ruoyi.media.event.media.MediaDepartureEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.IReceiveRtpServerService;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
 import com.ruoyi.wvp.service.bean.InviteErrorCode;
 import com.ruoyi.wvp.service.bean.RTPServerParam;
-import com.ruoyi.wvp.service.bean.SSRCInfo;
+import com.ruoyi.media.domain.SSRCInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -36,7 +36,7 @@ public class RtpServerServiceImpl implements IReceiveRtpServerService {
     private DynamicTask dynamicTask;
 
     @Autowired
-    private SSRCFactory ssrcFactory;
+    private ISSRCService ssrcService;
 
     @Autowired
     private UserSetting userSetting;
@@ -82,9 +82,9 @@ public class RtpServerServiceImpl implements IReceiveRtpServerService {
             ssrc = rtpServerParam.getPresetSsrc();
         }else {
             if (rtpServerParam.isPlayback()) {
-                ssrc = ssrcFactory.getPlayBackSsrc(rtpServerParam.getMediaServerItem().getId());
+                ssrc = ssrcService.getPlayBackSsrc(rtpServerParam.getMediaServerItem().getId(), userSetting.getServerId());
             }else {
-                ssrc = ssrcFactory.getPlaySsrc(rtpServerParam.getMediaServerItem().getId());
+                ssrc = ssrcService.getPlaySsrc(rtpServerParam.getMediaServerItem().getId(), userSetting.getServerId());
             }
         }
         final String streamId;
@@ -109,7 +109,7 @@ public class RtpServerServiceImpl implements IReceiveRtpServerService {
             callback.run(InviteErrorCode.ERROR_FOR_RESOURCE_EXHAUSTION.getCode(), "开启RTPServer失败", null);
             // 释放ssrc
             if (rtpServerParam.getPresetSsrc() == null) {
-                ssrcFactory.releaseSsrc(rtpServerParam.getMediaServerItem().getId(), ssrc);
+                ssrcService.releaseSsrc(rtpServerParam.getMediaServerItem().getId(), ssrc, userSetting.getServerId());
             }
             return null;
         }
@@ -126,7 +126,7 @@ public class RtpServerServiceImpl implements IReceiveRtpServerService {
             // 收流超时
             // 释放ssrc
             if (rtpServerParam.getPresetSsrc() == null) {
-                ssrcFactory.releaseSsrc(rtpServerParam.getMediaServerItem().getId(), ssrc);
+                ssrcService.releaseSsrc(rtpServerParam.getMediaServerItem().getId(), ssrc, userSetting.getServerId());
             }
             // 关闭收流端口
             mediaServerService.closeRTPServer(rtpServerParam.getMediaServerItem(), streamId);
@@ -155,7 +155,7 @@ public class RtpServerServiceImpl implements IReceiveRtpServerService {
         }
         if (ssrcInfo.getSsrc() != null) {
             // 释放ssrc
-            ssrcFactory.releaseSsrc(mediaServer.getId(), ssrcInfo.getSsrc());
+            ssrcService.releaseSsrc(mediaServer.getId(), ssrcInfo.getSsrc(), userSetting.getServerId());
         }
         mediaServerService.closeRTPServer(mediaServer, ssrcInfo.getStream());
     }

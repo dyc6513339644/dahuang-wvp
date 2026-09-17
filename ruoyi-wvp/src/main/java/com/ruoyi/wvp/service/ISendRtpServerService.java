@@ -1,7 +1,7 @@
 package com.ruoyi.wvp.service;
 
-import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.SendRtpInfo;
+import com.ruoyi.media.domain.MediaServer;
 
 import java.util.List;
 

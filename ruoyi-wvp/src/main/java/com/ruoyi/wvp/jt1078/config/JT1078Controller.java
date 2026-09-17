@@ -2,7 +2,7 @@ package com.ruoyi.wvp.jt1078.config;
 
 import com.ruoyi.wvp.jt1078.cmd.JT1078Template;
 import com.ruoyi.wvp.jt1078.proc.response.J9101;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

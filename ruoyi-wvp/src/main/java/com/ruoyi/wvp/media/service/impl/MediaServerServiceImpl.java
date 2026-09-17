@@ -3,31 +3,30 @@ package com.ruoyi.wvp.media.service.impl;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.ruoyi.common.enums.ErrorCode;
 import com.ruoyi.common.exception.ControllerException;
-import com.ruoyi.wvp.common.CommonCallback;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.common.VideoManagerConstants;
+import com.ruoyi.wvp.conf.SipConfig;
 import com.ruoyi.wvp.conf.UserSetting;
-import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
-import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
-import com.ruoyi.wvp.gb28181.session.SSRCFactory;
-import com.ruoyi.wvp.mapper.MediaServerMapper;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.media.MediaArrivalEvent;
-import com.ruoyi.wvp.media.event.media.MediaDepartureEvent;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerDeleteEvent;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerOfflineEvent;
-import com.ruoyi.wvp.media.event.mediaServer.MediaServerOnlineEvent;
+import com.ruoyi.media.domain.SendRtpInfo;
+import com.ruoyi.media.service.ISSRCService;
+import com.ruoyi.media.service.IMediaServerBaseService;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.media.MediaArrivalEvent;
+import com.ruoyi.media.event.media.MediaDepartureEvent;
+import com.ruoyi.media.event.mediaServer.MediaServerDeleteEvent;
+import com.ruoyi.media.event.mediaServer.MediaServerOfflineEvent;
+import com.ruoyi.media.event.mediaServer.MediaServerOnlineEvent;
 import com.ruoyi.wvp.media.service.IMediaNodeServerService;
 import com.ruoyi.wvp.media.service.IMediaServerService;
-import com.ruoyi.wvp.media.zlm.dto.StreamAuthorityInfo;
-import com.ruoyi.wvp.media.zlm.dto.hook.OriginType;
-import com.ruoyi.wvp.service.bean.MediaServerLoad;
-import com.ruoyi.wvp.service.bean.SSRCInfo;
-import com.ruoyi.wvp.storager.IRedisCatchStorage;
+import com.ruoyi.media.zlm.dto.StreamAuthorityInfo;
+import com.ruoyi.media.zlm.dto.hook.OriginType;
+import com.ruoyi.media.domain.MediaServerLoad;
+import com.ruoyi.media.domain.SSRCInfo;
+import com.ruoyi.wvp.service.IMediaStreamStorage;
 import com.ruoyi.wvp.streamProxy.bean.StreamProxy;
 import com.ruoyi.wvp.utils.DateUtil;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -53,19 +52,19 @@ import java.util.*;
 public class MediaServerServiceImpl implements IMediaServerService {
 
     @Autowired
-    private SSRCFactory ssrcFactory;
+    private ISSRCService ssrcService;
+
+    @Autowired
+    private SipConfig sipConfig;
 
     @Autowired
     private UserSetting userSetting;
 
     @Autowired
-    private MediaServerMapper mediaServerMapper;
+    private IMediaServerBaseService mediaServerBaseService;
 
     @Autowired
-    private IRedisCatchStorage redisCatchStorage;
-
-    @Autowired
-    private IInviteStreamService inviteStreamService;
+    private IMediaStreamStorage mediaStreamStorage;
 
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
@@ -88,7 +87,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
             log.info("流变化：注册 app->{}, stream->{}", event.getApp(), event.getStream());
             addCount(event.getMediaServer().getId());
             String type = OriginType.values()[event.getMediaInfo().getOriginType()].getType();
-            redisCatchStorage.addStream(event.getMediaServer(), type, event.getApp(), event.getStream(), event.getMediaInfo());
+            mediaStreamStorage.addStream(event.getMediaServer(), type, event.getApp(), event.getStream(), event.getMediaInfo());
         }
     }
 
@@ -101,13 +100,13 @@ public class MediaServerServiceImpl implements IMediaServerService {
         if ("rtsp".equals(event.getSchema())) {
             log.info("流变化：注销, app->{}, stream->{}", event.getApp(), event.getStream());
             removeCount(event.getMediaServer().getId());
-            MediaInfo mediaInfo = redisCatchStorage.getStreamInfo(
+            MediaInfo mediaInfo = mediaStreamStorage.getStreamInfo(
                     event.getApp(), event.getStream(), event.getMediaServer().getId());
             if (mediaInfo == null) {
                 return;
             }
             String type = OriginType.values()[mediaInfo.getOriginType()].getType();
-            redisCatchStorage.removeStream(mediaInfo.getMediaServer().getId(), type, event.getApp(), event.getStream());
+            mediaStreamStorage.removeStream(mediaInfo.getMediaServer().getId(), type, event.getApp(), event.getStream());
         }
     }
 
@@ -144,8 +143,8 @@ public class MediaServerServiceImpl implements IMediaServerService {
                 continue;
             }
             // 更新
-            if (!ssrcFactory.hasMediaServerSSRC(mediaServer.getId())) {
-                ssrcFactory.initMediaServerSSRC(mediaServer.getId(), null);
+            if (!ssrcService.hasMediaServerSSRC(mediaServer.getId(), userSetting.getServerId())) {
+                ssrcService.initMediaServerSSRC(mediaServer.getId(), null, getSsrcPrefix(), userSetting.getServerId());
             }
             // 查询redis是否存在此mediaServer
             String key = VideoManagerConstants.MEDIA_SERVER_PREFIX + userSetting.getServerId();
@@ -170,9 +169,9 @@ public class MediaServerServiceImpl implements IMediaServerService {
             ssrc = presetSsrc;
         }else {
             if (isPlayback) {
-                ssrc = ssrcFactory.getPlayBackSsrc(mediaServer.getId());
+                ssrc = ssrcService.getPlayBackSsrc(mediaServer.getId(), userSetting.getServerId());
             }else {
-                ssrc = ssrcFactory.getPlaySsrc(mediaServer.getId());
+                ssrc = ssrcService.getPlaySsrc(mediaServer.getId(), userSetting.getServerId());
             }
         }
 
@@ -237,20 +236,6 @@ public class MediaServerServiceImpl implements IMediaServerService {
     }
 
     @Override
-    public void closeRTPServer(MediaServer mediaServer, String streamId, CommonCallback<Boolean> callback) {
-        if (mediaServer == null) {
-            callback.run(false);
-            return;
-        }
-        IMediaNodeServerService mediaNodeServerService = nodeServerServiceMap.get(mediaServer.getType());
-        if (mediaNodeServerService == null) {
-            log.info("[closeRTPServer] 失败, mediaServer的类型： {}，未找到对应的实现类", mediaServer.getType());
-            return;
-        }
-        mediaNodeServerService.closeRtpServer(mediaServer, streamId, callback);
-    }
-
-    @Override
     public void closeRTPServer(String mediaServerId, String streamId) {
         MediaServer mediaServer = this.getOne(mediaServerId);
         if (mediaServer == null) {
@@ -286,7 +271,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
         if (mediaServer == null || ssrc == null) {
             return;
         }
-        ssrcFactory.releaseSsrc(mediaServerId, ssrc);
+        ssrcService.releaseSsrc(mediaServerId, ssrc, userSetting.getServerId());
     }
 
     /**
@@ -294,7 +279,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
      */
     @Override
     public void clearRTPServer(MediaServer mediaServer) {
-        ssrcFactory.reset(mediaServer.getId());
+        ssrcService.reset(mediaServer.getId(), getSsrcPrefix(), userSetting.getServerId());
     }
 
     @Override
@@ -317,16 +302,16 @@ public class MediaServerServiceImpl implements IMediaServerService {
         if (mediaSerItem.getRecordDay() == 0) {
             mediaSerItem.setRecordDay(7);
         }
-        mediaServerMapper.update(mediaSerItem);
+        mediaServerBaseService.update(mediaSerItem);
         MediaServer mediaServerInRedis = getOne(mediaSerItem.getId());
         // 获取完整数据
-        MediaServer mediaServerInDataBase = mediaServerMapper.getMediaServerById(mediaSerItem.getId());
+        MediaServer mediaServerInDataBase = mediaServerBaseService.getById(mediaSerItem.getId());
         if (mediaServerInDataBase == null) {
             return;
         }
         mediaServerInDataBase.setStatus(mediaSerItem.isStatus());
-        if (mediaServerInRedis == null || !ssrcFactory.hasMediaServerSSRC(mediaServerInDataBase.getId())) {
-            ssrcFactory.initMediaServerSSRC(mediaServerInDataBase.getId(),null);
+        if (mediaServerInRedis == null || !ssrcService.hasMediaServerSSRC(mediaServerInDataBase.getId(), userSetting.getServerId())) {
+            ssrcService.initMediaServerSSRC(mediaServerInDataBase.getId(), null, getSsrcPrefix(), userSetting.getServerId());
         }
         String key = VideoManagerConstants.MEDIA_SERVER_PREFIX + userSetting.getServerId();
         redisTemplate.opsForHash().put(key, mediaServerInDataBase.getId(), mediaServerInDataBase);
@@ -369,7 +354,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
 
     @Override
     public List<MediaServer> getAll() {
-        List<MediaServer> mediaServerList = mediaServerMapper.queryAll();
+        List<MediaServer> mediaServerList = mediaServerBaseService.queryAll();
         if (mediaServerList.isEmpty()) {
             return new ArrayList<>();
         }
@@ -385,7 +370,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
 
     @Override
     public List<MediaServer> getAllFromDatabase() {
-        return mediaServerMapper.queryAll();
+        return mediaServerBaseService.queryAll();
     }
 
     @Override
@@ -419,7 +404,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
         MediaServer mediaServer = (MediaServer) redisTemplate.opsForHash().get(key, mediaServerId);
         // Redis 缓存为空或 httpPort 为 0 时从 DB 兜底并回填缓存
         if (mediaServer == null || mediaServer.getHttpPort() == 0) {
-            mediaServer = mediaServerMapper.getMediaServerById(mediaServerId);
+            mediaServer = mediaServerBaseService.getById(mediaServerId);
             if (mediaServer != null) {
                 redisTemplate.opsForHash().put(key, mediaServer.getId(), mediaServer);
             }
@@ -430,7 +415,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
 
     @Override
     public MediaServer getDefaultMediaServer() {
-        return mediaServerMapper.queryDefault();
+        return mediaServerBaseService.queryDefault();
     }
 
     @Override
@@ -450,7 +435,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
             log.error("[添加媒体节点] 失败, mediaServer的类型为空, id={}", mediaServer.getId());
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "添加媒体节点失败：类型为空");
         }
-        if (mediaServerMapper.getMediaServerById(mediaServer.getId()) != null) {
+        if (mediaServerBaseService.getById(mediaServer.getId()) != null) {
             log.info("[添加媒体节点] 失败, 媒体服务ID已存在，请修改媒体服务器配置, {}", mediaServer.getId());
             throw new ControllerException(ErrorCode.ERROR100.getCode(),"保存失败，媒体服务ID [ " + mediaServer.getId() + " ] 已存在，请修改媒体服务器配置");
         }
@@ -478,7 +463,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
         if (mediaServer.getRecordDay() == 0) {
             mediaServer.setRecordDay(7);
         }
-        mediaServerMapper.add(mediaServer);
+        mediaServerBaseService.add(mediaServer);
         if (mediaServer.isStatus()) {
             mediaNodeServerService.online(mediaServer);
         }
@@ -568,7 +553,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
 
     @Override
     public MediaServer checkMediaServer(String ip, int port, String secret, String type) {
-        if (mediaServerMapper.queryOneByHostAndPort(ip, port) != null) {
+        if (mediaServerBaseService.queryOneByHostAndPort(ip, port) != null) {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "此连接已存在");
         }
 
@@ -579,7 +564,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
         }
         MediaServer mediaServer = mediaNodeServerService.checkMediaServer(ip, port, secret);
         if (mediaServer != null) {
-            if (mediaServerMapper.getMediaServerById(mediaServer.getId()) != null) {
+            if (mediaServerBaseService.getById(mediaServer.getId()) != null) {
                 throw new ControllerException(ErrorCode.ERROR100.getCode(), "媒体服务ID [" + mediaServer.getId() + " ] 已存在，请修改媒体服务器配置");
             }
         }
@@ -607,7 +592,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
 
     @Override
     public void delete(MediaServer mediaServer) {
-        mediaServerMapper.delOne(mediaServer.getId());
+        mediaServerBaseService.deleteById(mediaServer.getId());
         redisTemplate.opsForZSet().remove(VideoManagerConstants.ONLINE_MEDIA_SERVERS_PREFIX + userSetting.getServerId(), mediaServer.getId());
         String key = VideoManagerConstants.MEDIA_SERVER_PREFIX + userSetting.getServerId() + ":" + mediaServer.getId();
         redisTemplate.delete(key);
@@ -619,13 +604,13 @@ public class MediaServerServiceImpl implements IMediaServerService {
 
     @Override
     public MediaServer getOneFromDatabase(String mediaServerId) {
-        return mediaServerMapper.getMediaServerById(mediaServerId);
+        return mediaServerBaseService.getById(mediaServerId);
     }
 
     @Override
     public void syncCatchFromDatabase() {
         List<MediaServer> allInCatch = getAllOnlineList();
-        List<MediaServer> allInDatabase = mediaServerMapper.queryAll();
+        List<MediaServer> allInDatabase = mediaServerBaseService.queryAll();
         Map<String, MediaServer> mediaServerMap = new HashMap<>();
 
         for (MediaServer mediaServer : allInDatabase) {
@@ -643,17 +628,17 @@ public class MediaServerServiceImpl implements IMediaServerService {
     public MediaServerLoad getLoad(MediaServer mediaServer) {
         MediaServerLoad result = new MediaServerLoad();
         result.setId(mediaServer.getId());
-        result.setPush(redisCatchStorage.getPushStreamCount(mediaServer.getId()));
-        result.setProxy(redisCatchStorage.getProxyStreamCount(mediaServer.getId()));
+        result.setPush(mediaStreamStorage.getPushStreamCount(mediaServer.getId()));
+        result.setProxy(mediaStreamStorage.getProxyStreamCount(mediaServer.getId()));
 
-        result.setGbReceive(inviteStreamService.getStreamInfoCount(mediaServer.getId()));
-        result.setGbSend(redisCatchStorage.getGbSendCount(mediaServer.getId()));
+        result.setGbReceive(mediaStreamStorage.getStreamInfoCount(mediaServer.getId()));
+        result.setGbSend(mediaStreamStorage.getGbSendCount(mediaServer.getId()));
         return result;
     }
 
     @Override
     public List<MediaServer> getAllWithAssistPort() {
-        return mediaServerMapper.queryAllWithAssistPort();
+        return mediaServerBaseService.queryAllWithAssistPort();
     }
 
 
@@ -837,7 +822,7 @@ public class MediaServerServiceImpl implements IMediaServerService {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "未找到使用的媒体节点");
         }
         String calld = null;
-        StreamAuthorityInfo streamAuthorityInfo = redisCatchStorage.getStreamAuthorityInfo(app, stream);
+        StreamAuthorityInfo streamAuthorityInfo = mediaStreamStorage.getStreamAuthorityInfo(app, stream);
         if (streamAuthorityInfo != null) {
             calld = streamAuthorityInfo.getCallId();
         }
@@ -994,5 +979,17 @@ public class MediaServerServiceImpl implements IMediaServerService {
             throw new ControllerException(ErrorCode.ERROR100.getCode(), "未找到mediaServer对应的实现类");
         }
         mediaNodeServerService.stopProxy(mediaServer, streamKey);
+    }
+
+    /**
+     * 计算 SSRC 前缀：按国标规范取国标域(gb_domain)第3~8位，域名不足8位则取整串。
+     * <p>
+     * 前缀由调用方（国标层）计算后传入 SSRC 服务，media 侧不感知前缀来源。
+     *
+     * @return SSRC 前缀
+     */
+    private String getSsrcPrefix() {
+        String domain = sipConfig.getDomain();
+        return domain == null ? "" : (domain.length() >= 8 ? domain.substring(3, 8) : domain);
     }
 }

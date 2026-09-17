@@ -4,6 +4,7 @@ package com.ruoyi.wvp.gb28181.transmit.cmd;
 import com.ruoyi.wvp.conf.SipConfig;
 import com.ruoyi.wvp.gb28181.SipLayer;
 import com.ruoyi.wvp.gb28181.bean.*;
+import com.ruoyi.media.domain.SendRtpInfo;
 import com.ruoyi.wvp.gb28181.utils.SipUtils;
 import com.ruoyi.wvp.storager.IRedisCatchStorage;
 import com.ruoyi.wvp.utils.GitUtil;

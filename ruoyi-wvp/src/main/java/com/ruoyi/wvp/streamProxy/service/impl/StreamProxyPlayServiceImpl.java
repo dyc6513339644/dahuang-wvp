@@ -1,17 +1,17 @@
 package com.ruoyi.wvp.streamProxy.service.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.Device;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.hook.Hook;
-import com.ruoyi.wvp.media.event.hook.HookSubscribe;
-import com.ruoyi.wvp.media.event.hook.HookType;
-import com.ruoyi.wvp.media.event.media.MediaArrivalEvent;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.hook.Hook;
+import com.ruoyi.media.event.hook.HookSubscribe;
+import com.ruoyi.media.event.hook.HookType;
+import com.ruoyi.media.event.media.MediaArrivalEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.mapper.DeviceMapper;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
@@ -31,6 +31,7 @@ import org.springframework.util.ObjectUtils;
 import javax.sip.message.Response;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import com.ruoyi.wvp.utils.DateUtil;
 
 /**
  * 视频代理播放业务（基于 Device 表）

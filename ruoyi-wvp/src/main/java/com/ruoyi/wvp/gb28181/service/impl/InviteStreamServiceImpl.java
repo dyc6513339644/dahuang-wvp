@@ -8,7 +8,7 @@ import com.ruoyi.wvp.gb28181.bean.Device;
 import com.ruoyi.wvp.mapper.DeviceChannelMapper;
 import com.ruoyi.wvp.mapper.DeviceMapper;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
-import com.ruoyi.wvp.media.event.media.MediaDepartureEvent;
+import com.ruoyi.media.event.media.MediaDepartureEvent;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import com.ruoyi.media.domain.StreamInfo;
+import com.ruoyi.wvp.common.VideoManagerConstants;
 
 @Slf4j
 @Service

@@ -1,8 +1,8 @@
 package com.ruoyi.wvp.gb28181.controller.bean;
 
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.gb28181.bean.Device;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.WVPResult;
 import org.springframework.web.context.request.async.DeferredResult;
 
 public class PlayResult {

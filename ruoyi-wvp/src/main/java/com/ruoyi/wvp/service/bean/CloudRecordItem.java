@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ruoyi.wvp.media.event.media.MediaRecordMp4Event;
-import com.ruoyi.wvp.utils.MediaServerUtils;
+import com.ruoyi.media.event.media.MediaRecordMp4Event;
+import com.ruoyi.media.utils.MediaServerUtils;
 
 import java.util.Map;
 

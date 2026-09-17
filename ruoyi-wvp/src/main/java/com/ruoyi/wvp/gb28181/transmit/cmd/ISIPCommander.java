@@ -1,12 +1,13 @@
 package com.ruoyi.wvp.gb28181.transmit.cmd;
 
 import com.ruoyi.common.exception.SsrcTransactionNotFoundException;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.gb28181.bean.*;
+import com.ruoyi.media.domain.SendRtpInfo;
 import com.ruoyi.wvp.gb28181.event.SipSubscribe;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.event.hook.HookSubscribe;
-import com.ruoyi.wvp.service.bean.SSRCInfo;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.event.hook.HookSubscribe;
+import com.ruoyi.media.domain.SSRCInfo;
 import gov.nist.javax.sip.message.SIPRequest;
 
 import javax.sip.InvalidArgumentException;

@@ -55,12 +55,12 @@ public class UserSetting {
     /**
      * 推流直播是否录制
      */
-    private Boolean recordPushLive = Boolean.TRUE;
+    private Boolean recordPushLive = Boolean.FALSE;
 
     /**
      * 国标是否录制
      */
-    private Boolean recordSip = Boolean.TRUE;
+    private Boolean recordSip = Boolean.FALSE;
 
     /**
      * 使用推流状态作为推流通道状态

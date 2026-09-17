@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.common.StreamUrlHelper;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
@@ -19,8 +19,8 @@ import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
 import com.ruoyi.wvp.service.bean.InviteErrorCode;
 import com.ruoyi.wvp.storager.IRedisCatchStorage;
-import com.ruoyi.wvp.vmanager.bean.StreamContent;
-import com.ruoyi.wvp.vmanager.bean.WVPResult;
+import com.ruoyi.media.domain.StreamContent;
+import com.ruoyi.media.domain.WVPResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +34,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import com.ruoyi.media.domain.MediaServer;
 
 
 /**
@@ -337,7 +338,7 @@ public class CommonChannelController extends BaseController {
                 if (streamInfo != null) {
                     streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, streamInfo.getMediaServer());
                     if (userSetting.getUseSourceIpAsStreamIp()) {
-                        com.ruoyi.wvp.media.bean.MediaServer ms = streamInfo.getMediaServer();
+                        com.ruoyi.media.domain.MediaServer ms = streamInfo.getMediaServer();
                         if (ms == null || !ms.isNginxProxyEnabled()) {
                             streamInfo = streamInfo.clone();//深拷贝
                             String host;

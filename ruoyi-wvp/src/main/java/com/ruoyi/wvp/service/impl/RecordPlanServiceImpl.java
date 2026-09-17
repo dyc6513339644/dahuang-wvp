@@ -2,7 +2,7 @@ package com.ruoyi.wvp.service.impl;
 
 
 import com.google.common.base.Joiner;
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
 import com.ruoyi.wvp.gb28181.service.IGbChannelPlayService;
@@ -10,8 +10,8 @@ import com.ruoyi.wvp.mapper.CommonGBChannelMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.wvp.mapper.RecordPlanItemMapper;
 import com.ruoyi.wvp.mapper.RecordPlanMapper;
-import com.ruoyi.wvp.media.bean.MediaInfo;
-import com.ruoyi.wvp.media.event.media.MediaDepartureEvent;
+import com.ruoyi.media.domain.MediaInfo;
+import com.ruoyi.media.event.media.MediaDepartureEvent;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.IRecordPlanService;
 import com.ruoyi.wvp.service.bean.InviteErrorCode;

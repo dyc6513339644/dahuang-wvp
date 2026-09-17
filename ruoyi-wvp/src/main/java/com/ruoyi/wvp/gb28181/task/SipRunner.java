@@ -4,13 +4,14 @@ package com.ruoyi.wvp.gb28181.task;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
 import com.ruoyi.wvp.gb28181.bean.Device;
 import com.ruoyi.wvp.gb28181.bean.Platform;
-import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
+import com.ruoyi.media.domain.SendRtpInfo;
 import com.ruoyi.wvp.gb28181.service.IDeviceService;
 import com.ruoyi.wvp.gb28181.service.IGbChannelService;
 import com.ruoyi.wvp.gb28181.service.IPlatformService;
-import com.ruoyi.wvp.gb28181.session.SSRCFactory;
+import com.ruoyi.wvp.conf.UserSetting;
+import com.ruoyi.media.service.ISSRCService;
 import com.ruoyi.wvp.gb28181.transmit.cmd.ISIPCommanderForPlatform;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
 import com.ruoyi.wvp.service.ISendRtpServerService;
 import com.ruoyi.wvp.storager.IRedisCatchStorage;
@@ -41,7 +42,10 @@ public class SipRunner implements CommandLineRunner {
     private IRedisCatchStorage redisCatchStorage;
 
     @Autowired
-    private SSRCFactory ssrcFactory;
+    private ISSRCService ssrcService;
+
+    @Autowired
+    private UserSetting userSetting;
 
     @Autowired
     private IDeviceService deviceService;
@@ -106,7 +110,7 @@ public class SipRunner implements CommandLineRunner {
                 }
                 sendRtpServerService.delete(sendRtpItem);
                 if (mediaServerItem != null) {
-                    ssrcFactory.releaseSsrc(sendRtpItem.getMediaServerId(), sendRtpItem.getSsrc());
+                    ssrcService.releaseSsrc(sendRtpItem.getMediaServerId(), sendRtpItem.getSsrc(), userSetting.getServerId());
                     boolean stopResult = mediaServerService.initStopSendRtp(mediaServerItem, sendRtpItem.getApp(), sendRtpItem.getStream(), sendRtpItem.getSsrc());
                     if (stopResult) {
                         Platform platform = platformService.queryPlatformByServerGBId(sendRtpItem.getTargetId());

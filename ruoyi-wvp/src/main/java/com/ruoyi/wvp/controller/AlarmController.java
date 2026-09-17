@@ -128,6 +128,7 @@ public class AlarmController {
      *  分页查询报警
      *
      * @param deviceId 设备id
+     * @param channelId 通道编码（精确过滤 channel_id 字段）
      * @param page 当前页
      * @param count 每页查询数量
      * @param alarmPriority  报警级别
@@ -143,12 +144,16 @@ public class AlarmController {
             @RequestParam int page,
             @RequestParam int count,
             @RequestParam(required = false)  String deviceId,
+            @RequestParam(required = false)  String channelId,
             @RequestParam(required = false) String alarmPriority,
             @RequestParam(required = false) String alarmMethod,
             @RequestParam(required = false) String alarmType,
             @RequestParam(required = false) String startTime,
             @RequestParam(required = false) String endTime
     ) {
+        if (ObjectUtils.isEmpty(channelId)) {
+            channelId = null;
+        }
         if (ObjectUtils.isEmpty(alarmPriority)) {
             alarmPriority = null;
         }
@@ -171,7 +176,7 @@ public class AlarmController {
             throw new ControllerException(ErrorCode.ERROR400.getCode(), "endTime格式为" + DateUtil.PATTERN);
         }
 
-        return deviceAlarmService.getAllAlarm(page, count, deviceId, alarmPriority, alarmMethod,
+        return deviceAlarmService.getAllAlarm(page, count, deviceId, channelId, alarmPriority, alarmMethod,
                 alarmType, startTime, endTime);
     }
 }

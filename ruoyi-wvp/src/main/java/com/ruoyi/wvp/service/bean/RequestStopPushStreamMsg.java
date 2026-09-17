@@ -1,6 +1,6 @@
 package com.ruoyi.wvp.service.bean;
 
-import com.ruoyi.wvp.gb28181.bean.SendRtpInfo;
+import com.ruoyi.media.domain.SendRtpInfo;
 
 public class RequestStopPushStreamMsg {
 

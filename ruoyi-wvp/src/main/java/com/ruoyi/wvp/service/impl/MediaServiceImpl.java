@@ -12,16 +12,16 @@ import com.ruoyi.wvp.gb28181.bean.SsrcTransaction;
 import com.ruoyi.wvp.gb28181.service.IDeviceChannelService;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
 import com.ruoyi.wvp.gb28181.session.SipInviteSessionManager;
-import com.ruoyi.wvp.media.bean.MediaServer;
-import com.ruoyi.wvp.media.bean.ResultForOnPublish;
-import com.ruoyi.wvp.media.zlm.dto.StreamAuthorityInfo;
+import com.ruoyi.media.domain.MediaServer;
+import com.ruoyi.media.domain.ResultForOnPublish;
+import com.ruoyi.media.zlm.dto.StreamAuthorityInfo;
 import com.ruoyi.wvp.service.IMediaService;
 import com.ruoyi.wvp.service.IRecordPlanService;
 import com.ruoyi.wvp.storager.IRedisCatchStorage;
 import com.ruoyi.wvp.streamProxy.bean.StreamProxy;
 import com.ruoyi.wvp.streamProxy.service.IStreamProxyService;
 import com.ruoyi.wvp.utils.DateUtil;
-import com.ruoyi.wvp.utils.MediaServerUtils;
+import com.ruoyi.media.utils.MediaServerUtils;
 import com.ruoyi.common.enums.ErrorCode;
 import com.ruoyi.wvp.vmanager.bean.OtherPsSendInfo;
 import com.ruoyi.wvp.vmanager.bean.OtherRtpSendInfo;
@@ -31,6 +31,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import com.ruoyi.media.event.hook.Hook;
 
 @Slf4j
 @Service

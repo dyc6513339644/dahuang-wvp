@@ -1,7 +1,7 @@
 package com.ruoyi.wvp.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ruoyi.wvp.media.bean.MediaServer;
+import com.ruoyi.media.domain.MediaServer;
 import com.ruoyi.wvp.service.bean.CloudRecordItem;
 import org.apache.ibatis.annotations.Param;
 

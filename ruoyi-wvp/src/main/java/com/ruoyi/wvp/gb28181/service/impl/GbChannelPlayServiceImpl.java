@@ -1,6 +1,6 @@
 package com.ruoyi.wvp.gb28181.service.impl;
 
-import com.ruoyi.wvp.common.StreamInfo;
+import com.ruoyi.media.domain.StreamInfo;
 import com.ruoyi.wvp.common.enums.ChannelDataType;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;

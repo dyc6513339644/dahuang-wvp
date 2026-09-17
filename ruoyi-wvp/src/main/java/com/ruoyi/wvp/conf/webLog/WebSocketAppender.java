@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.nio.charset.StandardCharsets;
+import com.ruoyi.wvp.utils.DateUtil;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
