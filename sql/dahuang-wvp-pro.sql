@@ -415,7 +415,7 @@ CREATE TABLE `sys_config`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`config_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 31 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '参数配置表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 35 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '参数配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_config
@@ -438,6 +438,10 @@ INSERT INTO `sys_config` VALUES (27, '后台小Logo', 'site_logo_square', '', 'Y
 INSERT INTO `sys_config` VALUES (28, '后台大Logo', 'site_logo_lefttop', '', 'Y', 'admin', '2026-08-06 20:45:43', 'admin', '2026-08-06 21:19:15', NULL);
 INSERT INTO `sys_config` VALUES (29, '移动端登录Logo', 'mobile_login_logo', '', 'Y', 'admin', '2026-08-06 20:45:43', 'admin', '2026-08-06 21:19:15', NULL);
 INSERT INTO `sys_config` VALUES (30, '系统ICO图标', 'site_favicon', '', 'Y', 'admin', '2026-08-06 20:45:43', 'admin', '2026-08-06 21:19:15', NULL);
+INSERT INTO `sys_config` VALUES (31, '地图类型', 'map_type', 'amap', 'Y', 'admin', '2026-08-15 19:22:05', '', NULL, 'amap=高德地图，tianditu=天地图');
+INSERT INTO `sys_config` VALUES (32, '天地图KEY', 'tianditu_map_key', '', 'Y', 'admin', '2026-08-15 19:22:05', '', NULL, NULL);
+INSERT INTO `sys_config` VALUES (33, '天地图安全秘钥', 'tianditu_map_security_code', '', 'Y', 'admin', '2026-08-15 19:22:05', '', NULL, NULL);
+INSERT INTO `sys_config` VALUES (34, '天地图中心点坐标', 'tianditu_map_center', '40.09,116.24', 'Y', 'admin', '2026-08-15 19:22:05', '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_dept

@@ -520,13 +520,15 @@ INSERT INTO "public"."sys_config" VALUES (25, '后台小Logo', 'site_logo_square
 INSERT INTO "public"."sys_config" VALUES (26, '后台大Logo', 'site_logo_lefttop', '', 'Y', 'admin', '2026-08-15 19:20:04', '', '2026-08-15 19:20:04', NULL);
 INSERT INTO "public"."sys_config" VALUES (27, '移动端登录Logo', 'mobile_login_logo', '', 'Y', 'admin', '2026-08-15 19:20:04', '', '2026-08-15 19:20:04', NULL);
 INSERT INTO "public"."sys_config" VALUES (28, '系统ICO图标', 'site_favicon', '', 'Y', 'admin', '2026-08-15 19:20:04', '', '2026-08-15 19:20:04', NULL);
-INSERT INTO "public"."sys_config" VALUES (29, '地图类型', 'map_type', 'tianditu', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', NULL);
+INSERT INTO "public"."sys_config" VALUES (29, '地图类型', 'map_type', 'amap', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', 'amap=高德地图，tianditu=天地图');
 INSERT INTO "public"."sys_config" VALUES (19, '高德地图KEY ', 'gaode_map_key', '1111111111111', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-08-15 19:22:05', NULL);
 INSERT INTO "public"."sys_config" VALUES (20, '高德地图安全秘钥', 'gaode_map_security_code', '222222222', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-08-15 19:22:05', NULL);
 INSERT INTO "public"."sys_config" VALUES (21, '高德地图中心点坐标', 'gaode_map_center', '40.09,116.24', 'Y', 'admin', '2026-06-05 22:25:38', 'admin', '2026-08-15 19:22:05', NULL);
 INSERT INTO "public"."sys_config" VALUES (30, '天地图KEY', 'tianditu_map_key', '1111111111', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', NULL);
 INSERT INTO "public"."sys_config" VALUES (31, '天地图安全秘钥', 'tianditu_map_security_code', '11111111111111', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', NULL);
 INSERT INTO "public"."sys_config" VALUES (32, '天地图中心点坐标', 'tianditu_map_center', '40.09,116.24', 'Y', 'admin', '2026-08-15 19:22:05', '', '2026-08-15 19:22:05', NULL);
+INSERT INTO "public"."sys_config" VALUES (33, '用户管理-初始密码修改策略', 'sys.account.initPasswordModify', '1', 'Y', 'admin', '2026-08-05 16:55:03', '', '2026-08-05 16:55:03', '0：初始密码修改策略关闭，没有任何提示，1：提醒用户，如果未修改初始密码，则在登录时就会提醒修改密码对话框');
+INSERT INTO "public"."sys_config" VALUES (34, '用户管理-账号密码更新周期', 'sys.account.passwordValidateDays', '0', 'Y', 'admin', '2026-08-05 16:55:31', 'admin', '2026-08-05 20:58:19', '密码更新周期（填写数字，数据初始化值为0不限制，若修改必须为大于0小于365的正整数），如果超过这个周期登录系统时，则在登录时就会提醒修改密码对话框');
 
 -- ----------------------------
 -- Table structure for sys_dept
