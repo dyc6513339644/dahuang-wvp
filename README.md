@@ -198,11 +198,4 @@ v2.0.0 （2026-08-05）
 - 感谢作者[若依](https://ruoyi.vip/) 开源了这么棒快速开发框架。
 - 感谢作者[公安县泉姒禾网络科技工作室](https://gitee.com/xiaochemgzi/RuoYi-Wvp.git) 开源wvp做了集成。
 
-## 赞赏方式
-* 如果你感觉项目对你有帮助,请我们喝杯咖啡吧！
-<table>
-    <tr>
-        <td><img width="400" src="images/wx1.png"/></td>
-        <td><img width="400" src="images/wx2.png"/></td>
-    </tr>
-</table>
+
