@@ -1,10 +1,8 @@
 package com.ruoyi.wvp.common;
 
-
 import com.ruoyi.media.domain.SSRCInfo;
-import com.ruoyi.media.domain.StreamInfo;
 import lombok.Data;
-
+import com.ruoyi.media.domain.StreamInfo;
 
 /**
  * 记录每次发送invite消息的状态

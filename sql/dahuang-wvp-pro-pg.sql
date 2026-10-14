@@ -1708,7 +1708,8 @@ CACHE 1
   "longitude" float8,
   "latitude" float8,
   "alarm_type" text COLLATE "pg_catalog"."default",
-  "create_time" text COLLATE "pg_catalog"."default" NOT NULL
+  "create_time" text COLLATE "pg_catalog"."default" NOT NULL,
+  "channel_name" text COLLATE "pg_catalog"."default"
 )
 ;
 

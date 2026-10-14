@@ -8,9 +8,6 @@ import java.util.List;
 
 /**
  * 媒体服务器节点列表变更事件
- * <p>
- * 继承 {@link MediaServerEventAbstract} 以统一「媒体服务器事件」的类型体系。
- * 本事件携带的是节点列表，基类的单个 mediaServer 字段对本事件不适用，不使用。
  */
 public class MediaServerChangeEvent extends MediaServerEventAbstract {
 

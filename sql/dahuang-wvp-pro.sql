@@ -833,9 +833,9 @@ INSERT INTO `sys_menu` VALUES (2166, '报警管理', 0, 3, 'gbmanger', NULL, NUL
 INSERT INTO `sys_menu` VALUES (2167, '报警查询', 2166, 0, 'alarm', 'wvp/alarm/index', NULL, 'alarm', 1, 0, 'C', '0', '0', 'wvp:alarm:list', 'el-icon-bell', 'admin', '2026-08-06 16:14:25', 'admin', '2026-08-06 16:28:28', '');
 INSERT INTO `sys_menu` VALUES (2168, '删除', 2167, 0, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'wvp:alarm:remove', '#', 'admin', '2026-08-06 16:28:55', '', '2026-08-06 16:28:55', '');
 INSERT INTO `sys_menu` VALUES (2169, '海康ISUP', 2015, 5, 'isup', 'wvp/isup/index', NULL, '', 1, 0, 'C', '1', '0', 'isup:lsupDevice:list', '#', 'admin', '2026-08-11 23:44:39', 'admin', '2026-09-17 15:01:17', '');
-INSERT INTO `sys_menu` VALUES (2170, '协议管理', 1, 9, 'agreement', 'system/agreement/index', '', '', 1, 0, 'C', '0', '0', '', '', 'admin', '2026-09-14 10:00:07', 'admin', '2026-09-14 11:08:24', '协议管理菜单');
-INSERT INTO `sys_menu` VALUES (2171, '协议查询', 2167, 1, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'system:agreement:query', '#', 'admin', '2026-09-14 10:00:07', '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2172, '协议保存', 2167, 2, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'system:agreement:edit', '#', 'admin', '2026-09-14 10:00:07', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2170, '协议管理', 1, 9, 'agreement', 'system/agreement/index', '', '', 1, 0, 'C', '0', '0', '', 'el-icon-document', 'admin', '2026-09-14 10:00:07', 'admin', '2026-09-14 11:08:24', '协议管理菜单');
+INSERT INTO `sys_menu` VALUES (2171, '协议查询', 2170, 1, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'system:agreement:query', '#', 'admin', '2026-09-14 10:00:07', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2172, '协议保存', 2170, 2, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'system:agreement:edit', '#', 'admin', '2026-09-14 10:00:07', '', NULL, '');
 
 -- ----------------------------
 -- Table structure for sys_notice
@@ -1196,6 +1196,9 @@ INSERT INTO `sys_role_menu` VALUES (3, 2162);
 INSERT INTO `sys_role_menu` VALUES (3, 2163);
 INSERT INTO `sys_role_menu` VALUES (3, 2164);
 INSERT INTO `sys_role_menu` VALUES (3, 2165);
+INSERT INTO `sys_role_menu` VALUES (3, 2170);
+INSERT INTO `sys_role_menu` VALUES (3, 2171);
+INSERT INTO `sys_role_menu` VALUES (3, 2172);
 INSERT INTO `sys_role_menu` VALUES (4, 1);
 INSERT INTO `sys_role_menu` VALUES (4, 2);
 INSERT INTO `sys_role_menu` VALUES (4, 100);

@@ -10,9 +10,6 @@ import java.util.List;
 
 /**
  * 媒体服务器节点 Mapper
- * <p>
- * 简单 CRUD 使用 MyBatis-Plus {@link BaseMapper} 内置方法（insert / selectById / selectList / deleteById）；
- * 复杂 SQL（动态更新、按 host+port 查询/删除、默认节点查询等）在 MediaServer.xml 中定义。
  */
 @Mapper
 @Repository
