@@ -465,7 +465,16 @@ public class PlayServiceImpl implements IPlayService {
             }, (event) -> {
                 log.info("[点播失败]{}:{} deviceId: {}, channelId:{}",event.statusCode, event.msg, device.getDeviceId(), channel.getDeviceId());
                 receiveRtpServerService.closeRTPServer(mediaServerItem, ssrcInfo);
-
+                // 已经建立过会话的（例如收到对端重传的失败响应），必须补发BYE，
+                // 否则设备侧会一直占着这一路，后续点播全部被拒（403）
+                SsrcTransaction failedTransaction = sessionManager.getSsrcTransactionByStream(ssrcInfo.getApp(), ssrcInfo.getStream());
+                if (failedTransaction != null) {
+                    try {
+                        cmder.streamByeCmd(device, channel.getDeviceId(), ssrcInfo.getApp(), ssrcInfo.getStream(), null, null);
+                    } catch (Exception e) {
+                        log.error("[点播失败] 发送BYE失败 {}", e.getMessage());
+                    }
+                }
                 sessionManager.removeByStream(ssrcInfo.getApp(), ssrcInfo.getStream());
                 if (callback != null) {
                     callback.run(event.statusCode, event.msg, null);
