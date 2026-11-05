@@ -19,11 +19,15 @@ dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016，兼
   账号：admin
   密码：admin1234
 
+
 * 平台使用手册
   https://my.feishu.cn/wiki/VAAgwKRMkiMJ2dkBIWDcu7HKneb?from=from_copylink
+
+## 免安装下载
+* WINDOW 安装
+  window-v2.0.2版本
+  链接: https://pan.baidu.com/s/199FsE_lcX-0tZlifA98TOw?pwd=s3ii 提取码: s3ii
 ## 最近更新
-
-
 
 v2.0.1 （2026-08-08）
 * 修复国标设备编辑时，订阅配置变更时自动触发SIP订阅同步
