@@ -252,8 +252,8 @@
                     <otherwise>INSTR(',' || ancestors || ',', ',' || #{device.deptId} || ',') &gt; 0</otherwise>
                 </choose>
                 ))</if>
-            <if test="device.status != null">
-                AND de.on_line = #{device.status}
+            <if test="device.params.onLine != null">
+                AND de.on_line = #{device.params.onLine}
             </if>
             <if test="device.name != null">
                 AND de.name LIKE CONCAT('%', #{device.name}, '%')
@@ -321,8 +321,8 @@
                     <otherwise>INSTR(',' || ancestors || ',', ',' || #{device.deptId} || ',') &gt; 0</otherwise>
                 </choose>
                 ))</if>
-            <if test="device.status != null">
-                AND de.on_line = #{device.status}
+            <if test="device.params.onLine != null">
+                AND de.on_line = #{device.params.onLine}
             </if>
             <if test="device.name != null">
                 AND de.name LIKE CONCAT('%', #{device.name}, '%')

@@ -4,13 +4,16 @@ import org.springframework.context.ApplicationEvent;
 
 /**
  * ONVIF设备事件
+ * ADD:            新增设备 → 删旧通道，全量重建
+ * UPDATE:         更新设备 → 通道存在则更新，不存在则插入
+ * REFRESH_CHANNELS: 刷新通道 → 存在则更新，不存在则插入（不删旧通道）
  */
 public class DeviceOnvifEvent extends ApplicationEvent {
 
     public enum EventType {
-        ADD,               // 新增设备 → 删旧通道，全量重建
-        UPDATE,            // 更新设备 → 通道存在则更新，不存在则插入
-        REFRESH_CHANNELS   // 刷新通道 → 存在则更新，不存在则插入（不删旧通道）
+        ADD,
+        UPDATE,
+        REFRESH_CHANNELS
     }
 
     private Long id;

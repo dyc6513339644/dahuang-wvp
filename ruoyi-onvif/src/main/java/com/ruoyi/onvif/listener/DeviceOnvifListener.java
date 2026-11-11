@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * ONVIF设备添加事件监听器
+ * 负责：设备信息获取 → 更新 → 通道创建
  */
 @Component
 public class DeviceOnvifListener implements ApplicationListener<DeviceOnvifEvent> {

@@ -148,18 +148,6 @@ public class PlaybackController extends BaseController {
 					resultHolder.invokeResult(requestMessage);
 				});
 
-		// 回放请求超时兜底：设备不回放 / INVITE 无响应 / hook 未触发时，playBack 回调可能不触发，
-		// 导致 DeferredResult 挂到超时后返回 503 或挂起，前端 axios 等满 100s 才超时。
-		// 此处超时主动返回错误结果（对齐 GBRecordController 录像查询的 onTimeout 处理）。
-		result.onTimeout(() -> {
-			log.warn("[录像回放] 请求超时 deviceId: {}, channelId: {}", deviceId, channelId);
-			WVPResult<StreamContent> timeoutResult = new WVPResult<>();
-			timeoutResult.setCode(ErrorCode.ERROR100.getCode());
-			timeoutResult.setMsg("回放请求超时");
-			requestMessage.setData(timeoutResult);
-			resultHolder.invokeResult(requestMessage);
-		});
-
 		return result;
 	}
 

@@ -63,11 +63,6 @@ public class Device extends WvpBaseEntity {
     private String firmware;
 
     /**
-     * 在线状态
-     */
-    private String status;
-
-    /**
      * 传输协议
      * UDP/TCP
      */

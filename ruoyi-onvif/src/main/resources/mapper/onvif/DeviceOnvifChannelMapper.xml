@@ -27,6 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="port"    column="port"    />
         <result property="password"    column="password"    />
         <result property="status"    column="status"    />
+        <result property="onLine"    column="on_line"    />
         <result property="longitude"    column="longitude"    />
         <result property="latitude"    column="latitude"    />
         <result property="ptzType"    column="ptz_type"    />
@@ -90,7 +91,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectDeviceOnvifChannelVo">
-        select id, device_id, name, manufacturer, db_model, owner, civil_code, block, address, parental, parent_id, safety_way, register_way, cert_num, certifiable, err_code, end_time, secrecy, ip_address, port, password, status, longitude, latitude, ptz_type, position_type, room_type, use_type, supply_light_type, direction_type, resolution, business_group_id, download_speed, svc_space_support_mod, svc_time_support_mode, create_time, update_time, sub_count, stream_id, has_audio, gps_time, stream_identification, channel_type, gb_device_id, gb_name, gb_manufacturer, gb_model, gb_owner, gb_civil_code, gb_block, gb_address, gb_parental, gb_parent_id, gb_safety_way, gb_register_way, gb_cert_num, gb_certifiable, gb_err_code, gb_end_time, gb_secrecy, gb_ip_address, gb_port, gb_password, gb_status, gb_longitude, gb_latitude, gb_business_group_id, gb_ptz_type, gb_position_type, gb_room_type, gb_use_type, gb_supply_light_type, gb_direction_type, gb_resolution, gb_download_speed, gb_svc_space_support_mod, gb_svc_time_support_mode, record_plan_id, data_type, data_device_id, channel_no, src_url from wvp_device_channel
+        select id, device_id, name, manufacturer, db_model, owner, civil_code, block, address, parental, parent_id, safety_way, register_way, cert_num, certifiable, err_code, end_time, secrecy, ip_address, port, password, status, on_line, longitude, latitude, ptz_type, position_type, room_type, use_type, supply_light_type, direction_type, resolution, business_group_id, download_speed, svc_space_support_mod, svc_time_support_mode, create_time, update_time, sub_count, stream_id, has_audio, gps_time, stream_identification, channel_type, gb_device_id, gb_name, gb_manufacturer, gb_model, gb_owner, gb_civil_code, gb_block, gb_address, gb_parental, gb_parent_id, gb_safety_way, gb_register_way, gb_cert_num, gb_certifiable, gb_err_code, gb_end_time, gb_secrecy, gb_ip_address, gb_port, gb_password, gb_status, gb_longitude, gb_latitude, gb_business_group_id, gb_ptz_type, gb_position_type, gb_room_type, gb_use_type, gb_supply_light_type, gb_direction_type, gb_resolution, gb_download_speed, gb_svc_space_support_mod, gb_svc_time_support_mode, record_plan_id, data_type, data_device_id, channel_no, src_url from wvp_device_channel
     </sql>
 
     <select id="selectDeviceOnvifChannelList" parameterType="DeviceOnvifChannel" resultMap="DeviceOnvifChannelResult">
@@ -185,7 +186,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test='key != null and key != ""'>
                 AND (name LIKE CONCAT('%', #{key}, '%') OR device_id LIKE CONCAT('%', #{key}, '%'))
             </if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="onLine != null"> and on_line = #{onLine}</if>
             <if test="parentId != null  and parentId != ''"> and parent_id = #{parentId}</if>
             <if test="dataType != null "> and data_type = #{dataType}</if>
             <if test="dataDeviceId != null "> and data_device_id = #{dataDeviceId}</if>
@@ -201,7 +202,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test='reqVo.key != null and reqVo.key != ""'>
                 AND (name LIKE CONCAT('%', #{reqVo.key}, '%') OR device_id LIKE CONCAT('%', #{reqVo.key}, '%'))
             </if>
-            <if test="reqVo.status != null  and reqVo.status != ''"> and status = #{reqVo.status}</if>
+            <if test="reqVo.onLine != null"> and on_line = #{reqVo.onLine}</if>
             <if test="reqVo.parentId != null  and reqVo.parentId != ''"> and parent_id = #{reqVo.parentId}</if>
             <if test="reqVo.dataType != null "> and data_type = #{reqVo.dataType}</if>
             <if test="reqVo.dataDeviceId != null "> and data_device_id = #{reqVo.dataDeviceId}</if>
@@ -226,9 +227,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from wvp_device_channel where data_device_id = #{dataDeviceId}
     </delete>
 
-    <!-- 探测任务：按 dataDeviceId 批量更新通道状态 -->
-    <update id="updateStatusByDataDeviceId">
-        UPDATE wvp_device_channel SET status = #{status}
+    <!-- 探测任务：按 dataDeviceId 批量更新通道状态（status 与 on_line 双写，保持两者一致） -->
+    <update id="updateStatusAndOnLineByDataDeviceId">
+        UPDATE wvp_device_channel SET status = #{status}, on_line = #{onLine}
         WHERE data_device_id = #{dataDeviceId}
     </update>
 </mapper>

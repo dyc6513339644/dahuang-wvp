@@ -151,6 +151,30 @@ public class DeviceChannel extends CommonGBChannel {
     private String status;
 
     /**
+     * 在线状态（true 在线 / false 离线），落库 wvp_device_channel.on_line，由 status 派生同步
+     */
+    private Boolean onLine;
+
+    /**
+     * 设置通道状态，同时同步布尔在线状态，避免 status 与 on_line 两列不一致
+     * @param status ON=在线，其余=离线
+     */
+    public void setStatus(String status) {
+        this.status = status;
+        this.onLine = "ON".equalsIgnoreCase(status);
+    }
+
+    /**
+     * 在线状态：优先返回 onLine 列，为空时按 status 推导，避免批量更新写入 null
+     */
+    public Boolean getOnLine() {
+        if (onLine != null) {
+            return onLine;
+        }
+        return status != null && "ON".equalsIgnoreCase(status);
+    }
+
+    /**
      * 国标-经度 WGS-84坐标系
      */
     @MessageElementForCatalog("Longitude")

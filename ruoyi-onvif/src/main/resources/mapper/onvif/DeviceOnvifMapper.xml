@@ -131,8 +131,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test='key != null and key != ""'>
                 AND (de.name LIKE CONCAT('%', #{key}, '%') OR de.device_id LIKE CONCAT('%', #{key}, '%'))
             </if>
-            <if test='status != null'>
-                AND de.on_line = #{status}
+            <if test='onLine != null'>
+                AND de.on_line = #{onLine}
             </if>
             <if test="manufacturer != null  and manufacturer != ''"> and manufacturer = #{manufacturer}</if>
         </where>
@@ -148,8 +148,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test='reqVo.key != null and reqVo.key != ""'>
                 AND (de.name LIKE CONCAT('%', #{reqVo.key}, '%') OR de.device_id LIKE CONCAT('%', #{reqVo.key}, '%'))
             </if>
-            <if test='reqVo.status != null'>
-                AND de.on_line = #{reqVo.status}
+            <if test='reqVo.onLine != null'>
+                AND de.on_line = #{reqVo.onLine}
             </if>
             <if test="reqVo.manufacturer != null  and reqVo.manufacturer != ''"> and manufacturer = #{reqVo.manufacturer}</if>
             <if test="deviceIds != null and deviceIds.size() > 0">

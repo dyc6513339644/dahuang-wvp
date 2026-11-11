@@ -1564,6 +1564,7 @@ CREATE TABLE `wvp_device_channel`  (
   `port` int(11) NULL DEFAULT NULL,
   `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   `status` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT 'OFF',
+  `on_line` tinyint(1) NULL DEFAULT 0 COMMENT '在线状态(1在线 0离线)，由status派生同步',
   `longitude` double NULL DEFAULT NULL,
   `latitude` double NULL DEFAULT NULL,
   `ptz_type` int(11) NULL DEFAULT NULL,

@@ -19,6 +19,12 @@ import java.util.concurrent.*;
 
 /**
  * ONVIF 设备在线状态探测任务（ruoyi-onvif 版本）
+ *
+ * 设计要点：
+ * 1. SQL 层按 keepalive 时间 + 心跳间隔直接过滤需要探测的设备，避免全量加载到内存
+ * 2. 线程池 CallerRunsPolicy 确保队列满时不丢任务（由定时任务线程自行执行兜底）
+ * 3. 离线设备降频到 5 分钟探测一次，降低无效开销
+ * 4. 设备上线/离线自动联动通道状态（ON/OFF）
  */
 @Component
 public class OnvifDeviceProbeTask {

@@ -23,13 +23,13 @@ public interface DeviceChannelMapper {
             "insert into wvp_device_channel " +
             "(device_id, data_type, data_device_id, name, manufacturer, db_model, owner, civil_code, block, " +
             "address, parental, parent_id, safety_way, register_way, cert_num, certifiable, err_code, end_time, secrecy, " +
-            "ip_address, port, password, status, longitude, latitude, ptz_type, position_type, room_type, use_type, " +
+            "ip_address, port, password, status, on_line, longitude, latitude, ptz_type, position_type, room_type, use_type, " +
             "supply_light_type, direction_type, resolution, business_group_id, download_speed, svc_space_support_mod, " +
             "svc_time_support_mode, create_time, update_time, sub_count, stream_id, has_audio, gps_time, stream_identification, channel_type) " +
             "values " +
             "(#{deviceId}, #{dataType}, #{dataDeviceId}, #{name}, #{manufacturer}, #{dbModel}, #{owner}, #{civilCode}, #{block}, " +
             "#{address}, #{parental}, #{parentId}, #{safetyWay}, #{registerWay}, #{certNum}, #{certifiable}, #{errCode}, #{endTime}, #{secrecy}, " +
-            "#{ipAddress}, #{port}, #{password}, #{status}, #{longitude}, #{latitude}, #{ptzType}, #{positionType}, #{roomType}, #{useType}, " +
+            "#{ipAddress}, #{port}, #{password}, #{status}, #{onLine}, #{longitude}, #{latitude}, #{ptzType}, #{positionType}, #{roomType}, #{useType}, " +
             "#{supplyLightType}, #{directionType}, #{resolution}, #{businessGroupId}, #{downloadSpeed}, #{svcSpaceSupportMod}," +
             " #{svcTimeSupportMode}, #{createTime}, #{updateTime}, #{subCount}, #{streamId}, #{hasAudio}, #{gpsTime}, #{streamIdentification}, #{channelType}) " +
             "</script>")
@@ -62,6 +62,7 @@ public interface DeviceChannelMapper {
             ", port=#{port}" +
             ", password=#{password}" +
             ", status=#{status}" +
+            ", on_line=#{onLine}" +
             ", longitude=#{longitude}" +
             ", latitude=#{latitude}" +
             ", ptz_type=#{ptzType}" +
@@ -115,8 +116,12 @@ public interface DeviceChannelMapper {
     @Delete("DELETE FROM wvp_device_channel WHERE data_type =1 and data_device_id=#{dataDeviceId}")
     int cleanChannelsByDeviceId(@Param("dataDeviceId") int dataDeviceId);
 
-    @Update("UPDATE wvp_device_channel SET status='OFF' WHERE data_type=1 AND data_device_id=#{dataDeviceId}")
-    int offlineByDeviceId(@Param("dataDeviceId") int dataDeviceId);
+    default int offlineByDeviceId(int dataDeviceId) {
+        return updateOfflineByDeviceId(dataDeviceId, false);
+    }
+
+    @Update("UPDATE wvp_device_channel SET status='OFF', on_line=#{onLine} WHERE data_type=1 AND data_device_id=#{dataDeviceId}")
+    int updateOfflineByDeviceId(@Param("dataDeviceId") int dataDeviceId, @Param("onLine") Boolean onLine);
 
     @Delete("DELETE FROM wvp_device_channel WHERE id=#{id}")
     int del(@Param("id") int id);
@@ -206,21 +211,25 @@ public interface DeviceChannelMapper {
     List<ChannelReduce> queryChannelListInAll(@Param("query") String query, @Param("online") Boolean online, @Param("hasSubChannel") Boolean hasSubChannel, @Param("platformId") String platformId, @Param("catalogId") String catalogId);
 
 
-    @Update(value = {"UPDATE wvp_device_channel SET status='OFF' WHERE id=#{id}"})
-    void offline(@Param("id") int id);
+    default void offline(int id) {
+        updateOffline(id, false);
+    }
+
+    @Update(value = {"UPDATE wvp_device_channel SET status='OFF', on_line=#{onLine} WHERE id=#{id}"})
+    void updateOffline(@Param("id") int id, @Param("onLine") Boolean onLine);
 
     @Insert("<script> " +
             "insert into wvp_device_channel " +
             "(device_id, data_type, data_device_id, name, manufacturer, db_model, owner, civil_code, block, " +
             "address, parental, parent_id, safety_way, register_way, cert_num, certifiable, err_code, end_time, secrecy, " +
-            "ip_address, port, password, status, longitude, latitude, ptz_type, position_type, room_type, use_type, " +
+            "ip_address, port, password, status, on_line, longitude, latitude, ptz_type, position_type, room_type, use_type, " +
             "supply_light_type, direction_type, resolution, business_group_id, download_speed, svc_space_support_mod, " +
             "svc_time_support_mode, create_time, update_time, sub_count, stream_id, has_audio, gps_time, stream_identification, channel_type) " +
             "values " +
             "<foreach collection='addChannels' index='index' item='item' separator=','> " +
             "(#{item.deviceId}, #{item.dataType}, #{item.dataDeviceId}, #{item.name}, #{item.manufacturer}, #{item.dbModel}, #{item.owner}, #{item.civilCode}, #{item.block}, " +
             "#{item.address}, #{item.parental}, #{item.parentId}, #{item.safetyWay}, #{item.registerWay}, #{item.certNum}, #{item.certifiable}, #{item.errCode}, #{item.endTime}, #{item.secrecy}, " +
-            "#{item.ipAddress}, #{item.port}, #{item.password}, #{item.status}, #{item.longitude}, #{item.latitude}, #{item.ptzType}, #{item.positionType}, #{item.roomType}, #{item.useType}, " +
+            "#{item.ipAddress}, #{item.port}, #{item.password}, #{item.status}, #{item.onLine}, #{item.longitude}, #{item.latitude}, #{item.ptzType}, #{item.positionType}, #{item.roomType}, #{item.useType}, " +
             "#{item.supplyLightType}, #{item.directionType}, #{item.resolution}, #{item.businessGroupId}, #{item.downloadSpeed}, #{item.svcSpaceSupportMod}," +
             " #{item.svcTimeSupportMode}, #{item.createTime}, #{item.updateTime}, #{item.subCount}, #{item.streamId}, #{item.hasAudio}, #{item.gpsTime}, #{item.streamIdentification}, #{item.channelType}) " +
             "</foreach> " +
@@ -228,8 +237,12 @@ public interface DeviceChannelMapper {
     int batchAdd(@Param("addChannels") List<DeviceChannel> addChannels);
 
 
-    @Update(value = {"UPDATE wvp_device_channel SET status='ON' WHERE id=#{id}"})
-    void online(@Param("id") int id);
+    default void online(int id) {
+        updateOnline(id, true);
+    }
+
+    @Update(value = {"UPDATE wvp_device_channel SET status='ON', on_line=#{onLine} WHERE id=#{id}"})
+    void updateOnline(@Param("id") int id, @Param("onLine") Boolean onLine);
 
     @Update({"<script>" +
             "<foreach collection='updateChannels' item='item' separator=';'>" +
@@ -259,6 +272,7 @@ public interface DeviceChannelMapper {
             ", port=#{item.port}" +
             ", password=#{item.password}" +
             ", status=#{item.status}" +
+            ", on_line=#{item.onLine}" +
             ", longitude=#{item.longitude}" +
             ", latitude=#{item.latitude}" +
             ", ptz_type=#{item.ptzType}" +
@@ -312,6 +326,7 @@ public interface DeviceChannelMapper {
             ", port=#{item.port}" +
             ", password=#{item.password}" +
             ", status=#{item.status}" +
+            ", on_line=#{item.onLine}" +
             ", longitude=#{item.longitude}" +
             ", latitude=#{item.latitude}" +
             ", ptz_type=#{item.ptzType}" +
@@ -415,7 +430,7 @@ public interface DeviceChannelMapper {
 
     @Update({"<script>" +
             "<foreach collection='channels' item='item' separator=';'>" +
-            "UPDATE wvp_device_channel SET status=#{item.status} WHERE data_type = #{item.dataType} and device_id=#{item.deviceId}" +
+            "UPDATE wvp_device_channel SET status=#{item.status}, on_line=#{item.onLine} WHERE data_type = #{item.dataType} and device_id=#{item.deviceId}" +
             "</foreach>" +
             "</script>"})
     int batchUpdateStatus(List<DeviceChannel> channels);
@@ -577,7 +592,7 @@ public interface DeviceChannelMapper {
             "</script>")
     void updateStreamGPS(List<GPSMsgInfo> gpsMsgInfoList);
 
-    @Update("UPDATE wvp_device_channel SET status=#{status} WHERE data_type=#{dataType} and data_device_id=#{dataDeviceId} AND device_id=#{deviceId}")
+    @Update("UPDATE wvp_device_channel SET status=#{status}, on_line=#{onLine} WHERE data_type=#{dataType} and data_device_id=#{dataDeviceId} AND device_id=#{deviceId}")
     void updateStatus(DeviceChannel channel);
 
 
@@ -607,6 +622,7 @@ public interface DeviceChannelMapper {
             ", port=#{port}" +
             ", password=#{password}" +
             ", status=#{status}" +
+            ", on_line=#{onLine}" +
             ", longitude=#{longitude}" +
             ", latitude=#{latitude}" +
             ", ptz_type=#{ptzType}" +

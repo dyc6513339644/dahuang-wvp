@@ -104,9 +104,14 @@ public class DeviceOnvifChannel extends BaseEntity
     @Excel(name = "密码")
     private String password;
 
-    /** 设备状态 */
+    /** 设备状态 ON/OFF（国标协议字段，勿改为布尔） */
     @Excel(name = "设备状态")
     private String status;
+
+    /** 在线状态 true=在线 false=离线（与 wvp_device.on_line 同义，由 status 派生同步） */
+    @TableField("on_line")
+    @Excel(name = "在线状态")
+    private Boolean onLine;
 
     /** 经度 */
     @Excel(name = "经度")
@@ -513,8 +518,25 @@ public class DeviceOnvifChannel extends BaseEntity
         return status;
     }
 
+    /**
+     * 设置通道状态，同时同步布尔在线状态，避免两列不一致
+     * @param status ON=在线，其他值=离线
+     */
     public void setStatus(String status) {
         this.status = status;
+        this.onLine = "ON".equalsIgnoreCase(status);
+    }
+
+    /**
+     * 在线状态（取 on_line 列实际值；该实体由 MyBatis-Plus 维护，
+     * 此处不做 getter 兜底，否则部分字段更新时会把 on_line 误写为 false）
+     */
+    public Boolean getOnLine() {
+        return onLine;
+    }
+
+    public void setOnLine(Boolean onLine) {
+        this.onLine = onLine;
     }
 
     public Double getLongitude() {

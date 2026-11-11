@@ -92,11 +92,16 @@ public class DeviceQueryController extends BaseController {
      * 查询全部国标设备
      *
      * @param device 设备
+     * @param onLine 在线状态过滤（true 在线 / false 离线，不传则不过滤）
      * @return 国标列表
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/deviceList")
-    public AjaxResult deviceList(Device device) {
+    public AjaxResult deviceList(Device device,
+                                 @RequestParam(value = "onLine", required = false) Boolean onLine) {
+        if (onLine != null) {
+            device.getParams().put("onLine", onLine);
+        }
         List<Device> list = deviceService.getAllDeviceTypes(device);
         return success(list);
     }
@@ -105,11 +110,16 @@ public class DeviceQueryController extends BaseController {
      * 分页查询国标设备
      *
      * @param device 设备
+     * @param onLine 在线状态过滤（true 在线 / false 离线，不传则不过滤）
      * @return 分页国标列表
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/devices")
-    public TableDataInfo devices(Device device) {
+    public TableDataInfo devices(Device device,
+                                 @RequestParam(value = "onLine", required = false) Boolean onLine) {
+        if (onLine != null) {
+            device.getParams().put("onLine", onLine);
+        }
         startPage();
         List<Device> list = deviceService.getAll(device);
         return getDataTable(list);
@@ -539,11 +549,12 @@ public class DeviceQueryController extends BaseController {
      * 查询当前用户有权限的设备列表（无关联数据则返回全部）
      */
     @GetMapping("/userDeviceList")
-    public AjaxResult userDeviceList(Device device) {
+    public AjaxResult userDeviceList(Device device,
+                                     @RequestParam(value = "onLine", required = false) Boolean onLine) {
         Long userId = getUserId();
         log.info("[userDeviceList] userId={}", userId);
         if (userChannelMapper.countByUserId(userId) == 0) {
-            return deviceList(device);
+            return deviceList(device, onLine);
         }
         List<Device> list = userChannelMapper.selectUserDevices(userId);
         log.info("[userDeviceList] count={}", list.size());

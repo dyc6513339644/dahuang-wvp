@@ -25,10 +25,19 @@ public interface DeviceOnvifChannelMapper extends BaseMapper<DeviceOnvifChannel>
     int deleteDeviceOnvifChannelByDataDeviceId(Long dataDeviceId);
 
     /**
-     * 按 dataDeviceId 批量更新通道状态
+     * 按 dataDeviceId 批量更新通道状态（status 与 on_line 双写）
+     * 保留原签名，on_line 由 status 统一派生，避免调用方各写各的导致两列不一致
      */
-    int updateStatusByDataDeviceId(@Param("dataDeviceId") Long dataDeviceId,
-                                   @Param("status") String status);
+    default int updateStatusByDataDeviceId(Long dataDeviceId, String status) {
+        return updateStatusAndOnLineByDataDeviceId(dataDeviceId, status, "ON".equalsIgnoreCase(status));
+    }
+
+    /**
+     * 按 dataDeviceId 批量更新通道状态，显式指定在线状态
+     */
+    int updateStatusAndOnLineByDataDeviceId(@Param("dataDeviceId") Long dataDeviceId,
+                                            @Param("status") String status,
+                                            @Param("onLine") Boolean onLine);
 
     /**
      * 查询设备通道列表（含设备信息）

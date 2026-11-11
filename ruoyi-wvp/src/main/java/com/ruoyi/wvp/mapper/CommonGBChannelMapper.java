@@ -165,28 +165,45 @@ public interface CommonGBChannelMapper {
             " </script>"})
     int update(CommonGBChannel commonGBChannel);
 
+    /**
+     * 更新通道状态（status + gb_status + on_line 三列同步）
+     * 保留原签名，on_line 由 status 统一派生，防止调用方各写各的导致列间不一致
+     */
+    default int updateStatusById(int gbId, String status) {
+        return updateStatusAndOnLineById(gbId, status, "ON".equalsIgnoreCase(status));
+    }
+
     @Update(value = {" <script>" +
             " UPDATE wvp_device_channel " +
-            " SET gb_status = #{status}, status = #{status}" +
+            " SET gb_status = #{status}, status = #{status}, on_line = #{onLine}" +
             " WHERE id = #{gbId}"+
             " </script>"})
-    int updateStatusById(@Param("gbId") int gbId, @Param("status") String status);
+    int updateStatusAndOnLineById(@Param("gbId") int gbId, @Param("status") String status, @Param("onLine") Boolean onLine);
 
     /**
      * 按 data_type + data_device_id 批量更新通道状态（用于 ONVIF 设备在线/离线联动）
      */
-    @Update("UPDATE wvp_device_channel SET gb_status = #{status}, status = #{status} " +
+    default int updateStatusByDataTypeAndDeviceId(Integer dataType, Integer dataDeviceId, String status) {
+        return updateStatusAndOnLineByDataTypeAndDeviceId(dataType, dataDeviceId, status, "ON".equalsIgnoreCase(status));
+    }
+
+    @Update("UPDATE wvp_device_channel SET gb_status = #{status}, status = #{status}, on_line = #{onLine} " +
             "WHERE data_type = #{dataType} AND data_device_id = #{dataDeviceId}")
-    int updateStatusByDataTypeAndDeviceId(@Param("dataType") Integer dataType,
-                                          @Param("dataDeviceId") Integer dataDeviceId,
-                                          @Param("status") String status);
+    int updateStatusAndOnLineByDataTypeAndDeviceId(@Param("dataType") Integer dataType,
+                                                   @Param("dataDeviceId") Integer dataDeviceId,
+                                                   @Param("status") String status,
+                                                   @Param("onLine") Boolean onLine);
+
+    default int updateStatusForListById(List<CommonGBChannel> commonGBChannels, String status) {
+        return updateStatusAndOnLineForListById(commonGBChannels, status, "ON".equalsIgnoreCase(status));
+    }
 
     @Update("<script> " +
             "<foreach collection='commonGBChannels' index='index' item='item' separator=';'> " +
-            "UPDATE wvp_device_channel SET gb_status = #{status}, status = #{status} WHERE id = #{item.gbId}" +
+            "UPDATE wvp_device_channel SET gb_status = #{status}, status = #{status}, on_line = #{onLine} WHERE id = #{item.gbId}" +
             "</foreach> " +
             "</script>")
-    int updateStatusForListById(@Param("commonGBChannels") List<CommonGBChannel> commonGBChannels, @Param("status") String status);
+    int updateStatusAndOnLineForListById(@Param("commonGBChannels") List<CommonGBChannel> commonGBChannels, @Param("status") String status, @Param("onLine") Boolean onLine);
 
     @SelectProvider(type = ChannelProvider.class, method = "queryInListByStatus")
     List<CommonGBChannel> queryInListByStatus(@Param("commonGBChannelList") List<CommonGBChannel> commonGBChannelList, @Param("status") String status);

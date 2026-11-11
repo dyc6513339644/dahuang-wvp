@@ -1750,6 +1750,7 @@ CACHE 1
   "port" int4,
   "password" text COLLATE "pg_catalog"."default",
   "status" text COLLATE "pg_catalog"."default" DEFAULT 'OFF'::text,
+  "on_line" bool DEFAULT false,
   "longitude" float8,
   "latitude" float8,
   "ptz_type" int4,

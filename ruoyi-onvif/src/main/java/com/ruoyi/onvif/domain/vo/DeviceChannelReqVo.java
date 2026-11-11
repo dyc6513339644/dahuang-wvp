@@ -7,7 +7,8 @@ public class DeviceChannelReqVo {
 
     private String parentId;
     private String key;
-    private String status;
+    /** 在线状态过滤（true 在线 / false 离线），推荐外部按此字段过滤 */
+    private Boolean onLine;
     private String dataType;
     private Long dataDeviceId;
 
