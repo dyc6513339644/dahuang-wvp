@@ -88,13 +88,15 @@ public class SIPProcessorObserver implements ISIPProcessorObserver {
                 CallIdHeader callIdHeader = response.getCallIdHeader();
                 CSeqHeader cSeqHeader = response.getCSeqHeader();
                 if (callIdHeader != null) {
-                    SipEvent sipEvent = sipSubscribe.getSubscribe(callIdHeader.getCallId() + cSeqHeader.getSeqNumber());
+                    // 订阅是按 callId+cseq 存的，删除必须用同一个 key
+                    String key = callIdHeader.getCallId() + cSeqHeader.getSeqNumber();
+                    SipEvent sipEvent = sipSubscribe.getSubscribe(key);
                     if (sipEvent != null) {
                         if (sipEvent.getOkEvent() != null) {
                             SipSubscribe.EventResult<ResponseEvent> eventResult = new SipSubscribe.EventResult<>(responseEvent);
                             sipEvent.getOkEvent().response(eventResult);
                         }
-                        sipSubscribe.removeSubscribe(callIdHeader.getCallId());
+                        sipSubscribe.removeSubscribe(key);
                     }
                 }
             }
@@ -112,13 +114,16 @@ public class SIPProcessorObserver implements ISIPProcessorObserver {
                 CallIdHeader callIdHeader = response.getCallIdHeader();
                 CSeqHeader cSeqHeader = response.getCSeqHeader();
                 if (callIdHeader != null) {
-                    SipEvent sipEvent = sipSubscribe.getSubscribe(callIdHeader.getCallId() + cSeqHeader.getSeqNumber());
+                    // 用 callId+cseq 精确匹配：设备对非 2xx 响应会重传（直到 T2=4s、最长 32s），
+                    // 首次失败时就必须摘掉订阅，否则重传会反复触发失败回调，把后来已经点播成功的会话也关掉
+                    String key = callIdHeader.getCallId() + cSeqHeader.getSeqNumber();
+                    SipEvent sipEvent = sipSubscribe.getSubscribe(key);
                     if (sipEvent != null ) {
+                        sipSubscribe.removeSubscribe(key);
                         if (sipEvent.getErrorEvent() != null) {
                             SipSubscribe.EventResult<ResponseEvent> eventResult = new SipSubscribe.EventResult<>(responseEvent);
                             sipEvent.getErrorEvent().response(eventResult);
                         }
-                        sipSubscribe.removeSubscribe(callIdHeader.getCallId());
                     }
                 }
             }

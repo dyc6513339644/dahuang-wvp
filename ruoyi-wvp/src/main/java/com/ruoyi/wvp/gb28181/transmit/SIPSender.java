@@ -74,13 +74,15 @@ public class SIPSender {
             CallIdHeader callIdHeader = (CallIdHeader) message.getHeader(CallIdHeader.NAME);
             CSeqHeader cSeqHeader = (CSeqHeader) message.getHeader(CSeqHeader.NAME);
             String key = callIdHeader.getCallId() + cSeqHeader.getSeqNumber();
+            // 订阅是按 callId+cseq 存的，删除必须用同一个 key，否则删不掉，
+            // 对端重传的失败响应会反复回调，把后续已经成功的点播又打回失败
             SipEvent sipEvent = SipEvent.getInstance(key, eventResult -> {
-                sipSubscribe.removeSubscribe(callIdHeader.getCallId());
+                sipSubscribe.removeSubscribe(key);
                 if(okEvent != null) {
                     okEvent.response(eventResult);
                 }
             }, (eventResult -> {
-                sipSubscribe.removeSubscribe(callIdHeader.getCallId());
+                sipSubscribe.removeSubscribe(key);
                 if (errorEvent != null) {
                     errorEvent.response(eventResult);
                 }
