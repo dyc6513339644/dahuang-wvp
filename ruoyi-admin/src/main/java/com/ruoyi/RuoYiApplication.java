@@ -25,7 +25,6 @@ import java.util.Collections;
 
 /**
  * 启动程序
- *
  * @author ruoyi
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
@@ -37,16 +36,14 @@ public class RuoYiApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(RuoYiApplication.class, args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  ruoyi-wvp启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
+        System.out.println("(♥◠‿◠)ﾉﾞ dahuang-wvp启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
                 "\n" +
-                "                         _                              \n" +
-                "                        (_)                             \n" +
-                "  _ __ _   _  ___  _   _ _ ________      ____   ___ __  \n" +
-                " | '__| | | |/ _ \\| | | | |______\\ \\ /\\ / /\\ \\ / / '_ \\ \n" +
-                " | |  | |_| | (_) | |_| | |       \\ V  V /  \\ V /| |_) |\n" +
-                " |_|   \\__,_|\\___/ \\__, |_|        \\_/\\_/    \\_/ | .__/ \n" +
-                "                    __/ |                        | |    \n" +
-                "                   |___/                         |_|    \n");
+                " ____       _      _   _   _   _      _      _   _    ____      __        __ __     __  ____\n" +
+                "|  _ \\     / \\    | | | | | | | |    / \\    | \\ | |  / ___|     \\ \\      / / \\ \\   / / |  _ \\\n" +
+                "| | | |   / _ \\   | |_| | | | | |   / _ \\   |  \\| | | |  _   -   \\ \\ /\\ / /   \\ \\ / /  | |_) |\n" +
+                "| |_| |  / ___ \\  |  _  | | |_| |  / ___ \\  | . ` | | |_| |       \\ V  V /     \\ V /   |  __/\n" +
+                "|____/  /_/   \\_\\ |_| |_|  \\___/  /_/   \\_\\ |_|\\__|  \\____|        \\_/\\_/       \\_/    |_|\n");
+
     }
 
     @Override

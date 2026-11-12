@@ -426,8 +426,8 @@ INSERT INTO `sys_config` VALUES (3, '主框架页-侧边栏主题', 'sys.index.s
 INSERT INTO `sys_config` VALUES (4, '账号自助-验证码开关', 'sys.account.captchaEnabled', 'false', 'Y', 'admin', '2025-04-03 09:03:39', 'admin', '2026-09-06 16:27:00', '是否开启验证码功能（true开启，false关闭）');
 INSERT INTO `sys_config` VALUES (5, '账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '是否开启注册用户功能（true开启，false关闭）');
 INSERT INTO `sys_config` VALUES (6, '用户登录-黑名单列表', 'sys.login.blackIPList', '', 'Y', 'admin', '2025-04-03 09:03:39', '', NULL, '设置登录IP黑名单限制，多个匹配项以;分隔，支持匹配（*通配、网段）');
-INSERT INTO `sys_config` VALUES (19, '高德地图KEY ', 'gaode_map_key', '88f28edf21df134b8b4c45ae6b87761a', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-06-07 15:39:26', NULL);
-INSERT INTO `sys_config` VALUES (20, '高德地图安全秘钥', 'gaode_map_security_code', '082ed5b08a0c94f565964ce946e260dd', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-06-07 15:43:56', NULL);
+INSERT INTO `sys_config` VALUES (19, '高德地图KEY ', 'gaode_map_key', '', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-06-07 15:39:26', NULL);
+INSERT INTO `sys_config` VALUES (20, '高德地图安全秘钥', 'gaode_map_security_code', '', 'Y', 'admin', '2026-06-05 22:21:50', 'admin', '2026-06-07 15:43:56', NULL);
 INSERT INTO `sys_config` VALUES (21, '高德地图中心点坐标', 'gaode_map_center', '40.09,116.24', 'Y', 'admin', '2026-06-05 22:25:38', 'admin', '2026-06-07 15:51:26', NULL);
 INSERT INTO `sys_config` VALUES (22, '网站名称', 'plat_name', '大荒安防', 'Y', 'admin', '2026-06-22 17:37:07', '', NULL, NULL);
 INSERT INTO `sys_config` VALUES (23, '演示信息开关', 'sys.demo.enabled', 'true', 'Y', 'admin', '2026-07-16 18:05:33', 'admin', '2026-07-16 18:26:50', NULL);
