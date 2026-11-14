@@ -10,7 +10,7 @@
 dahuang-wvp是基于ruoyi-vue和wvp框架的全部开源的GB/T 28181-2016，兼容2022视频平台，保留版权的情况下可以用于商业项目。重点对前端UI进行升级优化
 * 最新更新已GITEE为准
 * 演示地址
-  https://wvp.zgdahuan.com/
+  https://wvp.zgdahuan.com:28081/
    账号：admin
    密码：admin1234
 
