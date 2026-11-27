@@ -39,15 +39,6 @@ public interface DeviceOnvifMapper extends BaseMapper<DeviceOnvif>
                                                    @Param("deviceIds") List<String> deviceIds);
 
     /**
-     * 查询需要定时探测的ONVIF设备
-     *
-     * @param heartbeatThreshold 在线设备心跳超时阈值（yyyy-MM-dd HH:mm:ss）
-     * @param offlineThreshold   离线设备重探阈值（yyyy-MM-dd HH:mm:ss）
-     */
-    List<DeviceOnvif> selectOnvifDevicesForProbe(@Param("heartbeatThreshold") String heartbeatThreshold,
-                                                 @Param("offlineThreshold") String offlineThreshold);
-
-    /**
      * 更新设备探测信息（keepalive + online）
      */
     int updateDeviceOnvifProbe(DeviceOnvif deviceOnvif);

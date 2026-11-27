@@ -107,3 +107,122 @@ user-settings:
   stream-on-demand: true
   # 开启sip日志
   sip-log: false
+
+# 文件对外访问域名（仅用于拼接图片/录像的访问 URL；文件保存目录统一用 ruoyi.profile，经 /profile/** 访问）
+file:
+  domain: http://localhost:28081
+
+# 海康 ISUP 配置（设备接入：一个对外 IP + 一组端口，监听地址由 listen-ip 统一派生）
+# 说明：开源版未包含 ISUP 实现（无 config/listener/sdk 等），此配置块仅作占位，不生效。
+#
+# 【迁移铁律】从闭源版同步代码/配置时，本段与 ruoyi-isup 模块必须显式排除：
+#   1) enabled 恒为 false —— 海康原生库（.so/.dll）与 SDK 实现未随开源包分发，改成 true 也无实现可用
+#   2) ruoyi-isup 只保留骨架（domain / constants / service 接口 + 两个空实现），
+#      sdk / handler / manager / config / listener / task / util / cache / mapper 与 resources/lib 一律不得迁入
+#   3) 同步后若上述目录重新出现、或 enabled 被改成 true，视为迁移污染，必须回退
+# 如需对接海康设备，请使用闭源版或自行补齐 ruoyi-isup 的 sdk/handler/manager/config。
+haikang-isup:
+  # 是否启用 ISUP 服务（关闭后不加载原生库、不监听端口，设备无法注册）
+  # 【开源版固定 false，勿改】缺 SDK 实现，改成 true 不会生效，只会让运维误判为"功能已开但设备不上线"
+  enabled: false
+  # 平台对外 IP：设备能访问到的地址，公网/NAT 对接填公网 IP
+  # 填 0.0.0.0 / 127.0.0.1 时自动探测本机内网 IP；多网卡或设备跨网段时请显式填写，
+  # 否则设备拿到错误地址会卡在 DAS 重定向阶段（日志只有 3/4/5，没有 0 上线），表现为"设备未注册"
+  ip: 192.168.1.143
+  # 本地监听 IP，默认 0.0.0.0 监听所有网卡；多网卡需要限定时再放开
+  #listen-ip: 0.0.0.0
+  # 各服务端口（对外端口与本地监听端口一致）
+  ports:
+    cms: 6500       # 注册，设备网页端填的平台端口
+    sms: 6501       # 实时预览取流
+    sms-back: 6502  # 回放取流
+    voice: 6503     # 语音对讲，设备对讲音频回连端口
+    alarm: 6504     # 报警 TCP/UDP
+    pic: 6011       # 图片存储，ISUP5.0 建议固定 6011
+  # NAT 端口映射：本地监听端口与对外不一致时才配，key 同 ports
+  # listen-ports:
+  #   cms: 16500
+  # 报警服务器类型：0-UDP 1-UDP+TCP 2-MQTT
+  alarm-type: 1
+  # 设备心跳超时（秒）：每收到一次心跳刷新一次延时任务，到期未再收到心跳则探活、判离线
+  keepalive-timeout: 90
+  # 心跳落库间隔（秒）：在线设备心跳时间同步到 wvp_device 的频率
+  keepalive-flush-interval: 60
+  # 是否保存报警事件
+  alarm-storage: true
+  # 报警联动抓图：设备不推图时，收到报警后主动向设备抓一张图写入 image_url
+  # 设备已在网页端配置「报警联动抓图上传」时优先用设备推的图，确认稳定后可关掉本开关
+  alarm-capture: true
+  # 同一设备同一通道联动抓图的最小间隔（秒），防止报警风暴频繁抓图拖慢设备
+  alarm-capture-interval: 3
+  # SS 图片服务器回调：设备把报警抓图推到 pic 端口（6011），平台落盘后直接关联到报警。
+  # 这条路不需要设备 Web 账号，是 ISUP 最稳的出图方式
+  ss-picture-enabled: true
+  # 收到报警后等待设备推图的最长时间（毫秒）：设备先推图或先报警都能接住。
+  # 确认推图稳定后建议把 alarm-capture 关掉，并把这里改成 0，省掉无效等待
+  ss-picture-wait-ms: 5000
+  # 推图可信窗口（秒）：只有最近这段时间推过图的设备才值得等待，避免从未配置推图的设备每次报警都白等
+  ss-picture-trust-window: 600
+  # 推图与报警的关联时间窗（秒）：只给这段时间内尚未带图的报警补图
+  ss-picture-match-window: 60
+  # 推图暂未匹配到报警时的重试时长（秒）：报警走队列入库有延迟，留出重试时间
+  ss-picture-associate-timeout: 30
+  # SS 安全模式：0-开启 1-关闭（与直觉相反，SDK 默认 0）。设备一直不上传图片时先看 SS SDK 日志
+  ss-security-mode: 1
+  # 抓图 HTTP 直连兜底：ISUP 透传抓图会被设备判为 statusCode=4 Invalid Operation
+  # （透传只稳定支持配置类接口，抓图属媒体类），打开后用设备 IP + Web 账号直连设备 ISAPI 抓图
+  snapshot-http-fallback: true
+  # 设备 ISAPI（Web）端口，HTTP 直连抓图时使用，海康默认 80；改过设备 Web 端口时同步修改
+  isapi-http-port: 80
+  # 图片服务器类型：0-Tomcat 1-VRB 2-云存储 3-KMS 4-ISUP5.0
+  pic-type: 4
+  # ISUP5.0 登录密钥
+  isup-key: 12345
+
+# ONVIF 设备探测（在线状态判定，具体探测节奏见 OnvifDeviceProbeTask）
+onvif:
+  probe:
+    # 在线设备探测间隔（秒）：设备未配 heart_beat_interval 时使用
+    online-interval: 60
+    # 探测失败后的重试间隔（秒）：连续失败达 heart_beat_count（默认 2 次）才判离线
+    fail-retry-interval: 15
+    # 已判离线设备的重探间隔（秒）：设备恢复后自动回到在线
+    offline-retry-interval: 300
+
+# 统一报警模块（wvp_alarms）：汇聚各协议报警，国标报警已改写入本表，旧表 wvp_device_alarm 不再写入
+alarm:
+  # 总开关：关闭后各协议均不再写入 wvp_alarms
+  enabled: true
+  # 报警去重间隔（秒）：同一设备、同一通道、同一报警类型在该时间内重复上报时只入库第一条，
+  # 不同类型各自独立计时、互不压制；0 或负数表示关闭去重。多实例通过 Redis 共享判定
+  dedup-interval-seconds: 15
+  # 原始数据中间表 wvp_alarms_raw：存放 Stream 投递超限的死信与历史遗留数据，
+  # 由 AlarmRawConsumer 异步消费写回 wvp_alarms；报警正常链路只走 Redis Stream，不再有内存队列
+  raw:
+    enabled: true
+    # 每轮领取条数与消费间隔
+    claim-batch-size: 200
+    consume-interval-ms: 1000
+    # 消费线程数（多实例部署可各自消费，抢占由 status + lock_owner 保证不重复）
+    consume-threads: 1
+    # 单条最大重试次数，超过置失败态等待清理
+    max-retry: 3
+    # 处理中超时（分钟）自动解锁，防消费进程崩溃后数据卡死
+    lock-timeout-minutes: 5
+    # 待处理/失败态数据保留天数，0=不自动清理
+    retain-days: 7
+  # Redis Stream 报警队列：协议线程只做一次 XADD（微秒级），消费者批量写 wvp_alarms
+  # 投递失败时自动由协议线程同步直写，没有单独开关
+  queue:
+    stream-key: alarm:stream:ingest
+    # 消费者组，多实例部署必须保持一致（同一条报警只会投给一个实例）
+    group: alarm-ingest
+    # Stream 最大长度：超出后丢弃最旧消息，防止报警洪水撑爆 Redis
+    max-len: 200000
+    # 单批读取条数，同时决定一次多值 INSERT 的规模
+    batch-size: 500
+    # 轮询间隔，越小延迟越低、Redis 压力越大
+    poll-interval-ms: 200
+    # 消费线程数
+    consume-threads: 2
+

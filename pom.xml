@@ -26,6 +26,8 @@
         <pagehelper.boot.version>1.4.7</pagehelper.boot.version>
         <fastjson.version>2.0.53</fastjson.version>
         <oshi.version>6.6.5</oshi.version>
+        <!-- JNA 版本（OSHI 与海康 ISUP SDK 共用） -->
+        <jna.version>5.15.0</jna.version>
         <commons.io.version>2.13.0</commons.io.version>
         <poi.version>4.1.2</poi.version>
         <velocity.version>2.3</velocity.version>
@@ -152,6 +154,18 @@
                 <version>${oshi.version}</version>
             </dependency>
 
+            <!-- JNA（OSHI 与海康 ISUP SDK 共用，统一版本） -->
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna-platform</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+
             <!-- Swagger3依赖 -->
             <dependency>
                 <groupId>io.springfox</groupId>
@@ -261,6 +275,20 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <!-- isup模块（海康私有协议）-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-isup</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- 统一报警模块（GB28181 / ISUP 等协议报警汇聚）-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-alarms</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
             <!-- rtsp模块-->
 <!--            <dependency>-->
 <!--                <groupId>com.ruoyi</groupId>-->
@@ -301,6 +329,8 @@
         <module>ruoyi-common</module>
         <module>ruoyi-onvif</module>
         <module>ruoyi-media</module>
+        <module>ruoyi-alarms</module>
+        <module>ruoyi-isup</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -224,6 +224,11 @@ public class DeviceOnvif extends BaseEntity
     @Excel(name = "onvif 设备鉴权方式")
     private String onvifAuthType;
 
+    /** 通道数量（通用字段，ISUP/其它协议复用；ISUP 由 syncChannels 写入） */
+    @Excel(name = "通道数量")
+    @TableField("channel_num")
+    private Integer channelNum;
+
     /** 通道数量（非表字段，仅查询时使用） */
     @TableField(exist = false)
     private Integer channelCount;
@@ -634,6 +639,14 @@ public class DeviceOnvif extends BaseEntity
 
     public void setOnvifAuthType(String onvifAuthType) {
         this.onvifAuthType = onvifAuthType;
+    }
+
+    public Integer getChannelNum() {
+        return channelNum;
+    }
+
+    public void setChannelNum(Integer channelNum) {
+        this.channelNum = channelNum;
     }
 
     public Integer getChannelCount() {

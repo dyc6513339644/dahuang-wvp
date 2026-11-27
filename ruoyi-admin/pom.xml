@@ -99,6 +99,15 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-onvif</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-isup</artifactId>
+        </dependency>
+        <!-- 统一报警模块 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-alarms</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.ruoyi</groupId>

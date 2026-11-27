@@ -58,11 +58,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="pushTime"    column="push_time"    />
         <result property="userName"    column="user_name"    />
         <result property="onvifAuthType"    column="onvif_auth_type"    />
+        <result property="channelNum"    column="channel_num"    />
         <result property="channelCount"    column="channel_count"    />
     </resultMap>
 
     <sql id="selectDeviceOnvifVo">
-        select id, dept_id, device_id, name, manufacturer, db_model, firmware, transport, stream_mode, on_line, register_time, keepalive_time, ip, create_time, update_time, port, expires, subscribe_cycle_for_catalog, subscribe_cycle_for_mobile_position, mobile_position_submission_interval, subscribe_cycle_for_alarm, host_address, charset, ssrc_check, geo_coord_sys, media_server_id, custom_name, sdp_ip, local_ip, password, as_message_channel, heart_beat_interval, heart_beat_count, position_capability, broadcast_push_after_ack, lat, lng, address_map, protocol_type, src_url, stream_type, ffmpeg_cmd_key, rtsp_type, enable_audio, enable_mp4, enable_remove_none_reader, enable_disable_none_reader, stream_key, start_offline_push, pushing, push_time, user_name, onvif_auth_type from wvp_device
+        select id, dept_id, device_id, name, manufacturer, db_model, firmware, channel_num, transport, stream_mode, on_line, register_time, keepalive_time, ip, create_time, update_time, port, expires, subscribe_cycle_for_catalog, subscribe_cycle_for_mobile_position, mobile_position_submission_interval, subscribe_cycle_for_alarm, host_address, charset, ssrc_check, geo_coord_sys, media_server_id, custom_name, sdp_ip, local_ip, password, as_message_channel, heart_beat_interval, heart_beat_count, position_capability, broadcast_push_after_ack, lat, lng, address_map, protocol_type, src_url, stream_type, ffmpeg_cmd_key, rtsp_type, enable_audio, enable_mp4, enable_remove_none_reader, enable_disable_none_reader, stream_key, start_offline_push, pushing, push_time, user_name, onvif_auth_type from wvp_device
     </sql>
 
     <select id="selectDeviceOnvifList" parameterType="DeviceOnvif" resultMap="DeviceOnvifResult">
@@ -173,20 +174,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test='onLine != null'>
             AND de.on_line = #{onLine}
         </if>
-        ORDER BY de.create_time DESC
-    </select>
-
-    <!-- 探测任务：查询需要探测的ONVIF设备 -->
-    <!-- 时间阈值在Java层预计算后传入，兼容MySQL/SQLite/达梦三种数据库 -->
-    <select id="selectOnvifDevicesForProbe" resultMap="DeviceOnvifResult">
-        SELECT de.*,
-        (SELECT COUNT(0) FROM wvp_device_channel dc WHERE dc.data_device_id = de.id) AS channel_count
-        FROM wvp_device de WHERE de.protocol_type = 'ONVIF'
-        AND (
-          (de.keepalive_time IS NULL OR de.keepalive_time = '')
-          OR (CASE WHEN de.on_line THEN 1 ELSE 0 END = 1 AND de.keepalive_time &lt;= #{heartbeatThreshold})
-          OR (CASE WHEN de.on_line THEN 1 ELSE 0 END = 0 AND de.keepalive_time &lt;= #{offlineThreshold})
-        )
         ORDER BY de.create_time DESC
     </select>
 

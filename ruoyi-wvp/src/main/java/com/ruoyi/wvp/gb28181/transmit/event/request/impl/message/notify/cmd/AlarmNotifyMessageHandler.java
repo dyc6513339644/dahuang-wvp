@@ -6,7 +6,7 @@ import com.ruoyi.wvp.conf.SipConfig;
 import com.ruoyi.wvp.conf.UserSetting;
 import com.ruoyi.wvp.gb28181.bean.*;
 import com.ruoyi.wvp.gb28181.event.EventPublisher;
-import com.ruoyi.wvp.gb28181.service.IDeviceAlarmService;
+import com.ruoyi.wvp.gb28181.event.alarm.GbAlarmIngestBridge;
 import com.ruoyi.wvp.gb28181.service.IDeviceChannelService;
 import com.ruoyi.wvp.gb28181.transmit.event.request.SIPRequestProcessorParent;
 import com.ruoyi.wvp.gb28181.transmit.event.request.impl.message.IMessageHandler;
@@ -60,7 +60,7 @@ public class AlarmNotifyMessageHandler extends SIPRequestProcessorParent impleme
     private IRedisCatchStorage redisCatchStorage;
 
     @Autowired
-    private IDeviceAlarmService deviceAlarmService;
+    private GbAlarmIngestBridge gbAlarmIngestBridge;
 
     @Autowired
     private IDeviceChannelService deviceChannelService;
@@ -191,11 +191,10 @@ public class AlarmNotifyMessageHandler extends SIPRequestProcessorParent impleme
                 }
 
                 log.debug("存储报警信息、报警分类");
-                // 存储报警信息、报警分类
+                // 国标报警统一写入 wvp_alarms，旧表 wvp_device_alarm 不再写入；
+                // 入库不依赖设备在线状态，在线判断仅用于 SSE 实时推送
                 if (sipConfig.isAlarm()) {
-                    deviceAlarmService.add(deviceAlarm);
-                    // 报警报文本身不含通道名称，落库成功后异步查通道表回填 channel_name
-                    deviceAlarmService.asyncFillChannelName(deviceAlarm);
+                    gbAlarmIngestBridge.ingest(deviceAlarm);
                 }
 
                 if (redisCatchStorage.deviceIsOnline(sipMsgInfo.getDevice().getDeviceId())) {

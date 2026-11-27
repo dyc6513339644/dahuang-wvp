@@ -311,6 +311,10 @@ public class ZLMMediaServerStatusManager {
         // 此参数不应大于播放器超时时间
         // 优化此消息以更快的收到流注销事件
         param.put("protocol.continue_push_ms", "3000" );
+
+        if (!ObjectUtils.isEmpty(mediaServerItem.getStreamIp())) {
+            param.put("rtc.externIP", mediaServerItem.getStreamIp());
+        }
         // 最多等待未初始化的Track时间，单位毫秒，超时之后会忽略未初始化的Track, 设置此选项优化那些音频错误的不规范流，
         // 等zlm支持给每个rtpServer设置关闭音频的时候可以不设置此选项
         if (mediaServerItem.isRtpEnable() && !ObjectUtils.isEmpty(mediaServerItem.getRtpPortRange())) {

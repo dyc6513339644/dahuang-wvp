@@ -81,14 +81,6 @@ public interface IDeviceOnvifService
     void refreshChannels(Long id);
 
     /**
-     * 查询需要定时探测的ONVIF设备
-     *
-     * @param heartbeatThreshold 在线设备心跳超时阈值（yyyy-MM-dd HH:mm:ss）
-     * @param offlineThreshold   离线设备重探阈值（yyyy-MM-dd HH:mm:ss）
-     */
-    List<DeviceOnvif> selectOnvifDevicesForProbe(String heartbeatThreshold, String offlineThreshold);
-
-    /**
      * 探测设备在线状态（TCP连接检测）
      */
     boolean probeDeviceOnline(DeviceOnvif device);

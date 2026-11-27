@@ -3,6 +3,7 @@ package com.ruoyi.wvp.gb28181.transmit.event.request.impl;
 import com.ruoyi.wvp.conf.SipConfig;
 import com.ruoyi.wvp.gb28181.bean.*;
 import com.ruoyi.wvp.gb28181.event.EventPublisher;
+import com.ruoyi.wvp.gb28181.event.alarm.GbAlarmIngestBridge;
 import com.ruoyi.wvp.gb28181.service.IDeviceChannelService;
 import com.ruoyi.wvp.gb28181.transmit.SIPProcessorObserver;
 import com.ruoyi.wvp.gb28181.transmit.event.request.ISIPRequestProcessor;
@@ -42,6 +43,9 @@ public class NotifyRequestProcessor extends SIPRequestProcessorParent implements
 
 	@Autowired
 	private EventPublisher publisher;
+
+	@Autowired
+	private GbAlarmIngestBridge gbAlarmIngestBridge;
 
 	private final String method = "NOTIFY";
 
@@ -168,6 +172,9 @@ public class NotifyRequestProcessor extends SIPRequestProcessorParent implements
 					deviceChannelService.updateChannelGPS(device, deviceChannel, mobilePosition);
 				}
 			}
+
+			// 国标报警统一写入 wvp_alarms（旧表 wvp_device_alarm 不再写入），入库不依赖设备在线状态
+			gbAlarmIngestBridge.ingest(deviceAlarm);
 
 			// 回复200 OK
 			if (redisCatchStorage.deviceIsOnline(deviceId)) {

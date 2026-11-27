@@ -139,16 +139,15 @@
         </dependency>
 
 
+        <!-- 获取系统信息（JNA 版本由根 pom 统一管理） -->
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>6.6.5</version>
         </dependency>
 
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
-            <version>5.14.0</version>
         </dependency>
 
 

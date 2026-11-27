@@ -3,8 +3,13 @@ package com.ruoyi.web.controller.play;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.RtpServerParam;
 import com.ruoyi.common.enums.ErrorCode;
 import com.ruoyi.common.exception.ControllerException;
+import com.ruoyi.isup.domain.HaiKangIsupPresetInfo;
+import com.ruoyi.isup.service.IDeviceIsupService;
+import com.ruoyi.isup.service.IDeviceIsupStreamService;
+import com.ruoyi.isup.service.IsupStreamCallback;
 import com.ruoyi.onvif.domain.DeviceOnvifChannel;
 import com.ruoyi.onvif.service.IDeviceOnvifChannelService;
 import com.ruoyi.onvif.service.IDeviceOnvifService;
@@ -39,6 +44,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -46,19 +52,16 @@ import org.springframework.web.context.request.async.DeferredResult;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 统一播放控制器 —— 兼容国标(GB28181)、ONVIF、拉流代理(STREAM_PROXY)、推流(STREAM_PUSH)
- * <p>
- * 参数风格与国标播放接口保持一致（String deviceId / channelId、command、速度 0-255 等），
- * 内部根据 device.protocolType 自动分发到对应协议的服务层。
- * <p>
- * 注意：本控制器为新增接口，不改动任何原有国标播放/云台/预置位控制器。
- *
- * @author unified
+ * 统一播放控制器
  */
 @Slf4j
 @RestController
@@ -105,6 +108,18 @@ public class UnifiedPlayController extends BaseController {
     private IStreamProxyService streamProxyService;
 
     @Autowired
+    private IDeviceIsupStreamService deviceIsupStreamService;
+
+    @Autowired
+    private IDeviceIsupService deviceIsupService;
+
+    /**
+     * ISUP 云台"停止"需要沿用上一次的方向指令（SDK 的 byAction=1 结束指定指令），
+     * 这里记录 deviceId:channelId → 上一次下发的 byPTZCmd，stop 时取出并移除。
+     */
+    private static final Map<String, Integer> ISUP_LAST_PTZ_CMD = new ConcurrentHashMap<>();
+
+    @Autowired
     private IInviteStreamService inviteStreamService;
 
     @Autowired
@@ -138,12 +153,81 @@ public class UnifiedPlayController extends BaseController {
         }
     }
 
+    // ==================== ISUP 辅助 ====================
+
+    /**
+     * 解析 ISUP 通道（DeviceOnvifChannel），ISUP 云台/预置位需要通道主键与通道号
+     */
+    private DeviceOnvifChannel resolveIsupChannel(String channelId) {
+        DeviceOnvifChannel channel = deviceOnvifChannelService.selectDeviceOnvifChannelByDeviceId(channelId);
+        Assert.notNull(channel, "ISUP通道不存在: " + channelId);
+        return channel;
+    }
+
+    /** ISUP 设备库ID：优先取通道上的 dataDeviceId，兜底设备主键 */
+    private Long isupDeviceDbId(Device device, DeviceOnvifChannel channel) {
+        return channel.getDataDeviceId() != null ? channel.getDataDeviceId() : device.getId();
+    }
+
+    /** ISUP 通道号（字符串 → 数字） */
+    private Integer isupChannelNo(DeviceOnvifChannel channel) {
+        String channelNo = channel.getChannelNo();
+        try {
+            return Integer.parseInt(channelNo);
+        } catch (Exception e) {
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "ISUP通道号非法: " + channelNo);
+        }
+    }
+
+    /**
+     * 统一 command → ISUP byPTZCmd
+     * 与前端 ISUP 云台面板保持一致：0上 1下 2左 3右 4左上 5左下 6右上 7右下 9放大 10缩小
+     */
+    private int isupPtzCmd(String command) {
+        switch (command) {
+            case "up":        return 0;
+            case "down":      return 1;
+            case "left":      return 2;
+            case "right":     return 3;
+            case "upleft":    return 4;
+            case "downleft":  return 5;
+            case "upright":   return 6;
+            case "downright": return 7;
+            case "zoomin":    return 9;
+            case "zoomout":   return 10;
+            default:
+                throw new ControllerException(ErrorCode.ERROR100.getCode(), "无效指令: " + command);
+        }
+    }
+
+    /** 0-255 速度 → ISUP 档位 1-7 */
+    private int isupSpeed(int speed255) {
+        if (speed255 <= 0) {
+            return 1;
+        }
+        int speed = (int) Math.round(speed255 / 255.0 * 7);
+        return Math.min(7, Math.max(1, speed));
+    }
+
+    /** ISUP 预置位编号校验（1-255） */
+    private int isupPresetId(String presetId) {
+        try {
+            int id = Integer.parseInt(presetId);
+            if (id < 1 || id > 255) {
+                throw new NumberFormatException();
+            }
+            return id;
+        } catch (NumberFormatException e) {
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "海康ISUP 预置位编号必须为1-255之间的数字");
+        }
+    }
+
     // ==================== 播放 ====================
 
     /**
-     * 统一播放 —— 兼容 GB28181 / ONVIF / STREAM_PROXY / STREAM_PUSH
-     * @param deviceId  设备国标编号
-     * @param channelId 通道国标编号
+     * 统一播放
+     * @param deviceId  设备编号
+     * @param channelId 通道编号
      * @return 流信息 (DeferredResult)
      */
     @PreAuthorize("@ss.hasPermi('wvp:play:start')")
@@ -151,7 +235,6 @@ public class UnifiedPlayController extends BaseController {
     public DeferredResult<WVPResult<StreamContent>> play(HttpServletRequest request,
                                                           @PathVariable String deviceId,
                                                           @PathVariable String channelId) {
-        log.info("[统一播放] deviceId: {}, channelId: {}", deviceId, channelId);
         Assert.notNull(deviceId, "设备国标编号不可为NULL");
         Assert.notNull(channelId, "通道国标编号不可为NULL");
         Device device = deviceService.getDeviceByDeviceId(deviceId);
@@ -172,6 +255,11 @@ public class UnifiedPlayController extends BaseController {
         // ---- ONVIF ----
         if ("ONVIF".equals(protocolType)) {
             return playOnvif(request, device, channelId);
+        }
+
+        // ---- ISUP（海康 EHOME/ISUP 私有协议）----
+        if ("ISUP".equals(protocolType)) {
+            return playIsup(request, device, channelId);
         }
 
         // ---- GB28181 ----
@@ -208,6 +296,16 @@ public class UnifiedPlayController extends BaseController {
             if (mediaServer != null) {
                 mediaServerService.closeStreams(mediaServer, device.getDeviceId(), channelId);
             }
+            return success();
+        }
+
+        // ---- ISUP（海康私有协议）----
+        if ("ISUP".equals(protocolType)) {
+            DeviceOnvifChannel channel = deviceOnvifChannelService.selectDeviceOnvifChannelByDeviceId(channelId);
+            Assert.notNull(channel, "通道不存在");
+            Integer channelNo = Integer.parseInt(channel.getChannelNo());
+            Long deviceDbId = channel.getDataDeviceId() != null ? channel.getDataDeviceId() : device.getId();
+            deviceIsupStreamService.stopPlay(deviceDbId, channelNo);
             return success();
         }
 
@@ -350,6 +448,55 @@ public class UnifiedPlayController extends BaseController {
         return result;
     }
 
+    /**
+     * ISUP 预览播放：按 channelId 反查通道取 channelNo 与设备，开流结果通过回调包装成 StreamContent 返回。
+     */
+    private DeferredResult<WVPResult<StreamContent>> playIsup(HttpServletRequest request, Device device, String channelId) {
+        DeviceOnvifChannel channel = deviceOnvifChannelService.selectDeviceOnvifChannelByDeviceId(channelId);
+        Assert.notNull(channel, "ISUP通道不存在: " + channelId);
+        Integer channelNo = Integer.parseInt(channel.getChannelNo());
+        Long deviceDbId = channel.getDataDeviceId() != null ? channel.getDataDeviceId() : device.getId();
+
+        RequestMessage requestMessage = new RequestMessage();
+        String key = DeferredResultHolder.CALLBACK_CMD_PLAY + device.getDeviceId() + channelId;
+        requestMessage.setKey(key);
+        String uuid = UUID.randomUUID().toString();
+        requestMessage.setId(uuid);
+        DeferredResult<WVPResult<StreamContent>> result = new DeferredResult<>(userSetting.getPlayTimeout().longValue());
+
+        result.onTimeout(() -> {
+            log.info("[统一播放-ISUP] 点播超时 deviceId: {}, channelId: {}", device.getDeviceId(), channelId);
+            WVPResult<StreamInfo> wvpResult = new WVPResult<>();
+            wvpResult.setCode(ErrorCode.ERROR100.getCode());
+            wvpResult.setMsg("点播超时");
+            requestMessage.setData(wvpResult);
+            resultHolder.invokeAllResult(requestMessage);
+        });
+
+        resultHolder.put(key, uuid, result);
+
+        RtpServerParam rtpServerParam = new RtpServerParam();
+        rtpServerParam.setId(deviceDbId);
+        rtpServerParam.setChannel(channelNo);
+        rtpServerParam.setStreamMode("1"); // 主码流
+        try {
+            IsupStreamCallback callback = (code, msg, streamInfo) -> {
+                WVPResult<StreamContent> wvpResult = buildStreamWvpResult(request, code, msg, streamInfo, null);
+                requestMessage.setData(wvpResult);
+                resultHolder.invokeAllResult(requestMessage);
+            };
+            deviceIsupStreamService.startPlay(rtpServerParam, callback);
+        } catch (Exception e) {
+            log.error("[统一播放-ISUP] 开流异常 deviceId: {}, channelId: {}", device.getDeviceId(), channelId, e);
+            WVPResult<StreamContent> wvpResult = new WVPResult<>();
+            wvpResult.setCode(ErrorCode.ERROR100.getCode());
+            wvpResult.setMsg(e.getMessage());
+            requestMessage.setData(wvpResult);
+            resultHolder.invokeAllResult(requestMessage);
+        }
+        return result;
+    }
+
     /** 构建流信息异步回调 WVPResult（GB / 代理 / 推流 共用） */
     private WVPResult<StreamContent> buildStreamWvpResult(HttpServletRequest request, int code, String msg,
                                                            StreamInfo streamInfo, MediaServer mediaServerItem) {
@@ -358,8 +505,12 @@ public class UnifiedPlayController extends BaseController {
             wvpResult.setCode(ErrorCode.SUCCESS.getCode());
             wvpResult.setMsg(ErrorCode.SUCCESS.getMsg());
             if (streamInfo != null) {
-                streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, mediaServerItem);
-                if (userSetting.getUseSourceIpAsStreamIp() && (mediaServerItem == null || !mediaServerItem.isNginxProxyEnabled())) {
+                // ISUP / 拉流代理 / 推流 这几个分支没有单独的 MediaServer 变量，回调里传的是 null，
+                // 直接跳过同源化会返回 ZLM 裸地址（https://<IP>:<sslport>/rtp/...），
+                // 浏览器因证书 CN 与 IP 不匹配而拒播。这里兜底取 streamInfo 上已经带好的那台媒体服务器。
+                MediaServer proxyTarget = mediaServerItem != null ? mediaServerItem : streamInfo.getMediaServer();
+                streamInfo = streamUrlHelper.applyNginxProxy(streamInfo, proxyTarget);
+                if (userSetting.getUseSourceIpAsStreamIp() && (proxyTarget == null || !proxyTarget.isNginxProxyEnabled())) {
                     streamInfo = streamInfo.clone();
                     String host = resolveRequestHost(request);
                     streamInfo.channgeStreamIp(host);
@@ -447,6 +598,11 @@ public class UnifiedPlayController extends BaseController {
             return ptzOnvif(channelId, command, horizonSpeed, verticalSpeed, zoomSpeed);
         }
 
+        // ---- ISUP（海康 EHOME/ISUP 私有协议）----
+        if ("ISUP".equals(protocolType)) {
+            return ptzIsup(device, channelId, command, horizonSpeed, verticalSpeed, zoomSpeed);
+        }
+
         // ---- GB28181 / STREAM_PUSH ----
         return ptzGb(deviceId, channelId, command, horizonSpeed, verticalSpeed, zoomSpeed);
     }
@@ -489,6 +645,39 @@ public class UnifiedPlayController extends BaseController {
 
         Device device = deviceService.getDeviceByDeviceId(deviceId);
         ptzService.frontEndCommand(device, channelId, cmdCode, horizonSpeed, verticalSpeed, zoomSpeed);
+        return success();
+    }
+
+    /**
+     * ISUP 云台控制（CMS NET_ECMS_RemoteControl）
+     * <p>
+     * ISUP 用 byPTZCmd 指定指令、byAction 区分 0=开始/1=结束，速度档位 1-7。
+     * 前端 stop 不带方向，这里用 ISUP_LAST_PTZ_CMD 记录本次按下的指令来收尾。
+     */
+    private AjaxResult ptzIsup(Device device, String channelId, String command,
+                               int horizonSpeed, int verticalSpeed, int zoomSpeed) {
+        DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+        Long deviceDbId = isupDeviceDbId(device, channel);
+        Integer channelNo = isupChannelNo(channel);
+        String key = device.getDeviceId() + ":" + channelId;
+        int speed = isupSpeed(Math.max(horizonSpeed, verticalSpeed));
+
+        if ("stop".equals(command)) {
+            Integer lastCmd = ISUP_LAST_PTZ_CMD.remove(key);
+            if (lastCmd == null) {
+                return success();
+            }
+            log.info("[统一云台-ISUP] 停止 deviceDbId: {}, channelNo: {}, ptzCmd: {}, speed: {}",
+                    deviceDbId, channelNo, lastCmd, speed);
+            deviceIsupService.endPtz(deviceDbId, channelNo, lastCmd, speed);
+            return success();
+        }
+
+        int ptzCmd = isupPtzCmd(command);
+        log.info("[统一云台-ISUP] deviceDbId: {}, channelNo: {}, command: {}, ptzCmd: {}, speed: {}",
+                deviceDbId, channelNo, command, ptzCmd, speed);
+        deviceIsupService.startPtz(deviceDbId, channelNo, ptzCmd, speed);
+        ISUP_LAST_PTZ_CMD.put(key, ptzCmd);
         return success();
     }
 
@@ -557,6 +746,11 @@ public class UnifiedPlayController extends BaseController {
 
         if ("ONVIF".equals(protocolType)) {
             return focusOnvif(channelId, command, speed);
+        }
+
+        // ---- ISUP：SDK 无独立聚焦指令，静默返回成功（前端不弹错误提示） ----
+        if ("ISUP".equals(protocolType)) {
+            return success();
         }
 
         return focusGb(deviceId, channelId, command, speed);
@@ -635,6 +829,11 @@ public class UnifiedPlayController extends BaseController {
             return irisOnvif(channelId, command, speed);
         }
 
+        // ---- ISUP：SDK 无独立光圈指令，静默返回成功（前端不弹错误提示） ----
+        if ("ISUP".equals(protocolType)) {
+            return success();
+        }
+
         return irisGb(deviceId, channelId, command, speed);
     }
 
@@ -709,23 +908,59 @@ public class UnifiedPlayController extends BaseController {
         // ---- ONVIF ----
         if ("ONVIF".equals(protocolType)) {
             DeferredResult<AjaxResult> result = new DeferredResult<>(5 * 1000L);
-            Long onvifChannelId = resolveOnvifChannelId(channelId);
-            List<OnvifUtils.PresetInfo> presetList = deviceOnvifService.getPresetListByChannelId(onvifChannelId);
+            try {
+                Long onvifChannelId = resolveOnvifChannelId(channelId);
+                List<OnvifUtils.PresetInfo> presetList = deviceOnvifService.getPresetListByChannelId(onvifChannelId);
+                if (presetList == null) {
+                    presetList = new ArrayList<>();
+                }
+                result.setResult(AjaxResult.success(presetList));
+            } catch (Exception e) {
+                // 设备不支持/查询失败时静默返回空列表，避免前端弹窗
+                log.warn("[统一预置位查询-ONVIF] 查询失败，返回空列表, channelId: {}, msg: {}", channelId, e.getMessage());
+                result.setResult(AjaxResult.success(new ArrayList<>()));
+            }
+            return result;
+        }
+
+        // ---- ISUP ----
+        if ("ISUP".equals(protocolType)) {
+            DeferredResult<AjaxResult> result = new DeferredResult<>(5 * 1000L);
+            List<Map<String, Object>> presetList = new ArrayList<>();
+            try {
+                DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+                List<HaiKangIsupPresetInfo> presets = deviceIsupService.getPresetList(isupDeviceDbId(device, channel),
+                        isupChannelNo(channel));
+                // 统一成与 GB/ONVIF 一致的 presetId / presetName 结构
+                if (presets != null) {
+                    for (HaiKangIsupPresetInfo preset : presets) {
+                        Map<String, Object> item = new HashMap<>();
+                        item.put("presetId", preset.getIndex());
+                        item.put("presetName", preset.getName());
+                        presetList.add(item);
+                    }
+                }
+            } catch (Exception e) {
+                // 设备不支持/查询失败时静默返回空列表，避免前端弹窗
+                log.warn("[统一预置位查询-ISUP] 查询失败，返回空列表, channelId: {}, msg: {}", channelId, e.getMessage());
+            }
             result.setResult(AjaxResult.success(presetList));
             return result;
         }
 
         // ---- GB28181 ----
+        // 说明：部分国标设备不支持预置位查询或响应很慢，此处统一"静默降级"为返回空列表，
+        // 不再向前端返回错误码，避免播放界面反复弹「获取设备预置位超时」。
         DeferredResult<AjaxResult> result = new DeferredResult<>(3 * 1000L);
         String uuid = UUID.randomUUID().toString();
         String key = DeferredResultHolder.CALLBACK_CMD_PRESETQUERY + channelId;
 
         result.onTimeout(() -> {
-            log.warn("[统一预置位查询-GB] 获取设备预置位超时");
+            log.warn("[统一预置位查询-GB] 获取设备预置位超时，返回空列表, deviceId: {}, channelId: {}", deviceId, channelId);
             RequestMessage msg = new RequestMessage();
             msg.setId(uuid);
             msg.setKey(key);
-            msg.setData(AjaxResult.error("获取设备预置位超时"));
+            msg.setData(AjaxResult.success(new ArrayList<>()));
             resultHolder.invokeResult(msg);
         });
 
@@ -737,15 +972,22 @@ public class UnifiedPlayController extends BaseController {
 
         try {
             cmder.presetQuery(device, channelId, event -> {
+                log.warn("[统一预置位查询-GB] 获取设备预置位失败，返回空列表, statusCode: {}, msg: {}",
+                        event.statusCode, event.msg);
                 RequestMessage msg = new RequestMessage();
                 msg.setId(uuid);
                 msg.setKey(key);
-                msg.setData(AjaxResult.error("获取设备预置位失败，错误码: " + event.statusCode + ", " + event.msg));
+                msg.setData(AjaxResult.success(new ArrayList<>()));
                 resultHolder.invokeResult(msg);
             });
         } catch (Exception e) {
-            log.error("[命令发送失败] 获取设备预置位: {}", e.getMessage());
-            throw new ControllerException(ErrorCode.ERROR100.getCode(), "命令发送失败: " + e.getMessage());
+            log.warn("[统一预置位查询-GB] 命令发送失败，返回空列表, deviceId: {}, channelId: {}, msg: {}",
+                    deviceId, channelId, e.getMessage());
+            RequestMessage msg = new RequestMessage();
+            msg.setId(uuid);
+            msg.setKey(key);
+            msg.setData(AjaxResult.success(new ArrayList<>()));
+            resultHolder.invokeResult(msg);
         }
         return result;
     }
@@ -779,6 +1021,13 @@ public class UnifiedPlayController extends BaseController {
         if ("ONVIF".equals(protocolType)) {
             Long onvifChannelId = resolveOnvifChannelId(channelId);
             deviceOnvifService.addPresetByChannelId(onvifChannelId, presetId);
+            return success();
+        }
+
+        // ---- ISUP ----
+        if ("ISUP".equals(protocolType)) {
+            DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+            deviceIsupService.setPreset(isupDeviceDbId(device, channel), isupChannelNo(channel), isupPresetId(presetId));
             return success();
         }
 
@@ -829,6 +1078,13 @@ public class UnifiedPlayController extends BaseController {
             return success();
         }
 
+        // ---- ISUP ----
+        if ("ISUP".equals(protocolType)) {
+            DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+            deviceIsupService.gotoPreset(isupDeviceDbId(device, channel), isupChannelNo(channel), isupPresetId(presetId));
+            return success();
+        }
+
         // GB: presetId 必须为 1-255 的数字
         int gbPresetId;
         try {
@@ -876,6 +1132,13 @@ public class UnifiedPlayController extends BaseController {
             return success();
         }
 
+        // ---- ISUP ----
+        if ("ISUP".equals(protocolType)) {
+            DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+            deviceIsupService.clearPreset(isupDeviceDbId(device, channel), isupChannelNo(channel), isupPresetId(presetId));
+            return success();
+        }
+
         // GB: presetId 必须为 1-255 的数字
         int gbPresetId;
         try {
@@ -889,6 +1152,369 @@ public class UnifiedPlayController extends BaseController {
 
         ptzService.frontEndCommand(device, channelId, 0x83, 1, gbPresetId, 0);
         return success();
+    }
+
+    // ==================== 云台扩展：巡航 / 扫描 / 雨刷 / 辅助开关 ====================
+
+    /**
+     * 统一巡航控制（兼容 GB28181 / ISUP，ONVIF 无巡航组概念，静默成功）
+     * <p>
+     * operation:
+     * add_to_cruise     加入巡航点（presetId）
+     * remove_from_cruise 删除巡航点（presetId）
+     * set_cruise_speed  设置巡航速度（value）
+     * set_cruise_dwell  设置巡航停留时间（value，秒）
+     * start_cruise      开始巡航
+     * stop_cruise       停止巡航
+     *
+     * @param route    巡航组号，默认 1
+     * @param presetId 预置位编号（add/remove 使用）
+     * @param value    速度或停留时间（set_cruise_* 使用）
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:play:ptz')")
+    @GetMapping("/cruise/{deviceId}/{channelId}")
+    public AjaxResult cruise(@PathVariable String deviceId, @PathVariable String channelId,
+                             String operation, Integer route, Integer presetId, Integer value) {
+        log.info("[统一巡航] deviceId: {}, channelId: {}, operation: {}, route: {}, presetId: {}, value: {}",
+                deviceId, channelId, operation, route, presetId, value);
+
+        if (operation == null || operation.isEmpty()) {
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "巡航操作不可为空");
+        }
+
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
+        Assert.notNull(device, "设备不存在");
+        assertPtzSupported(device);
+
+        String protocolType = device.getProtocolType();
+        int routeNo = (route == null || route <= 0) ? 1 : route;
+
+        // ---- ONVIF：无巡航组概念，静默成功 ----
+        if ("ONVIF".equals(protocolType)) {
+            return success();
+        }
+
+        // ---- ISUP ----
+        if ("ISUP".equals(protocolType)) {
+            DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+            Long dbId = isupDeviceDbId(device, channel);
+            int chNo = isupChannelNo(channel);
+            switch (operation) {
+                case "add_to_cruise":
+                case "remove_from_cruise":
+                    deviceIsupService.cruiseControl(dbId, chNo, operation,
+                            requirePositive(presetId, "预置位编号"));
+                    break;
+                case "set_cruise_speed":
+                case "set_cruise_dwell":
+                    deviceIsupService.cruiseControl(dbId, chNo, operation,
+                            requirePositive(value, "参数值"));
+                    break;
+                case "start_cruise":
+                case "stop_cruise":
+                    deviceIsupService.cruiseControl(dbId, chNo, operation, routeNo);
+                    break;
+                default:
+                    throw new ControllerException(ErrorCode.ERROR100.getCode(), "不支持的巡航操作: " + operation);
+            }
+            return success();
+        }
+
+        // ---- GB28181 ----
+        switch (operation) {
+            case "add_to_cruise":
+                ptzService.frontEndCommand(device, channelId, 0x84, routeNo, requirePositive(presetId, "预置位编号"), 0);
+                break;
+            case "remove_from_cruise":
+                ptzService.frontEndCommand(device, channelId, 0x85, routeNo, requirePositive(presetId, "预置位编号"), 0);
+                break;
+            case "set_cruise_speed": {
+                int v = requirePositive(value, "巡航速度");
+                ptzService.frontEndCommand(device, channelId, 0x86, routeNo, v & 0xFF, v >> 8);
+                break;
+            }
+            case "set_cruise_dwell": {
+                int v = requirePositive(value, "停留时间");
+                ptzService.frontEndCommand(device, channelId, 0x87, routeNo, v & 0xFF, v >> 8);
+                break;
+            }
+            case "start_cruise":
+                ptzService.frontEndCommand(device, channelId, 0x88, routeNo, 0, 0);
+                break;
+            case "stop_cruise":
+                ptzService.frontEndCommand(device, channelId, 0x00, 0, 0, 0);
+                break;
+            default:
+                throw new ControllerException(ErrorCode.ERROR100.getCode(), "不支持的巡航操作: " + operation);
+        }
+        return success();
+    }
+
+    /**
+     * 统一自动扫描控制（兼容 GB28181 / ISUP）
+     * <p>
+     * operation:
+     * set_scan_left     设置左边界
+     * set_scan_right    设置右边界
+     * set_scan_speed    设置扫描速度（speed）
+     * start_auto_scan   开始自动扫描
+     * stop_auto_scan    停止自动扫描
+     * <p>
+     * ISUP 的边界与速度由设备本地配置，平台侧只支持开始/停止，其余操作静默成功。
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:play:ptz')")
+    @GetMapping("/scan/{deviceId}/{channelId}")
+    public AjaxResult scan(@PathVariable String deviceId, @PathVariable String channelId,
+                           String operation, Integer scanId, Integer speed) {
+        log.info("[统一扫描] deviceId: {}, channelId: {}, operation: {}, scanId: {}, speed: {}",
+                deviceId, channelId, operation, scanId, speed);
+
+        if (operation == null || operation.isEmpty()) {
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "扫描操作不可为空");
+        }
+
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
+        Assert.notNull(device, "设备不存在");
+        assertPtzSupported(device);
+
+        String protocolType = device.getProtocolType();
+        int scanNo = (scanId == null || scanId <= 0) ? 1 : scanId;
+
+        // ---- ONVIF：不支持自动扫描，静默成功 ----
+        if ("ONVIF".equals(protocolType)) {
+            return success();
+        }
+
+        // ---- ISUP ----
+        if ("ISUP".equals(protocolType)) {
+            DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+            Long dbId = isupDeviceDbId(device, channel);
+            int chNo = isupChannelNo(channel);
+            switch (operation) {
+                case "start_auto_scan":
+                case "stop_auto_scan":
+                    deviceIsupService.cruiseControl(dbId, chNo, operation, scanNo);
+                    break;
+                case "set_scan_left":
+                case "set_scan_right":
+                case "set_scan_speed":
+                    // ISUP 自动扫描的边界/速度在设备端配置，平台侧不下发
+                    log.info("[统一扫描-ISUP] 设备端配置项，忽略: {}", operation);
+                    break;
+                default:
+                    throw new ControllerException(ErrorCode.ERROR100.getCode(), "不支持的扫描操作: " + operation);
+            }
+            return success();
+        }
+
+        // ---- GB28181 ----
+        switch (operation) {
+            case "set_scan_left":
+                ptzService.frontEndCommand(device, channelId, 0x89, scanNo, 1, 0);
+                break;
+            case "set_scan_right":
+                ptzService.frontEndCommand(device, channelId, 0x89, scanNo, 2, 0);
+                break;
+            case "set_scan_speed": {
+                int v = requirePositive(speed, "扫描速度");
+                ptzService.frontEndCommand(device, channelId, 0x8A, scanNo, v & 0xFF, v >> 8);
+                break;
+            }
+            case "start_auto_scan":
+                ptzService.frontEndCommand(device, channelId, 0x89, scanNo, 0, 0);
+                break;
+            case "stop_auto_scan":
+                ptzService.frontEndCommand(device, channelId, 0x00, 0, 0, 0);
+                break;
+            default:
+                throw new ControllerException(ErrorCode.ERROR100.getCode(), "不支持的扫描操作: " + operation);
+        }
+        return success();
+    }
+
+    /**
+     * 统一雨刷控制（兼容 GB28181 / ISUP，ONVIF 静默成功）
+     *
+     * @param command on / off
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:play:ptz')")
+    @GetMapping("/wiper/{deviceId}/{channelId}")
+    public AjaxResult wiper(@PathVariable String deviceId, @PathVariable String channelId, String command) {
+        log.info("[统一雨刷] deviceId: {}, channelId: {}, command: {}", deviceId, channelId, command);
+
+        boolean start = "on".equalsIgnoreCase(command);
+        boolean stop = "off".equalsIgnoreCase(command);
+        if (!start && !stop) {
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "雨刷指令仅支持 on/off");
+        }
+
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
+        Assert.notNull(device, "设备不存在");
+        assertPtzSupported(device);
+
+        String protocolType = device.getProtocolType();
+
+        // ---- ONVIF：静默成功 ----
+        if ("ONVIF".equals(protocolType)) {
+            return success();
+        }
+
+        // ---- ISUP ----
+        if ("ISUP".equals(protocolType)) {
+            DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+            deviceIsupService.cameraAuxControl(isupDeviceDbId(device, channel), isupChannelNo(channel), "wiper", start);
+            return success();
+        }
+
+        // ---- GB28181 ----
+        ptzService.frontEndCommand(device, channelId, start ? 0x8c : 0x8d, 1, 0, 0);
+        return success();
+    }
+
+    /**
+     * 统一辅助开关控制（兼容 GB28181 / ISUP，ONVIF 静默成功）
+     *
+     * @param command   on / off
+     * @param switchId  GB 开关编号（默认 1）
+     * @param operation ISUP 辅助设备类型：light / fan / heater / aux1 / aux2 / wiper（默认 light）
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:play:ptz')")
+    @GetMapping("/auxiliary/{deviceId}/{channelId}")
+    public AjaxResult auxiliary(@PathVariable String deviceId, @PathVariable String channelId,
+                                String command, Integer switchId, String operation) {
+        log.info("[统一辅助开关] deviceId: {}, channelId: {}, command: {}, switchId: {}, operation: {}",
+                deviceId, channelId, command, switchId, operation);
+
+        boolean start = "on".equalsIgnoreCase(command);
+        boolean stop = "off".equalsIgnoreCase(command);
+        if (!start && !stop) {
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "辅助开关指令仅支持 on/off");
+        }
+
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
+        Assert.notNull(device, "设备不存在");
+        assertPtzSupported(device);
+
+        String protocolType = device.getProtocolType();
+
+        // ---- ONVIF：静默成功 ----
+        if ("ONVIF".equals(protocolType)) {
+            return success();
+        }
+
+        // ---- ISUP ----
+        if ("ISUP".equals(protocolType)) {
+            DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+            String auxType = (operation == null || operation.isEmpty()) ? "light" : operation;
+            deviceIsupService.cameraAuxControl(isupDeviceDbId(device, channel), isupChannelNo(channel), auxType, start);
+            return success();
+        }
+
+        // ---- GB28181 ----
+        int sw = (switchId == null || switchId <= 0) ? 1 : switchId;
+        ptzService.frontEndCommand(device, channelId, start ? 0x8c : 0x8d, sw, 0, 0);
+        return success();
+    }
+
+    /** 云台扩展参数必填校验（正整数） */
+    private int requirePositive(Integer value, String name) {
+        if (value == null || value <= 0) {
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), name + "必须为正整数");
+        }
+        return value;
+    }
+
+    // ==================== 语音对讲（StmServer 模式，目前仅海康ISUP） ====================
+
+    /**
+     * 开始语音对讲。
+     * <p>
+     * ISUP 走 {@code NET_ECMS_StartVoiceWithStmServer}：设备对讲音频回推到平台流服务的
+     * {@code haikang-isup.ports.voice} 端口，平台侧音频随后通过 {@link #voiceAudio} 下发。
+     * 现场声音由实时预览的音频轨提供，避免双路音频造成回声。
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:play:start')")
+    @GetMapping("/voice/start/{deviceId}/{channelId}")
+    public AjaxResult voiceStart(@PathVariable String deviceId, @PathVariable String channelId) {
+        log.info("[统一语音对讲-开始] deviceId: {}, channelId: {}", deviceId, channelId);
+
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
+        Assert.notNull(device, "设备不存在");
+
+        if (!"ISUP".equals(device.getProtocolType())) {
+            return AjaxResult.error("仅海康ISUP 设备支持该对讲接口，其他协议请使用原有对讲入口");
+        }
+
+        DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+        deviceIsupService.startVoiceTalk(isupDeviceDbId(device, channel), isupChannelNo(channel));
+        return AjaxResult.success("对讲已开始");
+    }
+
+    /**
+     * 上送平台侧语音数据。
+     * <p>
+     * 请求体 {@code {"data": "<base64 PCM16LE 8000Hz 单声道>"}}，服务端转 G.711A 后下发设备；
+     * 设备尚未回连对讲端口时返回 sent=false，数据丢弃，前端持续发送即可。
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:play:start')")
+    @PostMapping("/voice/audio/{deviceId}/{channelId}")
+    public AjaxResult voiceAudio(@PathVariable String deviceId, @PathVariable String channelId,
+                                 @RequestBody Map<String, String> body) {
+        String base64 = body == null ? null : body.get("data");
+        if (ObjectUtils.isEmpty(base64)) {
+            return AjaxResult.error("语音数据为空");
+        }
+        byte[] pcm;
+        try {
+            pcm = Base64.getDecoder().decode(base64);
+        } catch (IllegalArgumentException e) {
+            return AjaxResult.error("语音数据格式错误");
+        }
+        if (pcm.length > 64 * 1024) {
+            return AjaxResult.error("单次语音数据过大");
+        }
+
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
+        Assert.notNull(device, "设备不存在");
+        if (!"ISUP".equals(device.getProtocolType())) {
+            return AjaxResult.error("仅海康ISUP 设备支持该对讲接口");
+        }
+        DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+        boolean sent = deviceIsupService.sendVoiceTalkAudio(isupDeviceDbId(device, channel), isupChannelNo(channel), pcm);
+        return AjaxResult.success(sent);
+    }
+
+    /**
+     * 停止语音对讲（幂等）
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:play:start')")
+    @GetMapping("/voice/stop/{deviceId}/{channelId}")
+    public AjaxResult voiceStop(@PathVariable String deviceId, @PathVariable String channelId) {
+        log.info("[统一语音对讲-停止] deviceId: {}, channelId: {}", deviceId, channelId);
+
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
+        Assert.notNull(device, "设备不存在");
+        if (!"ISUP".equals(device.getProtocolType())) {
+            return AjaxResult.success("当前协议无需释放对讲资源");
+        }
+        DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+        deviceIsupService.stopVoiceTalk(isupDeviceDbId(device, channel), isupChannelNo(channel));
+        return AjaxResult.success("对讲已停止");
+    }
+
+    /**
+     * 对讲链路状态：前端用来区分“等待设备回连”和“已连接”，也方便排查音频是否真的下发
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:play:start')")
+    @GetMapping("/voice/status/{deviceId}/{channelId}")
+    public AjaxResult voiceStatus(@PathVariable String deviceId, @PathVariable String channelId) {
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
+        if (device == null || !"ISUP".equals(device.getProtocolType())) {
+            return AjaxResult.success("当前协议无对讲链路状态");
+        }
+        DeviceOnvifChannel channel = resolveIsupChannel(channelId);
+        return AjaxResult.success(deviceIsupService.getVoiceTalkStatus(isupDeviceDbId(device, channel),
+                isupChannelNo(channel)));
     }
 
     // ==================== 统一通道删除 ====================

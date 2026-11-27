@@ -41,6 +41,12 @@
             <artifactId>ruoyi-onvif</artifactId>
         </dependency>
 
+        <!-- 统一报警模块（国标报警旁路双写 wvp_alarms） -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-alarms</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -200,11 +206,10 @@
             <version>1.24.0</version>
         </dependency>
 
-        <!-- 获取系统信息 -->
+        <!-- 获取系统信息（版本由根 pom 统一管理） -->
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>6.2.2</version>
         </dependency>
 
         <dependency>

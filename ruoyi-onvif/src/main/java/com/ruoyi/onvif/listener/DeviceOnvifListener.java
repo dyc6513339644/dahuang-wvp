@@ -5,6 +5,7 @@ import com.ruoyi.onvif.domain.DeviceOnvifChannel;
 import com.ruoyi.onvif.event.DeviceOnvifEvent;
 import com.ruoyi.onvif.service.IDeviceOnvifChannelService;
 import com.ruoyi.onvif.service.IDeviceOnvifService;
+import com.ruoyi.onvif.task.OnvifProbeStateCache;
 import com.ruoyi.onvif.utils.OnvifUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -28,6 +29,9 @@ public class DeviceOnvifListener implements ApplicationListener<DeviceOnvifEvent
 
     @Autowired
     private IDeviceOnvifChannelService deviceOnvifChannelService;
+
+    @Autowired
+    private OnvifProbeStateCache probeStateCache;
 
     /** ONVIF 数据类型标识 */
     private static final long DATA_TYPE_ONVIF = 4L;
@@ -91,6 +95,9 @@ public class DeviceOnvifListener implements ApplicationListener<DeviceOnvifEvent
                 }
             }
 
+            // 交给探测任务按心跳节奏接管，先立即入队做一次在线确认
+            probeStateCache.schedule(deviceOnvif.getDeviceId(), System.currentTimeMillis());
+
         } catch (Exception e) {
             log.error(e.getMessage());
             if (event.getType() != DeviceOnvifEvent.EventType.REFRESH_CHANNELS) {
@@ -101,6 +108,8 @@ public class DeviceOnvifListener implements ApplicationListener<DeviceOnvifEvent
                     // ignore
                 }
             }
+            // 探测任务稍后重试，设备恢复后自动回到在线
+            probeStateCache.schedule(deviceOnvif.getDeviceId(), System.currentTimeMillis() + 30_000L);
         }
     }
 

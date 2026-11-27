@@ -1,5 +1,4 @@
 package com.ruoyi.web.controller.device;
-
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -11,9 +10,7 @@ import com.ruoyi.onvif.service.IDeviceOnvifChannelService;
 import com.ruoyi.onvif.service.IDeviceOnvifService;
 import com.ruoyi.onvif.utils.OnvifUtils;
 import com.ruoyi.wvp.conf.DynamicTask;
-import com.ruoyi.wvp.gb28181.bean.CommonGBChannel;
 import com.ruoyi.wvp.gb28181.bean.Device;
-import com.ruoyi.wvp.gb28181.service.IGbChannelService;
 import com.ruoyi.wvp.gb28181.service.IDeviceService;
 import com.ruoyi.wvp.gb28181.service.IInviteStreamService;
 import com.ruoyi.wvp.gb28181.task.ISubscribeTask;
@@ -30,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +53,6 @@ public class UnifiedDeviceController extends BaseController {
     @Autowired
     private IRedisCatchStorage redisCatchStorage;
 
-
-
     @Autowired
     private IDeviceService deviceService;
 
@@ -78,29 +72,14 @@ public class UnifiedDeviceController extends BaseController {
     private IUserChannelService userChannelService;
 
 
-    // ==================== 用户通道过滤辅助方法 ====================
+
+
 
     /**
-     * 判断当前用户是否需要按分配通道过滤
-     * @return true=需要过滤，false=不过滤（无分配通道则返回全部）
+     * 查询所有设备（含分配通道过滤：无分配通道则返回全部，有则只返回分配的设备）
+     * @param deviceReqVo
+     * @return
      */
-    private boolean shouldFilterByUserChannel() {
-        Long userId = getUserId();
-        boolean needFilter = userChannelService.hasUserChannels(userId);
-        log.debug("[UnifiedDevice] userId={}, needFilter={}", userId, needFilter);
-        return needFilter;
-    }
-
-    /**
-     * 获取当前用户分配的设备ID列表
-     */
-    private List<String> getUserAssignedDeviceIds() {
-        return userChannelService.getDistinctDeviceIdsByUserId(getUserId());
-    }
-
-    // ==================== 设备查询 ====================
-
-    //查询所有设备（含分配通道过滤：无分配通道则返回全部，有则只返回分配的设备）
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listAllDevice")
     public AjaxResult listAllDevice(DeviceReqVo deviceReqVo) {
@@ -114,7 +93,12 @@ public class UnifiedDeviceController extends BaseController {
         return success(deviceOnvifService.selectAllDeviceList(deviceReqVo));
     }
 
-    //查下设备带分页（含分配通道过滤）
+
+    /**
+     * 查下设备带分页
+     * @param deviceReqVo
+     * @return
+     */
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listDevicePage")
     public TableDataInfo listDevicePage(DeviceReqVo deviceReqVo){
@@ -134,9 +118,12 @@ public class UnifiedDeviceController extends BaseController {
         return getDataTable(list);
     }
 
-    // ==================== 通道查询 ====================
 
-    //根据设备查下通道（含分配通道过滤）
+    /**
+     * 查下通道不带分页
+     * @param deviceChannelReqVo
+     * @return
+     */
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listDeviceChannel")
     public AjaxResult listDeviceChannel(DeviceChannelReqVo deviceChannelReqVo){
@@ -151,7 +138,11 @@ public class UnifiedDeviceController extends BaseController {
     }
 
 
-    //通道带分页（含分配通道过滤）
+    /**
+     * 查询通道不带分页
+     * @param deviceChannelReqVo
+     * @return
+     */
     @PreAuthorize("@ss.hasPermi('wvp:device:list')")
     @GetMapping("/listDeviceChannelPage")
     public TableDataInfo listDeviceChannelPage(DeviceChannelReqVo deviceChannelReqVo){
@@ -174,7 +165,7 @@ public class UnifiedDeviceController extends BaseController {
 
 
     /**
-     * 统一查询设备详情 — 支持所有协议类型
+     *设备详情
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:query')")
     @GetMapping("/{deviceId}")
@@ -187,7 +178,7 @@ public class UnifiedDeviceController extends BaseController {
     }
 
     /**
-     * 统一设备添加 — 兼容 ONVIF / STREAM_PUSH / STREAM_PROXY
+     * 设备添加
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:add')")
     @PostMapping("/add")
@@ -196,7 +187,6 @@ public class UnifiedDeviceController extends BaseController {
         if (protocolType == null || protocolType.isEmpty()) {
             return error("协议类型不能为空");
         }
-
         switch (protocolType.toUpperCase()) {
             case "ONVIF": {
                 DeviceOnvif deviceOnvif = new DeviceOnvif();
@@ -246,8 +236,7 @@ public class UnifiedDeviceController extends BaseController {
     }
 
     /**
-     * 统一设备更新 — 支持所有协议类型
-     * 当修改国标设备的订阅配置时，自动触发 SIP 订阅的开启/关闭
+     * 设备编辑
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:edit')")
     @PostMapping("/update")
@@ -288,51 +277,10 @@ public class UnifiedDeviceController extends BaseController {
         return success();
     }
 
-    /**
-     * 对比更新前后的订阅配置，变化时触发实际的 SIP 订阅开关
-     */
-    private void syncSubscriptionChanges(DeviceOnvif newDevice, Device oldGbDevice, Long deviceId) {
-        Boolean newCatalogCycle = newDevice.getSubscribeCycleForCatalog();
-        Boolean newAlarmCycle = newDevice.getSubscribeCycleForAlarm();
-        Boolean newMobilePosCycle = newDevice.getSubscribeCycleForMobilePosition();
-        Integer newMobilePosInterval = newDevice.getMobilePositionSubmissionInterval();
-
-        // 目录订阅：Boolean(true=开启, false=关闭)
-        if (newCatalogCycle != null) {
-            int cycle = newCatalogCycle ? 1 : 0;
-            if (cycle != oldGbDevice.getSubscribeCycleForCatalog()) {
-                log.info("[统一更新] 目录订阅变更: deviceId={}, {} -> {}", deviceId,
-                        oldGbDevice.getSubscribeCycleForCatalog(), cycle);
-                deviceService.subscribeCatalog(deviceId.intValue(), cycle);
-            }
-        }
-
-        // 移动位置订阅
-        if (newMobilePosCycle != null) {
-            int cycle = newMobilePosCycle ? 1 : 0;
-            if (cycle != oldGbDevice.getSubscribeCycleForMobilePosition()) {
-                int interval = newMobilePosInterval != null ? newMobilePosInterval : oldGbDevice.getMobilePositionSubmissionInterval();
-                log.info("[统一更新] 移动位置订阅变更: deviceId={}, {} -> {}", deviceId,
-                        oldGbDevice.getSubscribeCycleForMobilePosition(), cycle);
-                deviceService.subscribeMobilePosition(deviceId.intValue(), cycle, interval);
-            }
-        }
-
-        // 报警订阅
-        if (newAlarmCycle != null) {
-            int cycle = newAlarmCycle ? 1 : 0;
-            if (cycle != oldGbDevice.getSubscribeCycleForAlarm()) {
-                log.info("[统一更新] 报警订阅变更: deviceId={}, {} -> {}", deviceId,
-                        oldGbDevice.getSubscribeCycleForAlarm(), cycle);
-                deviceService.subscribeAlarm(deviceId.intValue(), cycle);
-            }
-        }
-    }
 
 
     /**
-     * 统一通道刷新 — 兼容国标和ONVIF设备，其他协议直接返回成功不处理
-     * @param deviceId     设备标识（GB为20位国标编码，ONVIF为wvp_device.device_id）
+     * 通道刷新
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:sync')")
     @PostMapping("/refreshChannels/{deviceId}")
@@ -380,8 +328,8 @@ public class UnifiedDeviceController extends BaseController {
 
 
     /**
-     * 统一设备删除 — 支持 GB28181 / ONVIF / STREAM_PUSH / STREAM_PROXY
-     * @param deviceId 设备标识（GB为国标编码，ONVIF为设备ID，推流/拉流为app）
+     * 设备删除
+     * @param deviceId 设备标识
      */
     @PreAuthorize("@ss.hasPermi('wvp:device:remove')")
     @DeleteMapping("/delete/{deviceId}")
@@ -447,6 +395,62 @@ public class UnifiedDeviceController extends BaseController {
     @GetMapping("/wsDiscovery")
     List<OnvifUtils.DiscoveryInfo> wsDiscovery(){
       return deviceOnvifService.wsDiscovery();
+    }
+
+
+
+
+    /**
+     * 判断当前用户是否需要按分配通道过滤
+     * @return true=需要过滤，false=不过滤（无分配通道则返回全部）
+     */
+    private boolean shouldFilterByUserChannel() {
+        Long userId = getUserId();
+        boolean needFilter = userChannelService.hasUserChannels(userId);
+        return needFilter;
+    }
+
+    /**
+     * 获取当前用户分配的设备ID列表
+     */
+    private List<String> getUserAssignedDeviceIds() {
+        return userChannelService.getDistinctDeviceIdsByUserId(getUserId());
+    }
+
+
+    /**
+     * 对比更新前后的订阅配置，变化时触发实际的 SIP 订阅开关
+     */
+    private void syncSubscriptionChanges(DeviceOnvif newDevice, Device oldGbDevice, Long deviceId) {
+        Boolean newCatalogCycle = newDevice.getSubscribeCycleForCatalog();
+        Boolean newAlarmCycle = newDevice.getSubscribeCycleForAlarm();
+        Boolean newMobilePosCycle = newDevice.getSubscribeCycleForMobilePosition();
+        Integer newMobilePosInterval = newDevice.getMobilePositionSubmissionInterval();
+
+        // 目录订阅：Boolean(true=开启, false=关闭)
+        if (newCatalogCycle != null) {
+            int cycle = newCatalogCycle ? 1 : 0;
+            if (cycle != oldGbDevice.getSubscribeCycleForCatalog()) {
+                deviceService.subscribeCatalog(deviceId.intValue(), cycle);
+            }
+        }
+
+        // 移动位置订阅
+        if (newMobilePosCycle != null) {
+            int cycle = newMobilePosCycle ? 1 : 0;
+            if (cycle != oldGbDevice.getSubscribeCycleForMobilePosition()) {
+                int interval = newMobilePosInterval != null ? newMobilePosInterval : oldGbDevice.getMobilePositionSubmissionInterval();
+                deviceService.subscribeMobilePosition(deviceId.intValue(), cycle, interval);
+            }
+        }
+
+        // 报警订阅
+        if (newAlarmCycle != null) {
+            int cycle = newAlarmCycle ? 1 : 0;
+            if (cycle != oldGbDevice.getSubscribeCycleForAlarm()) {
+                deviceService.subscribeAlarm(deviceId.intValue(), cycle);
+            }
+        }
     }
 
 

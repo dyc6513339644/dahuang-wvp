@@ -175,11 +175,6 @@ public class DeviceOnvifServiceImpl implements IDeviceOnvifService, ApplicationE
     }
 
     @Override
-    public List<DeviceOnvif> selectOnvifDevicesForProbe(String heartbeatThreshold, String offlineThreshold) {
-        return deviceOnvifMapper.selectOnvifDevicesForProbe(heartbeatThreshold, offlineThreshold);
-    }
-
-    @Override
     public boolean probeDeviceOnline(DeviceOnvif device) {
         String host = device.getIp();
         int port = device.getPort() != null ? device.getPort().intValue() : 80;

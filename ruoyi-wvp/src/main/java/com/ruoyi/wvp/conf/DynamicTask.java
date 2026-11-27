@@ -90,6 +90,13 @@ public class DynamicTask {
         if (future != null) {
             if (future.isCancelled()) {
                 log.debug("任务【{}】已存在但是关闭状态！！！", key);
+            } else if (future.isDone()) {
+                // 上一个延时任务已执行完毕：一次性任务执行后不会自动从 map 移除，
+                // 不清理的话同名 key 会一直停在“已启动”状态，后续收到的刷新请求全部被丢弃
+                // （国标设备心跳刷新离线任务、ISUP 心跳刷新过期任务都依赖同名 key 重建）
+                futureMap.remove(key);
+                runnableMap.remove(key);
+                future = null;
             } else {
                 log.debug("任务【{}】已存在且已启动！！！", key);
                 return;

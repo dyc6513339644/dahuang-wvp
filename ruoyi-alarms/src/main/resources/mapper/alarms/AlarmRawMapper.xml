@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.alarms.mapper.AlarmRawMapper">
+
+    <!-- 只保留 MP 表达不了的三条语句，其余走 BaseMapper + Wrapper，且不使用任何数据库方言特性 -->
+
+    <!-- 批量插入（多值 VALUES） -->
+    <insert id="insertBatch">
+        INSERT INTO wvp_alarms_raw
+        (protocol_type, device_id, channel_id, msg_json,
+         status, retry_count, receive_time, create_time)
+        VALUES
+        <foreach collection="list" item="it" separator=",">
+            (#{it.protocolType}, #{it.deviceId}, #{it.channelId}, #{it.msgJson},
+            #{it.status}, #{it.retryCount}, #{it.receiveTime}, #{it.createTime})
+        </foreach>
+    </insert>
+
+    <!-- 处理失败：重试次数在数据库端原子 +1，未达上限退回待处理，达到上限置失败态 -->
+    <update id="releaseFailed">
+        UPDATE wvp_alarms_raw
+        SET retry_count = retry_count + 1,
+            status = CASE WHEN retry_count + 1 &gt;= #{maxRetry} THEN 2 ELSE 0 END,
+            lock_owner = NULL,
+            lock_time = NULL,
+            error_msg = #{error}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 解锁超时未完成的行（消费进程崩溃 / 重启场景） -->
+    <update id="unlockExpired">
+        UPDATE wvp_alarms_raw
+        SET status = 0, lock_owner = NULL, lock_time = NULL
+        WHERE status = 1 AND lock_time &lt; #{before}
+    </update>
+
+</mapper>

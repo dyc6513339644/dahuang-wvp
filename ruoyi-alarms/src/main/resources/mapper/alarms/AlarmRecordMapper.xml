@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.alarms.mapper.AlarmRecordMapper">
+
+    <!-- 批量插入：一批报警合并成一次多值 VALUES，create_time 由 UniversalDateTypeHandler 转字符串 -->
+    <insert id="insertBatch">
+        INSERT INTO wvp_alarms
+        (protocol_type, device_id, device_name, channel_id, channel_name,
+         alarm_code, alarm_type, alarm_type_name, alarm_level, alarm_method, alarm_time,
+         alarm_desc, longitude, latitude, image_url, handle_status,
+         handle_by, handle_time, handle_remark, create_time)
+        VALUES
+        <foreach collection="list" item="it" separator=",">
+            (#{it.protocolType}, #{it.deviceId}, #{it.deviceName},
+            #{it.channelId}, #{it.channelName}, #{it.alarmCode}, #{it.alarmType},
+            #{it.alarmTypeName}, #{it.alarmLevel}, #{it.alarmMethod}, #{it.alarmTime},
+            #{it.alarmDesc}, #{it.longitude}, #{it.latitude}, #{it.imageUrl},
+            #{it.handleStatus}, #{it.handleBy}, #{it.handleTime},
+            #{it.handleRemark}, #{it.createTime})
+        </foreach>
+    </insert>
+
+</mapper>
